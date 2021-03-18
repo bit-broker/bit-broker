@@ -1,0 +1,26 @@
+{
+  "name": "register",
+  "version": "1.0.0",
+  "description": "bit-broker register server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "NODE_PATH=./node_modules node index.js"
+  },
+  "author": "Cisco",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-winston": "^4.1.0",
+    "http-errors": "^1.7.2",
+    "http-status-codes": "^2.1.4",
+    "knex": "^0.95.2",
+    "pg": "^8.5.1",
+    "url": "^0.11.0",
+    "winston": "^3.3.3",
+    "winston-daily-rotate-file": "^4.5.1"
+  }
+}
