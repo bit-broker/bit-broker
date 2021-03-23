@@ -1,0 +1,7 @@
+{
+    "error.entity.name-short": "Entity type name '%s' is too short.",
+    "error.entity.name-long": "Entity type name '%s' is too long.",
+    "error.entity.name-invalid-format": "Entity type name '%s' is an invalid format.",
+    "error.entity.desc-short": "Entity type description '%s' is too short.",
+    "error.entity.desc-long": "Entity type description '%s' is too long."
+}

@@ -25,7 +25,7 @@
 
 // --- load paths
 
-const PATH_UTILS = process.env.PATH_UTILS || '../utils/';
+const PATH_LIB = process.env.PATH_LIB || '../lib';
 const PATH_CONFIG = process.env.PATH_CONFIG || '..';
 
 // --- load configuration
@@ -34,12 +34,11 @@ require('dotenv').config({ path: `${ PATH_CONFIG }/.env` });
 
 // --- dependancies
 
-const Server = require(`${ PATH_UTILS }/server.js`);
-const Model = require(`${ PATH_UTILS }/model.js`);
-const View = require(`${ PATH_UTILS }/view.js`);
-const logger = require(`${ PATH_UTILS }/logger.js`);
-const http = require('http-status-codes');
-const failure = require('http-errors');
+const Server = require(`${ PATH_LIB }/server.js`);
+const Model = require(`${ PATH_LIB }/model.js`);
+const View = require(`${ PATH_LIB }/view.js`);
+const HTTP = require('http-status-codes');
+const logger = require(`${ PATH_LIB }/logger.js`);
 
 // --- running contexts
 
@@ -48,14 +47,14 @@ var model = new Model();
 var view = new View();
 var log = logger.Logger;
 
-// --- lists all entity type names in the register
+// --- lists all entity types in the register
 
 rest.router.get('/register', (req, res) => {
 
-    model.entities()
+    model.register.list()
 
-    .then((items) => {
-        res.json(view.entities(items));
+    .then(items => {
+        res.json(view.entities(items, rest.host(req)));
     })
 
     .catch((error) => {
@@ -63,20 +62,134 @@ rest.router.get('/register', (req, res) => {
     });
 });
 
-// --- a test error endpoint - TODO obs remove after the initial test :)
+// --- shows details of an entity type
 
-rest.router.get('/error/:msg', (req, res) => {
+rest.router.get('/register/:eid', (req, res) => {
 
-    throw failure(http.NOT_IMPLEMENTED, `Failed with "${ req.params.msg }"`);
+    let name = req.params.eid;
+    model.register.find(name)
 
+    .then(item => {
+        if (item) {
+            res.json(view.entity(item, rest.host(req)));
+        } else {
+            res.status(HTTP.NOT_FOUND).send();
+        }
+    })
+
+    .catch((error) => {
+        rest.error(res, error);
+    });
 });
 
-// --- a test error endpoint - TODO obs remove after the initial test :)
+// --- adds a new entity type to the register
 
-rest.router.get('/crash/:msg', (req, res) => {
+rest.router.post('/register/:eid', (req, res) => {
+    log.info('register', 'entity', 'insert', req.params.eid);
 
-    throw `Crashed with "${ req.params.msg }"`;
+    let name = req.params.eid;
+    let description = req.body.description || '';
+    let errors = [];
 
+    errors = errors.concat(model.validate.name(name));
+    errors = errors.concat(model.validate.description(description));
+
+    if (errors.length === 0) {
+        model.register.find(name)
+
+        .then(item => {
+            if (item) {
+                log.info('register', 'entity', 'insert', 'duplicate', name);
+                res.status(HTTP.CONFLICT).send();
+            } else {
+                model.register.insert(name, description)
+
+                .then(() => {
+                    log.info('register', 'entity', 'insert', 'complete', name);
+                    res.set({ 'Location': rest.url(req) }).status(HTTP.CREATED).send();
+                })
+
+                .catch((error) => {
+                    rest.error(res, error);
+                });
+            }
+        })
+
+        .catch((error) => {
+            rest.error(res, error);
+        });
+    } else {
+        res.status(HTTP.BAD_REQUEST).send(errors.join("\n"));
+    }
+});
+
+// --- modifies an existing entity type
+
+rest.router.put('/register/:eid', (req, res) => {
+    log.info('register', 'entity', 'update', req.params.eid);
+
+    let name = req.params.eid;
+    let description = req.body.description || '';
+    let errors = [];
+
+    errors = errors.concat(model.validate.description(description));
+
+    if (errors.length === 0) {
+        model.register.find(name)
+
+        .then(item => {
+            if (item) {
+                model.register.update(name, description)
+
+                .then(() => {
+                    log.info('register', 'entity', 'update', 'complete', name);
+                    res.status(HTTP.NO_CONTENT).send();
+                })
+
+                .catch((error) => {
+                    rest.error(res, error);
+                });
+            } else {
+                res.status(HTTP.NOT_FOUND).send();
+            }
+        })
+
+        .catch((error) => {
+            rest.error(res, error);
+        });
+    } else {
+        res.status(HTTP.BAD_REQUEST).send(errors.join("\n"));
+    }
+});
+
+// --- deletes an entity type from the register
+
+rest.router.delete('/register/:eid', (req, res) => {
+    log.info('register', 'entity', 'delete', req.params.eid);
+
+    let name = req.params.eid;
+    model.register.find(name)
+
+    .then((item) => {
+        if (item) {
+            model.register.delete(name)
+
+            .then(() => {
+                log.info('register', 'entity', 'delete', 'complete', name);
+                res.status(HTTP.NO_CONTENT).send();
+            })
+
+            .catch((error) => {
+                rest.error(res, error);
+            });
+        } else {
+            res.status(HTTP.NOT_FOUND).send();
+        }
+    })
+
+    .catch((error) => {
+        rest.error(res, error);
+    });
 });
 
 // --- main entry point
