@@ -8,9 +8,11 @@ This readme will be fleshed out over time. For now we can use it to gather ad ho
 
 You can set the following paths as environment variables - use absolute or relative paths. If you use the default project directory layout, then just ignore this and set nothing.
 
+```
 PATH_LOCALES - defaults to '../locales'
 PATH_LIB - defaults to '../lib';
 PATH_CONFIG - defaults to '..';
+```
 
 ### Code Formatting
 
