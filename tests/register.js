@@ -1,0 +1,206 @@
+/*
+
+  Copyright (c) 2021 Cisco and/or its affiliates.
+
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use this file except in compliance with the License. You may obtain a copy of
+  the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  License for the specific language governing permissions and limitations
+  under the License.
+
+  ----------------------------------------------------------------------------
+
+  The register server test harness - use command 'mocha register'
+
+  WARNING: Running this script will reset the entire database!
+
+*/
+
+'use strict'; // code assumes ECMAScript 6
+
+// -- dependancies
+
+const HTTP = require('http-status-codes');
+const chakram = require('chakram');
+const shared = require('./lib/shared.js');
+const expect = chakram.expect;
+
+// --- constants
+
+const DATA = require('./lib/data.js');
+
+// --- the test cases
+
+describe('Register Tests', function() {
+
+    this.timeout(0); // we are not interested in non-functional tests here
+
+    // --- before any tests are run
+
+    before(() => {
+        return shared.before_any();
+    });
+
+    // --- after all the tests have been run
+
+    after(() => {
+        return shared.after_all();
+    });
+
+    // --- start up tests
+
+    describe('start up tests', () => {
+
+        it('the server is up', () => {
+            return shared.up(shared.register);
+        });
+
+        it('it responds to an announce request', () => {
+            return shared.announce(shared.register, process.env.REGISTER_SERVER_NAME, process.env.REGISTER_SERVER_BASE);
+        });
+
+        it('it responds to unknown restful resources', () => {
+            return shared.is_bad_route(shared.rest('register', DATA.word()));
+        });
+
+        it('the register is empty', () => {
+            return shared.is_clean_slate();
+        });
+    });
+
+    // --- basic register manipulation tests
+
+    describe('basic register manipulation tests', () => {
+
+        let name = DATA.oneof(DATA.NAMES.VALID);
+        let details1 = {
+            description: DATA.words(4)
+        };
+        let details2 = {
+            description: DATA.words(5)
+        };
+
+        before(() => {
+            return shared.is_clean_slate();
+        });
+
+        after(() => {
+            return shared.is_clean_slate();
+        });
+
+        it('can add an entity type', () => {
+            return chakram.post(shared.rest('register', name), details1)
+            .then(response => {
+                expect(response).to.have.status(HTTP.CREATED);
+                expect(response).to.have.header('Location', shared.rest('register', name));
+                return chakram.wait();
+            });
+        });
+
+        it('it is present in the entity type list', () => {
+            return chakram.get(shared.rest('register'))
+            .then(response => {
+                expect(response).to.have.status(HTTP.OK);
+                expect(response.body).to.be.an('array');
+                expect(response.body.length).to.be.eq(1);
+                expect(response.body[0]).to.be.an('object');
+                expect(response.body[0].id).to.be.eq(name);
+                expect(response.body[0].url).to.be.eq(shared.rest('register', name));
+                expect(response.body[0].description).to.be.eq(details1.description);
+                return chakram.wait();
+            });
+        });
+
+        it('it is present when addressed directly', () => {
+            return chakram.get(shared.rest('register', name))
+            .then(response => {
+                expect(response).to.have.status(HTTP.OK);
+                expect(response.body).to.be.an('object');
+                expect(response.body.id).to.be.eq(name);
+                expect(response.body.url).to.be.eq(shared.rest('register', name));
+                expect(response.body.description).to.be.eq(details1.description);
+                return chakram.wait();
+            });
+        });
+
+        it('cannot add a duplicate entity type', () => {
+            return chakram.post(shared.rest('register', name), details1)
+            .then(response => {
+                expect(response).to.have.status(HTTP.CONFLICT);
+                expect(response.body).to.be.undefined;
+                return chakram.wait();
+            });
+        });
+
+        it('can update an entity type', () => {
+            return chakram.put(shared.rest('register', name), details2)
+            .then(response => {
+                expect(response).to.have.status(HTTP.NO_CONTENT);
+                expect(response.body).to.be.undefined;
+                return chakram.wait();
+            });
+        });
+
+        it('new details are present in the entity type list', () => {
+            return chakram.get(shared.rest('register'))
+            .then(response => {
+                expect(response).to.have.status(HTTP.OK);
+                expect(response.body).to.be.an('array');
+                expect(response.body.length).to.be.eq(1);
+                expect(response.body[0]).to.be.an('object');
+                expect(response.body[0].id).to.be.eq(name);
+                expect(response.body[0].url).to.be.eq(shared.rest('register', name));
+                expect(response.body[0].description).to.be.eq(details2.description);
+                return chakram.wait();
+            });
+        });
+
+        it('new details are present when addressed directly', () => {
+            return chakram.get(shared.rest('register', name))
+            .then(response => {
+                expect(response).to.have.status(HTTP.OK);
+                expect(response.body).to.be.an('object');
+                expect(response.body.id).to.be.eq(name);
+                expect(response.body.url).to.be.eq(shared.rest('register', name));
+                expect(response.body.description).to.be.eq(details2.description);
+                return chakram.wait();
+            });
+        });
+
+        it('can delete the entity type', () => {
+            return chakram.delete(shared.rest('register', name))
+            .then(response => {
+                expect(response).to.have.status(HTTP.NO_CONTENT);
+                expect(response.body).to.be.undefined;
+                return chakram.wait();
+            });
+        });
+
+        it('the register is empty', () => {
+            return shared.is_clean_slate();
+        });
+
+        it('the entity is gone', () => {
+            return chakram.get(shared.rest('register', name))
+            .then(response => {
+                expect(response).to.have.status(HTTP.NOT_FOUND);
+                expect(response.body).to.be.undefined;
+                return chakram.wait();
+            });
+        });
+
+        it('cannot re-delete the entity type', () => {
+            return chakram.delete(shared.rest('register', name))
+            .then(response => {
+                expect(response).to.have.status(HTTP.NOT_FOUND);
+                return chakram.wait();
+            });
+        });
+    });
+});
