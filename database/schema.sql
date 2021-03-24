@@ -17,9 +17,9 @@ DROP ROLE IF EXISTS bbk_writer;
 CREATE ROLE bbk_reader;
 CREATE ROLE bbk_writer;
 
-CREATE USER bbk_adm WITH ENCRYPTED PASSWORD 'bbk_adm';
-CREATE USER bbk_api WITH ENCRYPTED PASSWORD 'bbk_api';
-CREATE USER bbk_www WITH ENCRYPTED PASSWORD 'bbk_www';
+CREATE USER bbk_adm WITH ENCRYPTED PASSWORD 'bbk_adm_pwd';
+CREATE USER bbk_api WITH ENCRYPTED PASSWORD 'bbk_api_pwd';
+CREATE USER bbk_www WITH ENCRYPTED PASSWORD 'bbk_www_pwd';
 
 GRANT bbk_reader TO bbk_www;
 GRANT bbk_writer TO bbk_adm, bbk_api;
