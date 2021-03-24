@@ -42,9 +42,9 @@ const logger = require(`${ PATH_LIB }/logger.js`);
 
 // --- running contexts
 
-var rest = new Server(process.env.REGISTER_SERVER_NAME, process.env.REGISTER_SERVER_VERSION);
+var rest = new Server(process.env.REGISTER_SERVER_NAME, process.env.REGISTER_SERVER_BASE);
+var view = new View(process.env.REGISTER_SERVER_BASE);
 var model = new Model();
-var view = new View();
 var log = logger.Logger;
 
 // --- lists all entity types in the register
@@ -54,7 +54,7 @@ rest.router.get('/register', (req, res) => {
     model.register.list()
 
     .then(items => {
-        res.json(view.entities(items, rest.host(req)));
+        res.json(view.entities(items));
     })
 
     .catch((error) => {
@@ -71,7 +71,7 @@ rest.router.get('/register/:eid', (req, res) => {
 
     .then(item => {
         if (item) {
-            res.json(view.entity(item, rest.host(req)));
+            res.json(view.entity(item));
         } else {
             res.status(HTTP.NOT_FOUND).send();
         }
@@ -194,4 +194,4 @@ rest.router.delete('/register/:eid', (req, res) => {
 
 // --- main entry point
 
-rest.listen(process.argv.length > 2 ? process.argv[2] : process.env.REGISTER_SERVER_PORT);
+rest.listen();
