@@ -66,7 +66,7 @@ describe('Register Tests', function() {
         });
 
         it('it responds to unknown restful resources', () => {
-            return shared.is_bad_route(shared.rest('register', DATA.word()));
+            return shared.is_bad_route(shared.rest('register', DATA.name()));
         });
 
         it('the register is empty', () => {
@@ -78,13 +78,9 @@ describe('Register Tests', function() {
 
     describe('basic register manipulation tests', () => {
 
-        let name = DATA.oneof(DATA.NAMES.VALID);
-        let details1 = {
-            description: DATA.words(4)
-        };
-        let details2 = {
-            description: DATA.words(5)
-        };
+        let name = DATA.pick(DATA.NAME.VALID);
+        let details1 = { description: DATA.text(DATA.DESCRIPTION.REASONABLE) };
+        let details2 = { description: DATA.text(DATA.DESCRIPTION.REASONABLE + 1) };
 
         before(() => {
             return shared.is_clean_slate();
@@ -201,6 +197,99 @@ describe('Register Tests', function() {
                 expect(response).to.have.status(HTTP.NOT_FOUND);
                 return chakram.wait();
             });
+        });
+    });
+
+    // --- register validation tests
+
+    describe('register validation tests', () => {
+
+        function good_name(name, details = null) {
+            return chakram.post(shared.rest('register', name), details || { description: DATA.text(DATA.DESCRIPTION.REASONABLE) })
+            .then((response) => {
+                expect(response).to.have.status(HTTP.CREATED);
+                return chakram.delete(shared.rest('register', name.toLowerCase().trim()))
+                .then((response) => {
+                    expect(response).to.have.status(HTTP.NO_CONTENT);
+                    return chakram.wait();
+                })
+            });
+        }
+
+        function bad_name(name, type, error, details = null) {
+            return chakram.post(shared.rest('register', name), details || { description: DATA.text(DATA.DESCRIPTION.REASONABLE) })
+            .then((response) => {
+                expect(response).to.have.status(HTTP.BAD_REQUEST);
+                expect(response.body).to.contain(type);
+                expect(response.body).to.contain(error);
+                return chakram.get(shared.rest('register', name))
+                .then((response) => {
+                    expect(response).to.have.status(HTTP.NOT_FOUND);
+                    return chakram.wait();
+                })
+            });
+        }
+
+        before(() => {
+            return shared.is_clean_slate();
+        });
+
+        after(() => {
+            return shared.is_clean_slate();
+        });
+
+        it('disallows short names', () => {
+            return bad_name(DATA.name(DATA.NAME.SHORTEST - 1), 'name', 'too short');
+        });
+
+        it('disallows long names', () => {
+            return bad_name(DATA.name(DATA.NAME.LONGEST + 1), 'name', 'too long');
+        });
+
+        it('disallows various invalid names', () => {
+            let tests = [];
+            for (let i = 0; i < DATA.NAME.INVALID.length; i++) {
+                tests.push(bad_name(DATA.NAME.INVALID[i], 'name', 'invalid format'));
+            }
+            return Promise.all(tests);
+        });
+
+        it('allows shortest name', () => {
+            return good_name(DATA.name(DATA.NAME.SHORTEST));
+        });
+
+        it('allows longest name', () => {
+            return good_name(DATA.name(DATA.NAME.LONGEST));
+        });
+
+        it('handles names case independantly', () => {
+            let name = DATA.name(DATA.NAME.REASONABLE);
+            return good_name(name.toUpperCase());
+        });
+
+        it('handles names trimmed of spaces', () => {
+            let name = DATA.name(DATA.NAME.REASONABLE);
+            return good_name(name.concat('    '));
+        });
+
+        it('disallows a missing description', () => {
+            return bad_name(DATA.name(DATA.NAME.REASONABLE), 'description', 'too short', {});
+        });
+
+        it('disallows an empty description', () => {
+            return bad_name(DATA.name(DATA.NAME.REASONABLE), 'description', 'too short', { description: '' });
+        });
+
+        it('disallows a long description', () => {
+            return bad_name(DATA.name(DATA.NAME.REASONABLE), 'description', 'too long', { description: DATA.text(DATA.DESCRIPTION.LONGEST + 1) });
+        });
+
+        it('allows shortest description', () => {
+            return good_name(DATA.name(DATA.NAME.REASONABLE), { description: DATA.text(DATA.DESCRIPTION.SHORTEST) });
+        });
+
+        it('allows longest description', () => {
+            return good_name(DATA.name(DATA.NAME.REASONABLE), { description: DATA.text(DATA.DESCRIPTION.LONGEST) });
         });
     });
 });
