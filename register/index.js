@@ -66,7 +66,7 @@ rest.router.get('/register', (req, res) => {
 
 rest.router.get('/register/:eid', (req, res) => {
 
-    let name = req.params.eid;
+    let name = req.params.eid.toLowerCase();
     model.register.find(name)
 
     .then(item => {
@@ -87,7 +87,7 @@ rest.router.get('/register/:eid', (req, res) => {
 rest.router.post('/register/:eid', (req, res) => {
     log.info('register', 'entity', 'insert', req.params.eid);
 
-    let name = req.params.eid;
+    let name = req.params.eid.toLowerCase();
     let description = req.body.description || '';
     let errors = [];
 
@@ -128,7 +128,7 @@ rest.router.post('/register/:eid', (req, res) => {
 rest.router.put('/register/:eid', (req, res) => {
     log.info('register', 'entity', 'update', req.params.eid);
 
-    let name = req.params.eid;
+    let name = req.params.eid.toLowerCase();
     let description = req.body.description || '';
     let errors = [];
 
@@ -167,7 +167,7 @@ rest.router.put('/register/:eid', (req, res) => {
 rest.router.delete('/register/:eid', (req, res) => {
     log.info('register', 'entity', 'delete', req.params.eid);
 
-    let name = req.params.eid;
+    let name = req.params.eid.toLowerCase();
     model.register.find(name)
 
     .then((item) => {
