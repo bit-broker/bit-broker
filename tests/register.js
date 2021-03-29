@@ -66,7 +66,7 @@ describe('Register Tests', function() {
         });
 
         it('it responds to unknown restful resources', () => {
-            return shared.is_bad_route(shared.rest('register', DATA.name()));
+            return shared.is_bad_route(shared.rest('entity', DATA.name()));
         });
 
         it('the register is empty', () => {
@@ -91,42 +91,42 @@ describe('Register Tests', function() {
         });
 
         it('can add an entity type', () => {
-            return chakram.post(shared.rest('register', name), details1)
+            return chakram.post(shared.rest('entity', name), details1)
             .then(response => {
                 expect(response).to.have.status(HTTP.CREATED);
-                expect(response).to.have.header('Location', shared.rest('register', name));
+                expect(response).to.have.header('Location', shared.rest('entity', name));
                 return chakram.wait();
             });
         });
 
         it('it is present in the entity type list', () => {
-            return chakram.get(shared.rest('register'))
+            return chakram.get(shared.rest('entity'))
             .then(response => {
                 expect(response).to.have.status(HTTP.OK);
                 expect(response.body).to.be.an('array');
                 expect(response.body.length).to.be.eq(1);
                 expect(response.body[0]).to.be.an('object');
                 expect(response.body[0].id).to.be.eq(name);
-                expect(response.body[0].url).to.be.eq(shared.rest('register', name));
+                expect(response.body[0].url).to.be.eq(shared.rest('entity', name));
                 expect(response.body[0].description).to.be.eq(details1.description);
                 return chakram.wait();
             });
         });
 
         it('it is present when addressed directly', () => {
-            return chakram.get(shared.rest('register', name))
+            return chakram.get(shared.rest('entity', name))
             .then(response => {
                 expect(response).to.have.status(HTTP.OK);
                 expect(response.body).to.be.an('object');
                 expect(response.body.id).to.be.eq(name);
-                expect(response.body.url).to.be.eq(shared.rest('register', name));
+                expect(response.body.url).to.be.eq(shared.rest('entity', name));
                 expect(response.body.description).to.be.eq(details1.description);
                 return chakram.wait();
             });
         });
 
         it('cannot add a duplicate entity type', () => {
-            return chakram.post(shared.rest('register', name), details1)
+            return chakram.post(shared.rest('entity', name), details1)
             .then(response => {
                 expect(response).to.have.status(HTTP.CONFLICT);
                 expect(response.body).to.be.undefined;
@@ -135,7 +135,7 @@ describe('Register Tests', function() {
         });
 
         it('can update an entity type', () => {
-            return chakram.put(shared.rest('register', name), details2)
+            return chakram.put(shared.rest('entity', name), details2)
             .then(response => {
                 expect(response).to.have.status(HTTP.NO_CONTENT);
                 expect(response.body).to.be.undefined;
@@ -144,33 +144,33 @@ describe('Register Tests', function() {
         });
 
         it('new details are present in the entity type list', () => {
-            return chakram.get(shared.rest('register'))
+            return chakram.get(shared.rest('entity'))
             .then(response => {
                 expect(response).to.have.status(HTTP.OK);
                 expect(response.body).to.be.an('array');
                 expect(response.body.length).to.be.eq(1);
                 expect(response.body[0]).to.be.an('object');
                 expect(response.body[0].id).to.be.eq(name);
-                expect(response.body[0].url).to.be.eq(shared.rest('register', name));
+                expect(response.body[0].url).to.be.eq(shared.rest('entity', name));
                 expect(response.body[0].description).to.be.eq(details2.description);
                 return chakram.wait();
             });
         });
 
         it('new details are present when addressed directly', () => {
-            return chakram.get(shared.rest('register', name))
+            return chakram.get(shared.rest('entity', name))
             .then(response => {
                 expect(response).to.have.status(HTTP.OK);
                 expect(response.body).to.be.an('object');
                 expect(response.body.id).to.be.eq(name);
-                expect(response.body.url).to.be.eq(shared.rest('register', name));
+                expect(response.body.url).to.be.eq(shared.rest('entity', name));
                 expect(response.body.description).to.be.eq(details2.description);
                 return chakram.wait();
             });
         });
 
         it('can delete the entity type', () => {
-            return chakram.delete(shared.rest('register', name))
+            return chakram.delete(shared.rest('entity', name))
             .then(response => {
                 expect(response).to.have.status(HTTP.NO_CONTENT);
                 expect(response.body).to.be.undefined;
@@ -183,7 +183,7 @@ describe('Register Tests', function() {
         });
 
         it('the entity is gone', () => {
-            return chakram.get(shared.rest('register', name))
+            return chakram.get(shared.rest('entity', name))
             .then(response => {
                 expect(response).to.have.status(HTTP.NOT_FOUND);
                 expect(response.body).to.be.undefined;
@@ -192,7 +192,7 @@ describe('Register Tests', function() {
         });
 
         it('cannot re-delete the entity type', () => {
-            return chakram.delete(shared.rest('register', name))
+            return chakram.delete(shared.rest('entity', name))
             .then(response => {
                 expect(response).to.have.status(HTTP.NOT_FOUND);
                 return chakram.wait();
@@ -205,10 +205,10 @@ describe('Register Tests', function() {
     describe('register validation tests', () => {
 
         function good_name(name, details = null) {
-            return chakram.post(shared.rest('register', name), details || { description: DATA.text(DATA.DESCRIPTION.REASONABLE) })
+            return chakram.post(shared.rest('entity', name), details || { description: DATA.text(DATA.DESCRIPTION.REASONABLE) })
             .then((response) => {
                 expect(response).to.have.status(HTTP.CREATED);
-                return chakram.delete(shared.rest('register', name.toLowerCase().trim()))
+                return chakram.delete(shared.rest('entity', name.toLowerCase().trim()))
                 .then((response) => {
                     expect(response).to.have.status(HTTP.NO_CONTENT);
                     return chakram.wait();
@@ -217,12 +217,12 @@ describe('Register Tests', function() {
         }
 
         function bad_name(name, type, error, details = null) {
-            return chakram.post(shared.rest('register', name), details || { description: DATA.text(DATA.DESCRIPTION.REASONABLE) })
+            return chakram.post(shared.rest('entity', name), details || { description: DATA.text(DATA.DESCRIPTION.REASONABLE) })
             .then((response) => {
                 expect(response).to.have.status(HTTP.BAD_REQUEST);
                 expect(response.body).to.contain(type);
                 expect(response.body).to.contain(error);
-                return chakram.get(shared.rest('register', name))
+                return chakram.get(shared.rest('entity', name))
                 .then((response) => {
                     expect(response).to.have.status(HTTP.NOT_FOUND);
                     return chakram.wait();

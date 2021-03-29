@@ -56,14 +56,14 @@ class Shared {
     // --- returns a restful url to either the catalog or register service
 
     rest(...resources) {
-        resources.unshift(resources.length && resources[0] === 'register' ? this.register : this.catalog);
+        resources.unshift(resources.length && resources[0] === 'entity' ? this.register : this.catalog);
         return resources.join('/');
     }
 
     // --- resets the underlying database - use with care!
 
     nuke() {
-        return db('register').delete();
+        return db('entity').delete();
     }
 
     // --- before any tests are run
@@ -111,7 +111,7 @@ class Shared {
     // --- ensures that the register is currently empty
 
     is_clean_slate() {
-        return chakram.get(this.rest('register'))
+        return chakram.get(this.rest('entity'))
         .then(response => {
             expect(response).to.have.status(HTTP.OK);
             expect(response.body).to.be.an('array');
