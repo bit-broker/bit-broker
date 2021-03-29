@@ -61,9 +61,9 @@ class Entity {
     static add (name, details) {
         return chakram.post(shared.rest('entity', name), details)
         .then(response => {
+            expect(response.body).to.be.undefined;
             expect(response).to.have.status(HTTP.CREATED);
             expect(response).to.have.header('Location', shared.rest('entity', name));
-            expect(response.body).to.be.undefined;
             return chakram.wait();
         });
     }
@@ -73,8 +73,8 @@ class Entity {
     static update (name, details) {
         return chakram.put(shared.rest('entity', name), details)
         .then(response => {
-            expect(response).to.have.status(HTTP.NO_CONTENT);
             expect(response.body).to.be.undefined;
+            expect(response).to.have.status(HTTP.NO_CONTENT);
             return chakram.wait();
         });
     }
@@ -84,8 +84,8 @@ class Entity {
     static duplicate (name, details) {
         return chakram.post(shared.rest('entity', name), details)
         .then(response => {
-            expect(response).to.have.status(HTTP.CONFLICT);
             expect(response.body).to.be.undefined;
+            expect(response).to.have.status(HTTP.CONFLICT);
             return chakram.wait();
         });
     }
@@ -106,8 +106,8 @@ class Entity {
     static delete_missing (name) {
         return chakram.delete(shared.rest('entity', name))
         .then(response => {
-            expect(response).to.have.status(HTTP.NOT_FOUND);
             expect(response.body).to.be.undefined;
+            expect(response).to.have.status(HTTP.NOT_FOUND);
             return chakram.wait();
         });
     }
@@ -117,8 +117,8 @@ class Entity {
     static missing (name) {
         return chakram.get(shared.rest('entity', name))
         .then(response => {
-            expect(response).to.have.status(HTTP.NOT_FOUND);
             expect(response.body).to.be.undefined;
+            expect(response).to.have.status(HTTP.NOT_FOUND);
             return chakram.wait();
         });
     }
@@ -198,9 +198,9 @@ class Connector
     static add(entity, connector, details) {
         return chakram.post(shared.rest('entity', entity, 'connector', connector), details)
         .then(response => {
+            expect(response.body).to.be.undefined;
             expect(response).to.have.status(HTTP.CREATED);
             expect(response).to.have.header('Location', shared.rest('entity', entity, 'connector', connector));
-            expect(response.body).to.be.undefined;
             return chakram.wait();
         });
     }
@@ -210,8 +210,8 @@ class Connector
     static duplicate(entity, connector, details) {
         return chakram.post(shared.rest('entity', entity, 'connector', connector), details)
         .then(response => {
-            expect(response).to.have.status(HTTP.CONFLICT);
             expect(response.body).to.be.undefined;
+            expect(response).to.have.status(HTTP.CONFLICT);
             return chakram.wait();
         });
     }
@@ -221,8 +221,8 @@ class Connector
     static add_to_missing(entity, connector, details) {
         return chakram.post(shared.rest('entity', entity, 'connector', connector), details)
         .then(response => {
-            expect(response).to.have.status(HTTP.NOT_FOUND);
             expect(response.body).to.be.undefined;
+            expect(response).to.have.status(HTTP.NOT_FOUND);
             return chakram.wait();
         });
     }
@@ -232,8 +232,8 @@ class Connector
     static delete(entity, connector) {
         return chakram.delete(shared.rest('entity', entity, 'connector', connector))
         .then(response => {
-            expect(response).to.have.status(HTTP.NO_CONTENT);
             expect(response.body).to.be.undefined;
+            expect(response).to.have.status(HTTP.NO_CONTENT);
             return chakram.wait();
         });
     }
@@ -243,8 +243,8 @@ class Connector
     static delete_missing(entity, connector) {
         return chakram.delete(shared.rest('entity', entity, 'connector', connector))
         .then(response => {
-            expect(response).to.have.status(HTTP.NOT_FOUND);
             expect(response.body).to.be.undefined;
+            expect(response).to.have.status(HTTP.NOT_FOUND);
             return chakram.wait();
         });
     }
@@ -254,8 +254,8 @@ class Connector
     static missing(entity, connector) {
         return chakram.get(shared.rest('entity', entity, 'connector', connector))
         .then(response => {
-            expect(response).to.have.status(HTTP.NOT_FOUND);
             expect(response.body).to.be.undefined;
+            expect(response).to.have.status(HTTP.NOT_FOUND);
             return chakram.wait();
         });
     }
@@ -830,7 +830,7 @@ describe('Register Tests', function() {
     });
 
     describe('entity and connector wild card tests', () => {
-    
+
     });
 
 */
