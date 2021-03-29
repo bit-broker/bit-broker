@@ -108,17 +108,6 @@ class Shared {
             return chakram.wait();
         });
     }
-    // --- ensures that the register is currently empty
-
-    is_clean_slate() {
-        return chakram.get(this.rest('entity'))
-        .then(response => {
-            expect(response).to.have.status(HTTP.OK);
-            expect(response.body).to.be.an('array');
-            expect(response.body.length).to.be.eq(0);
-            return chakram.wait();
-        });
-    }
 
     // --- tests for an expected bad request with the given error strings
 

@@ -125,7 +125,7 @@ const DATA = {
         REASONABLE: 16,
         LONGEST: 64,
         CHARS: 'abcdefghijklmnopqrstuvwxyz0123456789_',
-        VALID: ['astaire', 'bergman', 'bogart', 'brando', 'cagney', 'chaplin', 'cooper', 'crawford', 'davis', 'dietrich', 'fonda', 'gable', 'garbo', 'garland', 'grant', 'hayworth', 'hepburn', 'kelly', 'monroe', 'olivier', 'rogers', 'stewart', 'tracy'],
+        VALID: ['astaire', 'bacall', 'bergman', 'bogart', 'brando', 'cagney', 'chaplin', 'cooper', 'crawford', 'davis', 'dietrich', 'douglas', 'fonda', 'fontaine', 'gable', 'garbo', 'garland', 'grant', 'hardy', 'hayworth', 'hepburn', 'kelly', 'laurel', 'monroe', 'olivier', 'rogers', 'stewart', 'taylor', 'tracy', 'wayne'],
         INVALID: ['0_number_at_start', '_starts_with_undescore', 'has spaces', 'has_invalid_chars!'],
     },
 
