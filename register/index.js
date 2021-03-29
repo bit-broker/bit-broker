@@ -102,7 +102,7 @@ rest.router.post('/entity/:eid', (req, res) => {
                 log.info('register', 'entity', eid, 'insert', 'duplicate');
                 res.status(HTTP.CONFLICT).send();
             } else {
-                model.register.entity.insert(eid, description)
+                model.register.entity.insert(eid, { description })
 
                 .then(() => {
                     log.info('register', 'entity', eid, 'insert', 'complete');
@@ -139,7 +139,7 @@ rest.router.put('/entity/:eid', (req, res) => {
 
         .then(item => {
             if (item) {
-                model.register.entity.update(eid, description)
+                model.register.entity.update(eid, { description })
 
                 .then(() => {
                     log.info('register', 'entity', eid, 'update', 'complete');
