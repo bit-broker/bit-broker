@@ -255,9 +255,13 @@ rest.router.post('/entity/:eid/connector/:cid', (req, res) => {
             } else {
                 model.register.entity.get(eid).insert(cid, { description, webhook, cache })
 
-                .then(() => {
-                    log.info('register', 'entity', eid, 'connector', cid, 'insert', 'complete');
-                    res.set({ 'Location': rest.url(req) }).status(HTTP.CREATED).send();
+                .then(done => {
+                    if (done) {
+                        log.info('register', 'entity', eid, 'connector', cid, 'insert', 'complete');
+                        res.set({ 'Location': rest.url(req) }).status(HTTP.CREATED).send();
+                    } else {
+                        res.status(HTTP.NOT_FOUND).send(); // entity was not present
+                    }
                 })
 
                 .catch(error => {
