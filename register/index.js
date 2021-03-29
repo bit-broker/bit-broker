@@ -43,31 +43,31 @@ const logger = require(`${ PATH_LIB }/logger.js`);
 // --- running contexts
 
 var rest = new Server(process.env.REGISTER_SERVER_NAME, process.env.REGISTER_SERVER_BASE);
-var view = new View(process.env.REGISTER_SERVER_BASE);
+var view = new View(process.env.REGISTER_SERVER_BASE, process.env.CATALOG_SERVER_BASE);
 var model = new Model();
 var log = logger.Logger;
 
 // --- lists all entity types in the register
 
-rest.router.get('/register', (req, res) => {
+rest.router.get('/entity', (req, res) => {
 
-    model.register.list()
+    model.register.entity.list()
 
     .then(items => {
         res.json(view.entities(items));
     })
 
-    .catch((error) => {
+    .catch(error => {
         rest.error(res, error);
     });
 });
 
-// --- shows details of an entity type
+// --- shows details of a named entity type
 
-rest.router.get('/register/:eid', (req, res) => {
+rest.router.get('/entity/:eid', (req, res) => {
 
-    let name = req.params.eid.toLowerCase();
-    model.register.find(name)
+    let eid = req.params.eid.toLowerCase();
+    model.register.entity.find(eid)
 
     .then(item => {
         if (item) {
@@ -77,45 +77,45 @@ rest.router.get('/register/:eid', (req, res) => {
         }
     })
 
-    .catch((error) => {
+    .catch(error => {
         rest.error(res, error);
     });
 });
 
 // --- adds a new entity type to the register
 
-rest.router.post('/register/:eid', (req, res) => {
-    log.info('register', 'entity', 'insert', req.params.eid);
+rest.router.post('/entity/:eid', (req, res) => {
+    log.info('register', 'entity', req.params.eid, 'insert');
 
-    let name = req.params.eid.toLowerCase();
+    let eid = req.params.eid.toLowerCase();
     let description = req.body.description || '';
     let errors = [];
 
-    errors = errors.concat(model.validate.name(name));
+    errors = errors.concat(model.validate.name(eid));
     errors = errors.concat(model.validate.description(description));
 
     if (errors.length === 0) {
-        model.register.find(name)
+        model.register.entity.find(eid)
 
         .then(item => {
             if (item) {
-                log.info('register', 'entity', 'insert', 'duplicate', name);
+                log.info('register', 'entity', eid, 'insert', 'duplicate');
                 res.status(HTTP.CONFLICT).send();
             } else {
-                model.register.insert(name, description)
+                model.register.entity.insert(eid, description)
 
                 .then(() => {
-                    log.info('register', 'entity', 'insert', 'complete', name);
+                    log.info('register', 'entity', eid, 'insert', 'complete');
                     res.set({ 'Location': rest.url(req) }).status(HTTP.CREATED).send();
                 })
 
-                .catch((error) => {
+                .catch(error => {
                     rest.error(res, error);
                 });
             }
         })
 
-        .catch((error) => {
+        .catch(error => {
             rest.error(res, error);
         });
     } else {
@@ -125,28 +125,28 @@ rest.router.post('/register/:eid', (req, res) => {
 
 // --- modifies an existing entity type
 
-rest.router.put('/register/:eid', (req, res) => {
-    log.info('register', 'entity', 'update', req.params.eid);
+rest.router.put('/entity/:eid', (req, res) => {
+    log.info('register', 'entity', req.params.eid, 'update');
 
-    let name = req.params.eid.toLowerCase();
+    let eid = req.params.eid.toLowerCase();
     let description = req.body.description || '';
     let errors = [];
 
     errors = errors.concat(model.validate.description(description));
 
     if (errors.length === 0) {
-        model.register.find(name)
+        model.register.entity.find(eid)
 
         .then(item => {
             if (item) {
-                model.register.update(name, description)
+                model.register.entity.update(eid, description)
 
                 .then(() => {
-                    log.info('register', 'entity', 'update', 'complete', name);
+                    log.info('register', 'entity', eid, 'update', 'complete');
                     res.status(HTTP.NO_CONTENT).send();
                 })
 
-                .catch((error) => {
+                .catch(error => {
                     rest.error(res, error);
                 });
             } else {
@@ -154,7 +154,7 @@ rest.router.put('/register/:eid', (req, res) => {
             }
         })
 
-        .catch((error) => {
+        .catch(error => {
             rest.error(res, error);
         });
     } else {
@@ -164,22 +164,22 @@ rest.router.put('/register/:eid', (req, res) => {
 
 // --- deletes an entity type from the register
 
-rest.router.delete('/register/:eid', (req, res) => {
-    log.info('register', 'entity', 'delete', req.params.eid);
+rest.router.delete('/entity/:eid', (req, res) => {
+    log.info('register', 'entity', req.params.eid, 'delete');
 
-    let name = req.params.eid.toLowerCase();
-    model.register.find(name)
+    let eid = req.params.eid.toLowerCase();
+    model.register.entity.find(eid)
 
-    .then((item) => {
+    .then(item => {
         if (item) {
-            model.register.delete(name)
+            model.register.entity.delete(eid)
 
             .then(() => {
-                log.info('register', 'entity', 'delete', 'complete', name);
+                log.info('register', 'entity', eid, 'delete', 'complete');
                 res.status(HTTP.NO_CONTENT).send();
             })
 
-            .catch((error) => {
+            .catch(error => {
                 rest.error(res, error);
             });
         } else {
@@ -187,7 +187,164 @@ rest.router.delete('/register/:eid', (req, res) => {
         }
     })
 
-    .catch((error) => {
+    .catch(error => {
+        rest.error(res, error);
+    });
+});
+
+// --- lists all the connectors for a named entity type
+
+rest.router.get('/entity/:eid/connector', (req, res) => {
+    let eid = req.params.eid.toLowerCase();
+    model.register.entity.get(eid).list()
+
+    .then(items => {
+        res.json(view.connectors(items));
+    })
+
+    .catch(error => {
+        rest.error(res, error);
+    });
+});
+
+// --- shows details of a named connector on a named entity type
+
+rest.router.get('/entity/:eid/connector/:cid', (req, res) => {
+
+    let eid = req.params.eid.toLowerCase();
+    let cid = req.params.cid.toLowerCase();
+    model.register.entity.get(eid).find(cid)
+
+    .then(item => {
+        if (item) {
+            res.json(view.connector(item));
+        } else {
+            res.status(HTTP.NOT_FOUND).send();
+        }
+    })
+
+    .catch(error => {
+        rest.error(res, error);
+    });
+});
+
+// --- adds a new connector to a named entity type
+
+rest.router.post('/entity/:eid/connector/:cid', (req, res) => {
+    log.info('register', 'entity', req.params.eid, 'connector', req.params.cid, 'insert');
+
+    let eid = req.params.eid.toLowerCase();
+    let cid = req.params.cid.toLowerCase();
+    let description = req.body.description || '';
+    let webhook = req.body.webhook || '';
+    let cache = req.body.cache || 0;
+    let errors = [];
+
+    errors = errors.concat(model.validate.name(cid));
+    errors = errors.concat(model.validate.description(description));
+    errors = errors.concat(model.validate.webhook(webhook));
+    errors = errors.concat(model.validate.cache(cache));
+
+    if (errors.length === 0) {
+        model.register.entity.get(eid).find(cid)
+
+        .then(item => {
+            if (item) {
+                log.info('register', 'entity', eid, 'connector', cid, 'insert', 'duplicate');
+                res.status(HTTP.CONFLICT).send();
+            } else {
+                model.register.entity.get(eid).insert(cid, { description, webhook, cache })
+
+                .then(() => {
+                    log.info('register', 'entity', eid, 'connector', cid, 'insert', 'complete');
+                    res.set({ 'Location': rest.url(req) }).status(HTTP.CREATED).send();
+                })
+
+                .catch(error => {
+                    rest.error(res, error);
+                });
+            }
+        })
+
+        .catch(error => {
+            rest.error(res, error);
+        });
+    } else {
+        res.status(HTTP.BAD_REQUEST).send(errors.join("\n"));
+    }
+});
+
+// --- modifies an existing connector on the named entity type
+
+rest.router.put('/entity/:eid/connector/:cid', (req, res) => {
+    log.info('register', 'entity', req.params.eid, 'connector', req.params.cid, 'update');
+
+    let eid = req.params.eid.toLowerCase();
+    let cid = req.params.cid.toLowerCase();
+    let description = req.body.description || '';
+    let webhook = req.body.webhook || '';
+    let cache = req.body.cache || 0;
+    let errors = [];
+
+    errors = errors.concat(model.validate.description(description));
+    errors = errors.concat(model.validate.webhook(webhook));
+    errors = errors.concat(model.validate.cache(cache));
+
+    if (errors.length === 0) {
+        model.register.entity.get(eid).find(cid)
+
+        .then(item => {
+            if (item) {
+                model.register.entity.get(eid).update(cid, { description, webhook, cache })
+
+                .then(() => {
+                    log.info('register', 'entity', eid, 'connector', cid, 'update', 'complete');
+                    res.status(HTTP.NO_CONTENT).send();
+                })
+
+                .catch(error => {
+                    rest.error(res, error);
+                });
+            } else {
+                res.status(HTTP.NOT_FOUND).send();
+            }
+        })
+
+        .catch(error => {
+            rest.error(res, error);
+        });
+    } else {
+        res.status(HTTP.BAD_REQUEST).send(errors.join("\n"));
+    }
+});
+
+// --- deletes a connector on the named entity type
+
+rest.router.delete('/entity/:eid/connector/:cid', (req, res) => {
+    log.info('register', 'entity', req.params.eid, 'connector', req.params.cid, 'delete');
+
+    let eid = req.params.eid.toLowerCase();
+    let cid = req.params.cid.toLowerCase();
+    model.register.entity.get(eid).find(cid)
+
+    .then(item => {
+        if (item) {
+            model.register.entity.get(eid).delete(cid)
+
+            .then(() => {
+                log.info('register', 'entity', eid, 'connector', cid, 'update', 'complete');
+                res.status(HTTP.NO_CONTENT).send();
+            })
+
+            .catch(error => {
+                rest.error(res, error);
+            });
+        } else {
+            res.status(HTTP.NOT_FOUND).send();
+        }
+    })
+
+    .catch(error => {
         rest.error(res, error);
     });
 });
