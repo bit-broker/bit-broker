@@ -51,10 +51,13 @@ CREATE TABLE connector
     entity_id SERIAL NOT NULL REFERENCES entity (id) ON DELETE CASCADE,
     name VARCHAR (64) NOT NULL,
     description TEXT NOT NULL,
-    contribution_id CHAR(36),
+    contribution_id CHAR(36) UNIQUE,
     contribution_key CHAR(36),
     webhook VARCHAR(255),
     cache INTEGER NOT NULL,
+    session_id CHAR(36) UNIQUE,
+    session_created_at TIMESTAMP,
+    session_updated_at TIMESTAMP,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (entity_id, name)
@@ -63,35 +66,10 @@ CREATE TABLE connector
 CREATE INDEX idx_connector_name ON connector (name);
 CREATE INDEX idx_connector_entity_id ON connector (entity_id);
 CREATE INDEX idx_connector_contribution_id ON connector (contribution_id);
+CREATE INDEX idx_connector_session_id ON connector (session_id);
 
 -- grant database permissions
 
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO bbk_reader;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO bbk_writer;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO bbk_writer;
-
--- TODO: obviously the below INSERTs are just temporary
-
-INSERT
-  INTO entity (name, description)
-VALUES ('car_park','xxx'), ('bus_stop','xxx'), ('school','xxx'), ('crime','xxx');
-
-INSERT
-  INTO connector (name, description, cache, entity_id)
-SELECT 'nhs', 'xxx', 0, id FROM entity WHERE name = 'car_park';
-
-INSERT
-  INTO connector (name, description, cache, entity_id)
-SELECT 'ncp', 'xxx', 0, id FROM entity WHERE name = 'car_park';
-
-INSERT
-  INTO connector (name, description, cache, entity_id)
-SELECT 'mcc', 'xxx', 0, id FROM entity WHERE name = 'car_park';
-
-INSERT
-  INTO connector (name, description, cache, entity_id)
-SELECT 'metro', 'xxx', 0, id FROM entity WHERE name = 'bus_stop';
-
-INSERT
-  INTO connector (name, description, cache, entity_id)
-SELECT 'tram_co', 'xxx', 0, id FROM entity WHERE name = 'bus_stop';

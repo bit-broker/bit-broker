@@ -94,7 +94,8 @@ class View {
                     url: this.url_contribution(item.contribution_id),
                 },
                 webhook: item.webhook,
-                cache: item.cache
+                cache: item.cache,
+                in_session: item.in_session
             });
         }
 

@@ -321,6 +321,7 @@ class Connector {
             expect(response.body.contribution.url).to.be.eq(shared.rest('connector', response.body.contribution.id));
             expect(response.body.webhook).to.be.eq(details.webhook);
             expect(response.body.cache).to.be.eq(details.cache);
+            expect(response.body.in_session).to.be.eq(false);
             expect(response).to.have.status(HTTP.OK);
 
             return chakram.wait();

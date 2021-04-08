@@ -45,7 +45,7 @@ module.exports = class Entity {
 
     // --- select column list
 
-    static get COLUMNS() {
+    get COLUMNS() {
         return [
             'name',
             'description',
@@ -57,7 +57,7 @@ module.exports = class Entity {
     // --- table read context
 
     get rows() {
-        return this.db('entity').select(Entity.COLUMNS);
+        return this.db('entity').select(this.COLUMNS);
     }
 
     // --- all entity types

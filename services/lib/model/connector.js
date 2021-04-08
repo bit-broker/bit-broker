@@ -55,7 +55,7 @@ module.exports = class Connector {
 
     // --- select column list
 
-    static get COLUMNS() {
+    get COLUMNS() {
         return [
             'connector.name',
             'entity.name as entity_name',
@@ -64,6 +64,10 @@ module.exports = class Connector {
             'connector.contribution_key',
             'connector.webhook',
             'connector.cache',
+            this.db.raw('CASE WHEN connector.session_id IS NULL THEN false ELSE true END AS in_session'),
+            'connector.session_id',
+            'connector.session_created_at',
+            'connector.session_updated_at',
             'connector.created_at',
             'connector.updated_at'
         ];
@@ -72,7 +76,7 @@ module.exports = class Connector {
     // --- table read context
 
     get rows() {
-        return this.db('connector').select(Connector.COLUMNS).join('entity', 'entity.id', 'connector.entity_id').where({ 'entity.name': this.entity_name });
+        return this.db('connector').select(this.COLUMNS).join('entity', 'entity.id', 'connector.entity_id').where({ 'entity.name': this.entity_name });
     }
 
     // --- table write context
