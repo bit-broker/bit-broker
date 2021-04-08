@@ -38,10 +38,6 @@ const expect = chakram.expect;
 
 const DATA = require('./data.js');
 
-// --- running contexts
-
-var db = new Knex({ client: 'pg', connection: process.env.DB_CONNECT });
-
 // --- shared class
 
 class Shared {
@@ -51,6 +47,7 @@ class Shared {
     constructor() {
         this.catalog = process.env.CATALOG_SERVER_BASE.replace(/\/$/g, ''); // without trailing slash
         this.register = process.env.REGISTER_SERVER_BASE.replace(/\/$/g, ''); // without trailing slash
+        this.db = null;
     }
 
     // --- returns a restful url to either the catalog or register service
@@ -63,12 +60,13 @@ class Shared {
     // --- resets the underlying database - use with care!
 
     nuke() {
-        return db('entity').delete();
+        return this.db('entity').delete();
     }
 
     // --- before any tests are run
 
     before_any() {
+        this.db = new Knex({ client: 'pg', connection: process.env.DB_CONNECT });
         return this.nuke();
     }
 
@@ -77,7 +75,7 @@ class Shared {
     after_all(wipe = true) {
         return (wipe ? this.nuke() : Promise.resolve())
         .then(() => {
-            return db.destroy();
+            return this.db.destroy();
         });
     }
 
