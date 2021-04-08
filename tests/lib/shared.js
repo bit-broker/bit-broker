@@ -103,24 +103,13 @@ class Shared {
         });
     }
 
-    // --- tests for an expected bad request with the given error strings
-
-    is_bad_request(url, errors, action = chakram.get) {
-        return action(url)
-        .then(response => {
-            expect(response).to.have.status(HTTP.BAD_REQUEST);
-            for (let i = 0; i < errors.length; i++) {
-                expect(response.body).to.contain(errors[i]);
-            }
-            return chakram.wait();
-        });
-    }
-
     // --- tests for an expected bad route
 
     is_bad_route(url, verb = chakram.get) {
         return verb(url)
         .then(response => {
+            expect(response.body).to.be.a('string');
+            expect(response.body.toLowerCase()).to.contain('not found');
             expect(response).to.have.status(HTTP.NOT_FOUND);
             return chakram.wait();
         });
