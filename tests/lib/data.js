@@ -62,7 +62,7 @@ const DATA = {
             text = text.concat(this.pick(words) + ' ');
         }
 
-        return text.substring(0, size).replace(/\s$/, 'x'); // changes trailing spaces to preserve desired size
+        return text.substring(0, size).replace(/\s$/, 'x'); // changes trailing spaces to 'x' in order to preserve desired size
     },
 
     name: function(size = 16) {
@@ -107,6 +107,10 @@ const DATA = {
 
     DATE: {
         REGEX: "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+Z$", // ISO8601 format
+    },
+
+    VERSION: {
+        REGEX: "^v\\d+$",
     },
 
     ID: { // uuidv4

@@ -96,23 +96,19 @@ class Shared {
     announce(server, name, base) {
         return chakram.get(server)
         .then(response => {
-            expect(response.body).to.be.a('string');
-            let elements = response.body.split(' - ');
-            let parts = url.parse(base);
-            expect(elements).to.be.an('array');
-            expect(elements.length).to.be.equal(4);
-            expect(elements[0]).to.match(new RegExp(DATA.DATE.REGEX));
-            expect(elements[1]).to.be.equal(name);
-            expect(elements[2]).to.be.equal(parts.path.replace(/^\/|\/$/g, ''));
-            expect(elements[3]).to.be.equal(DATA.STATUS);
+            expect(response.body).to.be.an('object');
+            expect(response.body.now).to.match(new RegExp(DATA.DATE.REGEX));
+            expect(response.body.name).to.be.equal(name);
+            expect(response.body.version).to.match(new RegExp(DATA.VERSION.REGEX));
+            expect(response.body.status).to.be.equal(DATA.STATUS);
             return chakram.wait();
         });
     }
 
     // --- tests for an expected bad request with the given error strings
 
-    is_bad_request(url, errors, verb = chakram.get) {
-        return verb(url)
+    is_bad_request(url, errors, action = chakram.get) {
+        return action(url)
         .then(response => {
             expect(response).to.have.status(HTTP.BAD_REQUEST);
             for (let i = 0; i < errors.length; i++) {
