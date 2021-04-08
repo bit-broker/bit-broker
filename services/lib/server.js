@@ -101,7 +101,7 @@ module.exports = class Server {
         // --- catch all HTTP/404 for unhandled routes
 
         this.app.use((req, res, next) => {
-            res.status(HTTP.NOT_FOUND).send();
+            throw new failure(HTTP.NOT_FOUND);
         });
 
         // --- catch all HTTP/500 for uncaught exceptions
