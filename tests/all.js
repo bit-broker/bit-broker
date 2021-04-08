@@ -36,7 +36,7 @@ var mocha = new Mocha();
 // --- test case list in preferred order
 
 mocha.addFile('./register.js');
-//mocha.addFile('./connector.js');
+mocha.addFile('./catalog.js');
 //mocha.addFile('./session.js');
 //mocha.addFile('./records.js');
 

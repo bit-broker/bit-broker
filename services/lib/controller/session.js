@@ -16,8 +16,7 @@
 
   ----------------------------------------------------------------------------
 
-  Provides process control abstraction for all bit-broker services, who should
-  all come via this model and never manipulate the domain entities directly.
+  The data connector session process controller.
 
 */
 
@@ -25,14 +24,34 @@
 
 // --- dependancies
 
-const Entity = require('./entity.js');
-const Connector = require('./connector.js');
-const Session = require('./session.js');
+const HTTP = require('http-status-codes');
+const failure = require('http-errors');
+const model = require('../model/index.js');
+const view = require('../view.js');
+const log = require('../logger.js').Logger;
 
-// --- exports
+// --- session class (exported)
 
-module.exports = {
-    entity: new Entity(),
-    connector: new Connector(),
-    session: new Session()  
-};
+module.exports = class Session {
+
+    // --- opens a session for a given data connector
+
+    open(req, res, next) {
+
+        res.status(HTTP.OK).send();
+    }
+
+    // --- processed actions on an open session for a given data connector
+
+    action(req, res, next) {
+
+        res.status(HTTP.OK).send();
+    }
+
+    // --- closes a session for a given data connector
+
+    close(req, res, next) {
+
+        res.status(HTTP.OK).send();
+    }
+}
