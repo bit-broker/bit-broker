@@ -11,7 +11,7 @@ You can set the following paths as environment variables - use absolute or relat
 ```
 PATH_LOCALES - defaults to '../locales'
 PATH_LIB - defaults to '../lib';
-PATH_CONFIG - defaults to '..';
+PATH_CFG - defaults to '..';
 ```
 
 ### Code Formatting
