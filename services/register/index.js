@@ -26,7 +26,7 @@
 // --- load paths - can be overridden with environment variables
 
 const PATH_LIB = process.env.PATH_LIB || '../lib';
-const PATH_CFG = process.env.PATH_CFG || '..';
+const PATH_CFG = process.env.PATH_CFG || '../..';
 
 // --- load configuration
 
