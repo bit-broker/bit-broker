@@ -1,0 +1,30 @@
+PORT_WEBAPP = "8080"
+PORT_CATMAN = "8091"
+PORT_TYK    = "8100"
+PORT_BRIDGE = "8101"
+PORT_DISTRO = "8102"
+PORT_API    = "8090"
+PORT_DB    = "5432"
+PORT_REFAPP    = "8200"
+PORT_REDIS    = "6379"
+PORT_PUBSUB    = "8092"
+PORT_MONGO    = "27017"
+
+Vagrant.configure ("2") do |config|
+  config.vm.box  = "ubuntu/bionic64"
+  config.vm.hostname = "kalydo-dev"
+  config.vm.network "forwarded_port", guest: PORT_WEBAPP, host: PORT_WEBAPP
+  config.vm.network "forwarded_port", guest: PORT_API, host: PORT_API
+  config.vm.network "forwarded_port", guest: PORT_CATMAN, host: PORT_CATMAN
+  config.vm.network "forwarded_port", guest: PORT_TYK, host: PORT_TYK
+  config.vm.network "forwarded_port", guest: PORT_BRIDGE, host: PORT_BRIDGE
+  config.vm.network "forwarded_port", guest: PORT_DISTRO, host: PORT_DISTRO
+  config.vm.network "forwarded_port", guest: PORT_DB, host: PORT_DB
+  config.vm.network "forwarded_port", guest: PORT_REFAPP, host: PORT_REFAPP
+  config.vm.network "forwarded_port", guest: PORT_REDIS, host: PORT_REDIS
+  config.vm.network "forwarded_port", guest: PORT_PUBSUB, host: PORT_PUBSUB
+  config.vm.network "forwarded_port", guest: PORT_MONGO, host: PORT_MONGO
+
+  config.vm.synced_folder "../../..", "/bit-broker"
+  config.vm.provision "shell", path: "provisioner.sh", privileged: true
+end

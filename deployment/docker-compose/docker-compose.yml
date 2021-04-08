@@ -1,0 +1,25 @@
+##################################################################################
+# Name:        docker-compose.yml
+##################################################################################
+
+version: '3'
+services:
+
+  # The Database
+  db:
+    image: postgres:13.2
+    container_name: bitbroker_db
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+      - ../../database/schema.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      POSTGRES_PASSWORD: 'bitbr0ker'
+    ports:
+      - "5432:5432"
+
+networks:
+  default:
+    name: bitbroker-net
+
+volumes:
+  dbdata:
