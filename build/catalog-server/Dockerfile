@@ -14,9 +14,9 @@ RUN mkdir /home/node/app/services && \
 WORKDIR /home/node/app/services
 
 
-# Copy bitbroker registry server code, env config, lib/ locales directory and test directory and set ownership
-COPY ./services/register register/
-RUN chown -R bitbroker:bitbroker /home/node/app/services/register
+# Copy bitbroker catalog server code, env config, lib/ locales directory and test directory and set ownership
+COPY ./services/catalog catalog/
+RUN chown -R bitbroker:bitbroker /home/node/app/services/catalog
 
 COPY ./services/lib lib/
 RUN chown -R bitbroker:bitbroker /home/node/app/services/lib
@@ -24,30 +24,30 @@ RUN chown -R bitbroker:bitbroker /home/node/app/services/lib
 COPY ./services/locales locales/
 RUN chown -R bitbroker:bitbroker /home/node/app/services/locales
 
-COPY ./tests tests/
-RUN chown -R bitbroker:bitbroker /home/node/app/services/tests
+#COPY ./tests tests/
+#RUN chown -R bitbroker:bitbroker /home/node/app/services/tests
 
 COPY .env.example /home/node/app/.env
 RUN chown bitbroker:bitbroker /home/node/app/.env
 
 
 # Copy docker entry point script (Placeholder for now)
-COPY ./build/register-server/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+COPY ./build/catalog-server/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chown bitbroker:bitbroker /usr/local/bin/docker-entrypoint.sh
 
 # Create logs folder and expose it as a volume
-WORKDIR /home/node/app/services/register
+WORKDIR /home/node/app/services/catalog
 RUN mkdir -p ./logs && \
     chown -R bitbroker:bitbroker ./logs
-VOLUME /home/node/app/services/register/logs
+VOLUME /home/node/app/services/catalog/logs
 
 #Set bitbroker non root user
 USER bitbroker
 
 #Run npm install and pull deps
-WORKDIR /home/node/app/services/register
+WORKDIR /home/node/app/services/catalog
 RUN npm install
 
-EXPOSE 8001
+EXPOSE 8002
 ENTRYPOINT [ "docker-entrypoint.sh" ]
 CMD ["npm","start"]
