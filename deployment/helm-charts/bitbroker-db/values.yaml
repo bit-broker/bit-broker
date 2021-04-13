@@ -1,0 +1,32 @@
+replicaCount: 1
+postgres:
+  name: postgres
+  group: db
+  container:
+    image: postgres:13.2-alpine
+    name: bitbroker-db
+    port: 5432
+  volumeMounts:
+    - mountPath: /docker-entrypoint-initdb.d/init.sql
+      name: entrypoint-volume
+  volumes:
+    - name: entrypoint-volume
+      hostPath:
+        # directory location on host
+      path: ../../../database/schema.sql
+  service:
+    type: ClusterIP
+    port: 5432
+  volume:
+    name: postgres-storage
+    kind: PersistentVolumeClaim
+    mountPath: /var/lib/postgresql/data
+    pvc:
+      name: postgres-persistent-volume-claim
+      accessMode: ReadWriteOnce
+      storage: 4Gi
+  config:
+    name: postgres-config
+    data:
+      - key: key
+        value: value
