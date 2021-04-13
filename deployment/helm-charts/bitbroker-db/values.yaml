@@ -3,17 +3,9 @@ postgres:
   name: postgres
   group: db
   container:
-    image: postgres:13.2-alpine
+    image: dockerhub.cisco.com/bit-broker-docker/bitbroker-db
     name: bitbroker-db
     port: 5432
-  volumeMounts:
-    - mountPath: /docker-entrypoint-initdb.d/init.sql
-      name: entrypoint-volume
-  volumes:
-    - name: entrypoint-volume
-      hostPath:
-        # directory location on host
-      path: ../../../database/schema.sql
   service:
     type: ClusterIP
     port: 5432
