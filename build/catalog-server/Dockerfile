@@ -48,5 +48,5 @@ WORKDIR /home/node/app/services/catalog
 RUN npm install
 
 EXPOSE 8002
-ENTRYPOINT [ "docker-entrypoint.sh" ]
+ENTRYPOINT [ "/usr/local/bin/docker-entrypoint.sh" ]
 CMD ["npm","start"]
