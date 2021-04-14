@@ -20,8 +20,5 @@ postgres:
       name: postgres-persistent-volume-claim
       accessMode: ReadWriteOnce
       storage: 4Gi
-  config:
-    name: postgres-config
-    data:
-      - key: key
-        value: value
+
+postgres_password: 'bitbr0ker'

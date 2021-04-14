@@ -1,7 +1,0 @@
-postgres:
-  config:
-    data:
-      - key: POSTGRES_DB
-        value: bitbroker
-      - key: POSTGRES_PASSWORD
-        value: bitbr0ker

@@ -31,7 +31,7 @@ spec:
             - containerPort: {{ .Values.postgres.container.port }}
           envFrom:
             - configMapRef:
-                name: {{ .Values.postgres.config.name }}
+                name: {{ .Release.Name }}-configmap
           volumeMounts:
             - name: {{ .Values.postgres.volume.name }}
               mountPath: {{ .Values.postgres.volume.mountPath }}
