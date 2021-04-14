@@ -1,0 +1,22 @@
+replicaCount: 1
+bbregserver:
+  name: bitbroker-register-server
+  group: app
+  container:
+    image: public.ecr.aws/y1v9w5g2/bitbroker-register-server:latest
+    name: bitbroker-register-server
+    port: 8001
+  imagePullSecrets: ecrcred
+  service:
+    type: ClusterIP
+    port: 8001
+    nodeport: 30002
+  volume:
+    name: bibroker-register-server-storage
+    kind: PersistentVolumeClaim
+    mountPath: /home/node/app/services/register-server
+    subPath: logs
+    pvc:
+      name: bibroker-register-server-volume-claim
+      accessMode: ReadWriteOnce
+      storage: 4Gi

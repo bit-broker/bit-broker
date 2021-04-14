@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.bbregserver.name }}
+  labels:
+    group: {{ .Values.bbregserver.group }}
+spec:
+  type: {{ .Values.bbregserver.service.type }}
+  selector:
+    app: {{ .Values.bbregserver.name }}
+  ports:
+    - port: {{ .Values.bbregserver.service.port }}
+      targetPort: {{ .Values.bbregserver.container.port }}
+      {{ if eq .Values.bbregserver.service.type "NodePort" }}nodePort: {{ .Values.bbregserver.service.nodeport }}{{ end }}
