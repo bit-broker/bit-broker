@@ -13,6 +13,9 @@ RUN mkdir /home/node/app/services && \
 # Switch to bitbroker services root folder
 WORKDIR /home/node/app/services
 
+# Copy docker entry point script (Placeholder for now)
+COPY ./build/register-server/docker-entrypoint.sh ./docker-entrypoint.sh
+RUN chown bitbroker:bitbroker ./docker-entrypoint.sh
 
 # Copy bitbroker registry server code, env config, lib/ locales directory and test directory and set ownership
 COPY ./services/register register/
@@ -31,9 +34,6 @@ COPY .env.example /home/node/app/.env
 RUN chown bitbroker:bitbroker /home/node/app/.env
 
 
-# Copy docker entry point script (Placeholder for now)
-COPY ./build/register-server/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN chown bitbroker:bitbroker /usr/local/bin/docker-entrypoint.sh
 
 # Create logs folder
 WORKDIR /home/node/app/services/register
@@ -48,5 +48,5 @@ WORKDIR /home/node/app/services/register
 RUN npm install
 
 EXPOSE 8001
-ENTRYPOINT [ "/usr/local/bin/docker-entrypoint.sh" ]
+ENTRYPOINT [ "/home/node/app/services/docker-entrypoint.sh" ]
 CMD ["npm","start"]
