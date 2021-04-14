@@ -1,18 +1,21 @@
 replicaCount: 1
 postgres:
-  name: postgres
+  name: bitbroker-db
   group: db
   container:
-    image: dockerhub.cisco.com/bit-broker-docker/bitbroker-db
+    image: public.ecr.aws/y1v9w5g2/bitbroker-db:latest
     name: bitbroker-db
     port: 5432
+  imagePullSecrets: ecrcred
   service:
     type: ClusterIP
     port: 5432
+    nodeport: 30001
   volume:
     name: postgres-storage
     kind: PersistentVolumeClaim
     mountPath: /var/lib/postgresql/data
+    subPath: postgres
     pvc:
       name: postgres-persistent-volume-claim
       accessMode: ReadWriteOnce

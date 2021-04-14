@@ -23,6 +23,10 @@ spec:
       containers:
         - name: {{ .Values.postgres.name }}
           image: {{ .Values.postgres.container.image }}
+          {{ if .Values.imagePullSecrets }}
+          imagePullSecrets:
+            - name: {{ .Values.imagePullSecrets }}
+          {{ end }}
           ports:
             - containerPort: {{ .Values.postgres.container.port }}
           envFrom:
@@ -31,3 +35,4 @@ spec:
           volumeMounts:
             - name: {{ .Values.postgres.volume.name }}
               mountPath: {{ .Values.postgres.volume.mountPath }}
+              subPath: {{ .Values.postgres.volume.subPath }}

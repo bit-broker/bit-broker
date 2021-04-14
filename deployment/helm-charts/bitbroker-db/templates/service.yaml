@@ -11,3 +11,4 @@ spec:
   ports:
     - port: {{ .Values.postgres.service.port }}
       targetPort: {{ .Values.postgres.container.port }}
+      {{ if eq .Values.postgres.service.type "NodePort" }}nodePort: {{ .Values.postgres.service.nodeport }}{{ end }}
