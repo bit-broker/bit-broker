@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.bbcatalogserver.name }}
+  labels:
+    group: {{ .Values.bbcatalogserver.group }}
+spec:
+  type: {{ .Values.bbcatalogserver.service.type }}
+  selector:
+    app: {{ .Values.bbcatalogserver.name }}
+  ports:
+    - port: {{ .Values.bbcatalogserver.service.port }}
+      targetPort: {{ .Values.bbcatalogserver.container.port }}
+      {{ if eq .Values.bbcatalogserver.service.type "NodePort" }}nodePort: {{ .Values.bbcatalogserver.service.nodeport }}{{ end }}
