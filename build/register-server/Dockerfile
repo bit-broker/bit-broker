@@ -10,12 +10,14 @@ RUN addgroup -S bitbroker \
 RUN mkdir /home/node/app/services && \
     chown -R bitbroker:bitbroker /home/node/app/services
 
+
 # Switch to bitbroker services root folder
 WORKDIR /home/node/app/services
 
 # Copy docker entry point script (Placeholder for now)
 COPY ./build/register-server/docker-entrypoint.sh ./docker-entrypoint.sh
 RUN chown bitbroker:bitbroker ./docker-entrypoint.sh
+RUN ["chmod", "+x", "./docker-entrypoint.sh"]
 
 # Copy bitbroker registry server code, env config, lib/ locales directory and test directory and set ownership
 COPY ./services/register register/
