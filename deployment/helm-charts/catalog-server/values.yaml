@@ -10,7 +10,7 @@ bbcatalogserver:
   service:
     type: ClusterIP
     port: 8001
-    nodeport: 30002
+    nodeport: 30003
   volume:
     name: bibroker-catalog-server-storage
     kind: PersistentVolumeClaim
