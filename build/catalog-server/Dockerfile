@@ -35,11 +35,10 @@ RUN chown bitbroker:bitbroker /home/node/app/.env
 COPY ./build/catalog-server/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chown bitbroker:bitbroker /usr/local/bin/docker-entrypoint.sh
 
-# Create logs folder and expose it as a volume
+# Create logs folder
 WORKDIR /home/node/app/services/catalog
 RUN mkdir -p ./logs && \
     chown -R bitbroker:bitbroker ./logs
-VOLUME /home/node/app/services/catalog/logs
 
 #Set bitbroker non root user
 USER bitbroker
