@@ -108,7 +108,7 @@ module.exports = class Connector {
                 }
 
                 return connectors.insert(cid, { description, webhook, cache });
-            })
+            });
         })
 
         .then(() => {
@@ -149,7 +149,7 @@ module.exports = class Connector {
             .then(item => {
                 if (!item) throw failure(HTTP.NOT_FOUND);
                 return connectors.update(cid, { description, webhook, cache });
-            })
+            });
         })
 
         .then(() => {
@@ -177,7 +177,7 @@ module.exports = class Connector {
             .then(item => {
                 if (!item) throw failure(HTTP.NOT_FOUND);
                 return connectors.delete(cid);
-            })
+            });
         })
 
         .then(() => {
