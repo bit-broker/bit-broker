@@ -74,15 +74,15 @@ module.exports = class Entity {
 
     // --- inserts a new entity type
 
-    insert(name, details) {
-        details.name = name
-        return this.rows.insert(details).then(result => result.rowCount > 0);
+    insert(name, values) {
+        values.name = name
+        return this.rows.insert(values).then(result => result.rowCount > 0);
     }
 
     // --- updates an existing entity type
 
-    update(name, details) {
-        return this.find(name).update(details).then(result => result.rowCount > 0);
+    update(name, values) {
+        return this.find(name).update(values).then(result => result.rowCount > 0);
     }
 
     // --- deletes an existing entity type
