@@ -27,6 +27,7 @@ spec:
           imagePullSecrets:
             - name: {{ .Values.imagePullSecrets }}
           {{ end }}
+          imagePullPolicy: { { .Values.imagePullPolicy } }
           ports:
             - containerPort: {{ .Values.bbregserver.container.port }}
           envFrom:

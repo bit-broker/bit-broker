@@ -7,6 +7,7 @@ bbregserver:
     name: bitbroker-register-server
     port: 8001
   imagePullSecrets: ecrcred
+  imagePullPolicy: Always
   service:
     type: ClusterIP
     port: 8001
