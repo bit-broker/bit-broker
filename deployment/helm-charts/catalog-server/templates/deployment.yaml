@@ -23,10 +23,6 @@ spec:
       containers:
         - name: {{ .Values.bbcatalogserver.name }}
           image: {{ .Values.bbcatalogserver.container.image }}
-          {{ if .Values.bbcatalogserver.imagePullSecrets }}
-          imagePullSecrets:
-            - name: {{ .Values.bbcatalogserver.imagePullSecrets }}
-          {{ end }}
           imagePullPolicy: {{ .Values.bbcatalogserver.imagePullPolicy }}
           ports:
             - containerPort: {{ .Values.bbcatalogserver.container.port }}
