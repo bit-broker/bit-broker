@@ -16,7 +16,7 @@
 
   ----------------------------------------------------------------------------
 
-  The testing data used by all test scripts
+  Shared testing data used by all test scripts
 
 */
 
