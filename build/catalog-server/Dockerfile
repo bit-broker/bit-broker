@@ -1,6 +1,10 @@
 # Use latest stable node alpine image
 FROM node:15.13.0-alpine3.10
 
+# Add some development tools (To be removed)
+RUN apk --no-cache add curl && apk --no-cache add busybox-extras
+
+
 # Create bitbroker group and user
 #RUN addgroup bitbroker && adduser bitbroker
 RUN addgroup -S bitbroker \

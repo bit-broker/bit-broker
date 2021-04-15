@@ -6,6 +6,9 @@ FROM node:15.13.0-alpine3.10
 RUN addgroup -S bitbroker \
  && adduser -S -D -s /sbin/nologin -h /home/node/app -G bitbroker bitbroker
 
+# Add some development tools (To be removed)
+RUN apk --no-cache add curl && apk --no-cache add busybox-extras
+
 # Create services services root folder and change permissions
 RUN mkdir /home/node/app/services && \
     chown -R bitbroker:bitbroker /home/node/app/services
