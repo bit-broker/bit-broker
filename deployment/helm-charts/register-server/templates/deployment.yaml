@@ -23,11 +23,11 @@ spec:
       containers:
         - name: {{ .Values.bbregserver.name }}
           image: {{ .Values.bbregserver.container.image }}
-          {{ if .Values.imagePullSecrets }}
+          {{ if .Values.bbregserver.imagePullSecrets }}
           imagePullSecrets:
-            - name: {{ .Values.imagePullSecrets }}
+            - name: {{ .Values.bbregserver.imagePullSecrets }}
           {{ end }}
-          imagePullPolicy: { { .Values.imagePullPolicy } }
+          imagePullPolicy: { { .Values.bbregserver.imagePullPolicy } }
           ports:
             - containerPort: {{ .Values.bbregserver.container.port }}
           envFrom:
