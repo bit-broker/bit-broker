@@ -10,7 +10,7 @@ postgres:
   service:
     type: ClusterIP
     port: 5432
-    nodeport: 30001
+    nodeport: 30200
   volume:
     name: postgres-storage
     kind: PersistentVolumeClaim

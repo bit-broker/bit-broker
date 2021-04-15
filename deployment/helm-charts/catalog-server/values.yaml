@@ -10,8 +10,8 @@ bbcatalogserver:
   imagePullPolicy: Always
   service:
     type: ClusterIP
-    port: 8001
-    nodeport: 30003
+    port: 8002
+    nodeport: 30002
   volume:
     name: bibroker-catalog-server-storage
     kind: PersistentVolumeClaim

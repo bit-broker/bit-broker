@@ -11,7 +11,7 @@ bbregserver:
   service:
     type: ClusterIP
     port: 8001
-    nodeport: 30002
+    nodeport: 30001
   volume:
     name: bibroker-register-server-storage
     kind: PersistentVolumeClaim
