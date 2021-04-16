@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.bbcatalogserver.name }}
+  labels:
+    app: {{ .Values.bbcatalogserver.name }}
+    group: {{ .Values.bbcatalogserver.group }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.bbcatalogserver.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.bbcatalogserver.name }}
+        group: {{ .Values.bbcatalogserver.group }}
+    spec:
+      volumes:
+        - name: {{ .Values.bbcatalogserver.volume.name }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.bbcatalogserver.volume.pvc.name }}
+      containers:
+        - name: {{ .Values.bbcatalogserver.name }}
+          image: {{ .Values.bbcatalogserver.container.image }}
+          imagePullPolicy: {{ .Values.bbcatalogserver.imagePullPolicy }}
+          ports:
+            - containerPort: {{ .Values.bbcatalogserver.container.port }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-configmap
+          volumeMounts:
+              - name: {{ .Values.bbcatalogserver.volume.name }}
+                mountPath: {{ .Values.bbcatalogserver.volume.mountPath }}
+                subPath: {{ .Values.bbcatalogserver.volume.subPath }}
