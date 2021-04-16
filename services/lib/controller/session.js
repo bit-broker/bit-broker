@@ -37,21 +37,94 @@ module.exports = class Session {
     // --- opens a session for a given data connector
 
     open(req, res, next) {
+        log.info('connector', req.params.cid, 'session', 'open', req.params.mode);
+        let cid = req.params.cid;
+        let mode = req.params.mode.toLowerCase();
+        let errors = [];
 
-        res.status(HTTP.OK).send();
+        errors = errors.concat(model.validate.id(cid));
+        errors = errors.concat(model.validate.mode(mode));
+
+        if (errors.length) {
+            throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
+        }
+
+        model.connector.session(cid)
+
+        .then(session => {
+            if (!session) throw failure(HTTP.NOT_FOUND);
+            if (session.id) {
+                log.warn('connector', cid, 'session', 'open', mode, 'overwrite', session.id);
+            }
+
+            return session.open(mode)
+
+            .then(() => {
+                res.json(session.id);
+            });
+        })
+
+        .catch(error => next(error));
     }
 
     // --- processed actions on an open session for a given data connector
 
     action(req, res, next) {
+        let cid = req.params.cid;
+        let sid = req.params.sid;
+        let action = req.params.action.toLowerCase();
+        let errors = [];
 
-        res.status(HTTP.OK).send();
+        errors = errors.concat(model.validate.id(cid));
+        errors = errors.concat(model.validate.id(sid));
+        errors = errors.concat(model.validate.action(action));
+
+        if (errors.length) {
+            throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
+        }
+
+        model.connector.session(cid)
+
+        .then(session => {
+            if (!session) throw failure(HTTP.NOT_FOUND);
+            if (session.id != sid) throw failure(HTTP.UNAUTHORIZED);
+
+            res.status(HTTP.OK).send();  // TODO - fill this operation in
+        })
+
+        .catch(error => next(error));
     }
 
     // --- closes a session for a given data connector
 
     close(req, res, next) {
+        log.info('connector', req.params.cid, 'session', req.params.sid, 'close', req.params.commit);
+        let cid = req.params.cid;
+        let sid = req.params.sid;
+        let commit = req.params.commit.toLowerCase();
+        let errors = [];
 
-        res.status(HTTP.OK).send();
+        errors = errors.concat(model.validate.id(cid));
+        errors = errors.concat(model.validate.id(sid));
+        errors = errors.concat(model.validate.commit(commit));
+
+        if (errors.length) {
+            throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
+        }
+
+        model.connector.session(cid)
+
+        .then(session => {
+            if (!session) throw failure(HTTP.NOT_FOUND);
+            if (session.id != sid) throw failure(HTTP.UNAUTHORIZED);
+
+            return session.close(commit == 'true') // converts to a boolean
+
+            .then(() => {
+                res.status(HTTP.OK).send();
+            });
+        })
+
+        .catch(error => next(error));
     }
 }

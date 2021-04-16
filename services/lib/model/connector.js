@@ -35,6 +35,7 @@
 // --- dependancies
 
 const uuidv4 = require('uuid').v4;
+const Session = require('./session.js');
 
 // --- connector class (exported)
 
@@ -42,7 +43,7 @@ module.exports = class Connector {
 
     // --- class constructor
 
-    constructor(db, name) {
+    constructor(db, name = null) {
         this.db = db;
         this.entity_name = name;
     }
@@ -65,9 +66,6 @@ module.exports = class Connector {
             'connector.webhook',
             'connector.cache',
             this.db.raw('CASE WHEN connector.session_id IS NULL THEN false ELSE true END AS in_session'),
-            'connector.session_id',
-            'connector.session_created_at',
-            'connector.session_updated_at',
             'connector.created_at',
             'connector.updated_at'
         ];
@@ -82,7 +80,7 @@ module.exports = class Connector {
     // --- table write context
 
     get write() {
-        return this.db('connector').where('entity_id', this.db('entity').select('id').where({ 'name': this.entity_name }));
+        return this.db('connector').where('entity_id', this.db('entity').select('id').where({ name: this.entity_name }));
     }
 
     // --- all connectors on the instance entity type
@@ -99,24 +97,30 @@ module.exports = class Connector {
 
     // --- inserts a new connector on the instance entity type
 
-    insert(name, details) {
-        details.name = name;
-        details.webhook = details.webhook.length ? details.webhook : null;
-        details.contribution_id = Connector.UNIQUE_ID;
-        details.entity_id = this.db.from('entity').select('id').where({ 'name': this.entity_name }).first(); // this will *not* execute here, but is compounded into the SQL below
-        return this.write.insert(details).then(result => result.rowCount > 0);
+    insert(name, values) {
+        values.name = name;
+        values.webhook = values.webhook.length ? values.webhook : null;
+        values.contribution_id = Connector.UNIQUE_ID;
+        values.entity_id = this.db.from('entity').select('id').where({ name: this.entity_name }).first(); // this will *not* execute here, but is compounded into the SQL below
+        return this.write.insert(values).then(result => result.rowCount > 0);
     }
 
     // --- updates a connector on the instance entity type
 
-    update(name, details) {
-        details.webhook = details.webhook.length ? details.webhook : null;
-        return this.write.where({ name }).update(details).then(result => result.rowCount > 0);
+    update(name, values) {
+        values.webhook = values.webhook.length ? values.webhook : null;
+        return this.write.where({ name }).update(values).then(result => result.rowCount > 0);
     }
 
     // --- deletes a connector on the instance entity type
 
     delete(name) {
         return this.write.where({ name }).delete().then(result => result.rowCount > 0);
+    }
+
+    // --- gets the session sub-model
+
+    session(contribution_id) {
+        return this.db('connector').where({ contribution_id }).first().then(item => item ? new Session(this.db, item) : null);
     }
 }

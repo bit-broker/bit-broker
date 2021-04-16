@@ -16,7 +16,7 @@
 
   ----------------------------------------------------------------------------
 
-  Shared methods used by all test scripts
+  Shared general methods used by all test scripts
 
 */
 
@@ -29,14 +29,11 @@ require('dotenv').config({ path: '../.env' });
 // --- dependancies
 
 const HTTP = require('http-status-codes');
-const Knex = require('knex');
-const chakram = require('chakram');
-const url = require('url');
-const expect = chakram.expect;
-
-// --- constants
-
 const DATA = require('./data.js');
+const Knex = require('knex');
+const url = require('url');
+const chakram = require('chakram');
+const expect = chakram.expect;
 
 // --- shared class
 
@@ -105,12 +102,24 @@ class Shared {
 
     // --- tests for an expected bad route
 
-    is_bad_route(url, verb = chakram.get) {
+    bad_route(url, verb = chakram.get) {
         return verb(url)
         .then(response => {
             expect(response.body).to.be.a('string');
             expect(response.body.toLowerCase()).to.contain('not found');
             expect(response).to.have.status(HTTP.NOT_FOUND);
+            return chakram.wait();
+        });
+    }
+
+    // --- ensures that the register is empty
+
+    empty() {
+        return chakram.get(this.rest('entity'))
+        .then(response => {
+            expect(response.body).to.be.an('array');
+            expect(response.body.length).to.be.eq(0);
+            expect(response).to.have.status(HTTP.OK);
             return chakram.wait();
         });
     }

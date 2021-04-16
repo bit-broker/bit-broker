@@ -27,367 +27,12 @@
 // -- dependancies
 
 const HTTP = require('http-status-codes');
-const chakram = require('chakram');
-const shared = require('./lib/shared.js');
-const expect = chakram.expect;
-
-// --- constants
-
 const DATA = require('./lib/data.js');
-
-// --- register class
-
-class Register {
-
-    // --- ensures that the register is empty
-
-    static is_empty() {
-        return chakram.get(shared.rest('entity'))
-        .then(response => {
-            expect(response.body).to.be.an('array');
-            expect(response.body.length).to.be.eq(0);
-            expect(response).to.have.status(HTTP.OK);
-            return chakram.wait();
-        });
-    }
-}
-
-// --- entity class
-
-class Entity {
-
-    // --- adds an entity type
-
-    static add(name, details) {
-        return chakram.post(shared.rest('entity', name), details)
-        .then(response => {
-            expect(response.body).to.be.undefined;
-            expect(response).to.have.status(HTTP.CREATED);
-            expect(response).to.have.header('Location', shared.rest('entity', name));
-            return chakram.wait();
-        });
-    }
-
-    // --- updates an entity type
-
-    static update(name, details) {
-        return chakram.put(shared.rest('entity', name), details)
-        .then(response => {
-            expect(response.body).to.be.undefined;
-            expect(response).to.have.status(HTTP.NO_CONTENT);
-            return chakram.wait();
-        });
-    }
-
-    // --- attempts to add a duplicate entity type
-
-    static duplicate(name, details) {
-        return chakram.post(shared.rest('entity', name), details)
-        .then(response => {
-            expect(response.body).to.be.a('string');
-            expect(response.body.toLowerCase()).to.contain('conflict');
-            expect(response).to.have.status(HTTP.CONFLICT);
-            return chakram.wait();
-        });
-    }
-
-    // --- deletes an entity type
-
-    static delete(name) {
-        return chakram.delete(shared.rest('entity', name))
-        .then(response => {
-            expect(response.body).to.be.undefined;
-            expect(response).to.have.status(HTTP.NO_CONTENT);
-            return chakram.wait();
-        });
-    }
-
-    // --- attempts to action an missing entity type
-
-    static action_missing(action, name, details) {
-        return action(shared.rest('entity', name), details)
-        .then(response => {
-            expect(response.body).to.be.a('string');
-            expect(response.body.toLowerCase()).to.contain('not found');
-            expect(response).to.have.status(HTTP.NOT_FOUND);
-            return chakram.wait();
-        });
-    }
-
-    // --- checks an entity type is not there
-
-    static missing(name) {
-        return chakram.get(shared.rest('entity', name))
-        .then(response => {
-            expect(response.body).to.be.a('string');
-            expect(response.body.toLowerCase()).to.contain('not found');
-            expect(response).to.have.status(HTTP.NOT_FOUND);
-            return chakram.wait();
-        });
-    }
-
-    // --- verifies an entity type
-
-    static verify(name, details) {
-        return chakram.get(shared.rest('entity', name))
-        .then(response => {
-            expect(response.body).to.be.an('object');
-            expect(response.body.id).to.be.eq(name);
-            expect(response.body.url).to.be.eq(shared.rest('entity', name));
-            expect(response.body.description).to.be.eq(details.description);
-            expect(response).to.have.status(HTTP.OK);
-            return chakram.wait();
-        });
-    }
-
-    // --- verifies the entire entity type list
-
-    static verify_all(entities) {
-        entities.sort((a, b) => a.name.localeCompare(b.name)); // in name order
-        return chakram.get(shared.rest('entity'))
-        .then(response => {
-            expect(response.body).to.be.an('array');
-            expect(response.body.length).to.be.eq(entities.length);
-            for (let i = 0; i < entities.length; i++) {
-                expect(response.body[i]).to.be.an('object');
-                expect(response.body[i].id).to.be.eq(entities[i].name);
-                expect(response.body[i].url).to.be.eq(shared.rest('entity', entities[i].name));
-                expect(response.body[i].description).to.be.eq(entities[i].details.description);
-            }
-            expect(response).to.have.status(HTTP.OK);
-            return chakram.wait();
-        });
-    }
-
-    // --- adds and then deleted an entity with a good name
-
-    static good(action, name, details = null) {
-        return action(shared.rest('entity', name), details || { description: DATA.text(DATA.DESCRIPTION.REASONABLE) })
-        .then(response => {
-            expect(response).to.have.status(action == chakram.post ? HTTP.CREATED : HTTP.NO_CONTENT);
-            return chakram.delete(shared.rest('entity', name.toLowerCase().trim()))
-            .then(response => {
-                expect(response.body).to.be.undefined;
-                expect(response).to.have.status(HTTP.NO_CONTENT);
-                return chakram.wait();
-            })
-        });
-    }
-
-    // --- attemps to add an entity with a bad name
-
-    static bad(action, name, type, error, details = null) {
-        return action(shared.rest('entity', name), details || { description: DATA.text(DATA.DESCRIPTION.REASONABLE) })
-        .then(response => {
-            expect(response.body).to.contain(type);
-            expect(response.body).to.contain(error);
-            expect(response).to.have.status(HTTP.BAD_REQUEST);
-            return chakram.get(shared.rest('entity', name))
-            .then(response => {
-                expect(response.body).to.be.a('string');
-                expect(response.body.toLowerCase()).to.contain('not found');
-                expect(response).to.have.status(HTTP.NOT_FOUND);
-                return chakram.wait();
-            })
-        });
-    }
-}
-
-// --- connector class
-
-class Connector {
-
-    // --- adds a connector to an entity type
-
-    static add(entity, connector, details) {
-        return chakram.post(shared.rest('entity', entity, 'connector', connector), details)
-        .then(response => {
-            expect(response.body).to.be.undefined;
-            expect(response).to.have.status(HTTP.CREATED);
-            expect(response).to.have.header('Location', shared.rest('entity', entity, 'connector', connector));
-            return chakram.wait();
-        });
-    }
-
-    // --- updates a connector on an entity type
-
-    static update(entity, connector, details) {
-        return chakram.put(shared.rest('entity', entity, 'connector', connector), details)
-        .then(response => {
-            expect(response.body).to.be.undefined;
-            expect(response).to.have.status(HTTP.NO_CONTENT);
-            return chakram.wait();
-        });
-    }
-
-    // --- attempts to add a duplicate connector to an entity type
-
-    static duplicate(entity, connector, details) {
-        return chakram.post(shared.rest('entity', entity, 'connector', connector), details)
-        .then(response => {
-            expect(response.body).to.be.a('string');
-            expect(response.body.toLowerCase()).to.contain('conflict');
-            expect(response).to.have.status(HTTP.CONFLICT);
-            return chakram.wait();
-        });
-    }
-
-    // --- attempts to add a connector to a missing entity type
-
-    static add_to_missing(entity, connector, details) {
-        return chakram.post(shared.rest('entity', entity, 'connector', connector), details)
-        .then(response => {
-            expect(response.body).to.be.a('string');
-            expect(response.body.toLowerCase()).to.contain('not found');
-            expect(response).to.have.status(HTTP.NOT_FOUND);
-            return chakram.wait();
-        });
-    }
-
-    // --- deletes a connector from an entity type
-
-    static delete(entity, connector) {
-        return chakram.delete(shared.rest('entity', entity, 'connector', connector))
-        .then(response => {
-            expect(response.body).to.be.undefined;
-            expect(response).to.have.status(HTTP.NO_CONTENT);
-            return chakram.wait();
-        });
-    }
-
-    // --- attempts to delete a missing connector on an entity type
-
-    static delete_missing(entity, connector) {
-        return chakram.delete(shared.rest('entity', entity, 'connector', connector))
-        .then(response => {
-            expect(response.body).to.be.a('string');
-            expect(response.body.toLowerCase()).to.contain('not found');
-            expect(response).to.have.status(HTTP.NOT_FOUND);
-            return chakram.wait();
-        });
-    }
-
-    // --- checks a connector is not present on an entity type
-
-    static missing(entity, connector) {
-        return chakram.get(shared.rest('entity', entity, 'connector', connector))
-        .then(response => {
-            expect(response.body).to.be.a('string');
-            expect(response.body.toLowerCase()).to.contain('not found');
-            expect(response).to.have.status(HTTP.NOT_FOUND);
-            return chakram.wait();
-        });
-    }
-
-    // --- checks connectors are not returned for a missing parent entity
-
-    static missing_parent(entity) {
-        return chakram.get(shared.rest('entity', entity, 'connector'))
-        .then(response => {
-            expect(response.body).to.be.a('string');
-            expect(response.body.toLowerCase()).to.contain('not found');
-            expect(response).to.have.status(HTTP.NOT_FOUND);
-            return chakram.wait();
-        });
-    }
-
-    // --- attempts an action for a missing parent entity
-
-    static action_missing(action, entity, connector, details) {
-        return action(shared.rest('entity', entity, 'connector', connector), details)
-        .then(response => {
-            expect(response.body).to.be.a('string');
-            expect(response.body.toLowerCase()).to.contain('not found');
-            expect(response).to.have.status(HTTP.NOT_FOUND);
-            return chakram.wait();
-        });
-    }
-
-    // --- verifies a connector of an entity type
-
-    static verify(entity, connector, details) {
-        return chakram.get(shared.rest('entity', entity, 'connector', connector))
-        .then(response => {
-            expect(response.body).to.be.an('object');
-            expect(response.body.id).to.be.eq(connector);
-            expect(response.body.url).to.be.eq(shared.rest('entity', entity, 'connector', connector));
-            expect(response.body.description).to.be.eq(details.description);
-            expect(response.body.entity).to.be.an('object');
-            expect(response.body.entity.id).to.be.eq(entity);
-            expect(response.body.entity.url).to.be.eq(shared.rest('entity', entity));
-            expect(response.body.contribution).to.be.an('object');
-            expect(response.body.contribution.id).to.match(new RegExp(DATA.ID.REGEX));
-            expect(response.body.contribution.id.length).to.be.eq(DATA.ID.SIZE);
-            expect(response.body.contribution.url).to.be.eq(shared.rest('connector', response.body.contribution.id));
-            expect(response.body.webhook).to.be.eq(details.webhook);
-            expect(response.body.cache).to.be.eq(details.cache);
-            expect(response.body.in_session).to.be.eq(false);
-            expect(response).to.have.status(HTTP.OK);
-
-            return chakram.wait();
-        });
-    }
-
-    // --- verifies the entire connector list for an entity type
-
-    static verify_all(entity, connectors) {
-        connectors.sort((a, b) => a.name.localeCompare(b.name)); // in name order
-        return chakram.get(shared.rest('entity', entity, 'connector'))
-        .then(response => {
-            expect(response.body).to.be.an('array');
-            expect(response.body.length).to.be.eq(connectors.length);
-            for (let i = 0; i < connectors.length; i++) {
-                expect(response.body[i]).to.be.an('object');
-                expect(response.body[i].id).to.be.eq(connectors[i].name);
-                expect(response.body[i].url).to.be.eq(shared.rest('entity', entity, 'connector', connectors[i].name));
-                expect(response.body[i].description).to.be.eq(connectors[i].details.description);
-            }
-            expect(response).to.have.status(HTTP.OK);
-            return chakram.wait();
-        });
-    }
-
-    // --- adds, checks the defaults and deletes a connector
-
-    static check_defaults(entity, connector, details) {
-        return Connector.add(entity, connector, details)
-        .then(() => {
-            return chakram.get(shared.rest('entity', entity, 'connector', connector))
-            .then(response => {
-                expect(response.body.webhook).to.be.eq(null);
-                expect(response.body.cache).to.be.eq(0);
-                expect(response).to.have.status(HTTP.OK);
-                return chakram.wait();
-            })
-            .then(() => {
-                return Connector.delete(entity, connector)
-            });
-        });
-    }
-
-    // --- attemps to add a connector with a bad values
-
-    static bad(entity, connector, details, errors, delta = {}) {
-        let merged = Object.assign({}, details, Object.assign({}, delta)); // merges without destroying original
-        return chakram.post(shared.rest('entity', entity, 'connector', connector), merged)
-        .then(response => {
-            for (let i = 0; i < errors.length; i++) {
-                for (let j in errors[i]) {
-                    expect(response.body).to.contain(j);
-                    expect(response.body).to.contain(errors[i][j]);
-                }
-            }
-            expect(response).to.have.status(HTTP.BAD_REQUEST);
-            return chakram.get(shared.rest('entity', entity, 'connector', connector))
-            .then(response => {
-                expect(response.body).to.be.a('string');
-                expect(response.body.toLowerCase()).to.contain('not found');
-                expect(response).to.have.status(HTTP.NOT_FOUND);
-                return chakram.wait();
-            })
-        });
-    }
-}
+const Shared = require('./lib/shared.js');
+const Entity = require('./lib/entity.js');
+const Connector = require('./lib/connector.js');
+const chakram = require('chakram');
+const expect = chakram.expect;
 
 // --- the test cases
 
@@ -398,13 +43,13 @@ describe('Register Tests', function() {
     // --- before any tests are run
 
     before(() => {
-        return shared.before_any();
+        return Shared.before_any();
     });
 
     // --- after all the tests have been run
 
     after(() => {
-        return shared.after_all();
+        return Shared.after_all();
     });
 
     // --- start up tests
@@ -412,37 +57,37 @@ describe('Register Tests', function() {
     describe('start up tests', () => {
 
         it('the server is up', () => {
-            return shared.up(shared.register);
+            return Shared.up(Shared.register);
         });
 
         it('it responds to an announce request', () => {
-            return shared.announce(shared.register, process.env.REGISTER_SERVER_NAME, process.env.REGISTER_SERVER_BASE);
+            return Shared.announce(Shared.register, process.env.REGISTER_SERVER_NAME, process.env.REGISTER_SERVER_BASE);
         });
 
         it('it responds to unknown restful resources', () => {
-            return shared.is_bad_route(shared.rest('entity', DATA.name()));
+            return Shared.bad_route(Shared.rest('entity', DATA.name()));
         });
 
-        it('the register is empty', () => {
-            return Register.is_empty();
+        it('the database is empty', () => {
+            return Shared.empty();
         });
     });
 
-    // --- basic register manipulation tests
+    // --- register manipulation tests
 
-    describe('basic register manipulation tests', () => {
+    describe('register manipulation tests', () => {
 
         let name1 = DATA.pluck(DATA.NAME.VALID); // pluck - so as to never get duplicate
         let name2 = DATA.pick(DATA.NAME.VALID);
-        let details1 = { description: DATA.text(DATA.DESCRIPTION.REASONABLE) };
-        let details2 = { description: DATA.text(DATA.DESCRIPTION.REASONABLE + 1) }; // +1 - so as to be different from first
+        let values1 = { description: DATA.text(DATA.DESCRIPTION.REASONABLE) };
+        let values2 = { description: DATA.text(DATA.DESCRIPTION.REASONABLE + 1) }; // +1 - so as to be different from first
 
         before(() => {
-            return Register.is_empty();
+            return Shared.empty();
         });
 
         after(() => {
-            return Register.is_empty();
+            return Shared.empty();
         });
 
         it('the entity is not there to start with', () => {
@@ -450,31 +95,31 @@ describe('Register Tests', function() {
         });
 
         it('can add an entity type', () => {
-            return Entity.add(name1, details1);
+            return Entity.add(name1, values1);
         });
 
         it('it is present in the entity type list', () => {
-            return Entity.verify_all([{ name: name1, details: details1 }]);
+            return Entity.verify_all([{ name: name1, values: values1 }]);
         });
 
         it('it is present when addressed directly', () => {
-            return Entity.verify(name1, details1);
+            return Entity.verify(name1, values1);
         });
 
         it('cannot add a duplicate entity type', () => {
-            return Entity.duplicate(name1, details1);
+            return Entity.duplicate(name1, values1);
         });
 
         it('can update an entity type', () => {
-            return Entity.update(name1, details2);
+            return Entity.update(name1, values2);
         });
 
-        it('new details are present in the entity type list', () => {
-            return Entity.verify_all([{ name: name1, details: details2 }]);
+        it('new values are present in the entity type list', () => {
+            return Entity.verify_all([{ name: name1, values: values2 }]);
         });
 
-        it('new details are present when addressed directly', () => {
-            return Entity.verify(name1, details2);
+        it('new values are present when addressed directly', () => {
+            return Entity.verify(name1, values2);
         });
 
         it('the second entity is not there to start with', () => {
@@ -482,13 +127,13 @@ describe('Register Tests', function() {
         });
 
         it('can add a second entity type', () => {
-            return Entity.add(name2, details2);
+            return Entity.add(name2, values2);
         });
 
         it('both are present in the entity type list', () => {
             return Entity.verify_all([
-                { name: name1, details: details2 },
-                { name: name2, details: details2 }
+                { name: name1, values: values2 },
+                { name: name2, values: values2 }
             ]);
         });
 
@@ -497,7 +142,7 @@ describe('Register Tests', function() {
         });
 
         it('it is gone from the entity type list', () => {
-            return Entity.verify_all([{ name: name2, details: details2 }]);
+            return Entity.verify_all([{ name: name2, values: values2 }]);
         });
 
         it('the entity is gone when addressed directly', () => {
@@ -505,11 +150,11 @@ describe('Register Tests', function() {
         });
 
         it('cannot re-delete the entity type', () => {
-            return Entity.action_missing(chakram.delete, name1, details2);
+            return Entity.action_missing(chakram.delete, name1, values2);
         });
 
         it('cannot update the entity type', () => {
-            return Entity.action_missing(chakram.put, name1, details2);
+            return Entity.action_missing(chakram.put, name1, values2);
         });
 
         it('can delete the second entity type', () => {
@@ -522,11 +167,11 @@ describe('Register Tests', function() {
     describe('register validation tests', () => {
 
         before(() => {
-            return Register.is_empty();
+            return Shared.empty();
         });
 
         after(() => {
-            return Register.is_empty();
+            return Shared.empty();
         });
 
         it('disallows various invalid names', () => {
@@ -573,41 +218,43 @@ describe('Register Tests', function() {
             return Promise.all(tests);
         });
 
-/*  TODO: How best to handle the time delay between creation and update in the test?
+        /*  TODO: How best to handle the time delay between creation and update in the test?
 
         it('allows update of various valid descriptions', () => {
             let tests = [];
             tests.push(Entity.good(chakram.put, DATA.name(DATA.NAME.REASONABLE + 1), { description: DATA.text(DATA.DESCRIPTION.SHORTEST) }));
             tests.push(Entity.good(chakram.put, DATA.name(DATA.NAME.REASONABLE + 2), { description: DATA.text(DATA.DESCRIPTION.LONGEST) }));
             return Promise.all(tests);
-        }); */
+        });
+
+        */
     });
 
-    // --- basic connector adding tests
+    // --- connector adding tests
 
-    describe('basic connector adding tests', () => {
+    describe('connector adding tests', () => {
 
         let entity1 = DATA.pluck(DATA.NAME.VALID); // pluck - so as to never get duplicate
         let entity2 = DATA.pick(DATA.NAME.VALID);
         let connector1 = DATA.pluck(DATA.NAME.VALID); // pluck - so as to never get duplicate
         let connector2 = DATA.pick(DATA.NAME.VALID);
-        let details1 = {
+        let values1 = {
             description: DATA.text(DATA.DESCRIPTION.REASONABLE),
             webhook: DATA.pluck(DATA.WEBHOOK.VALID), // pluck - so as to never get duplicate
             cache: DATA.integer(DATA.CACHE.REASONABLE),
         };
-        let details2 = {
+        let values2 = {
             description: DATA.text(DATA.DESCRIPTION.REASONABLE + 1), // +1 - so as to be different from first
             webhook: DATA.pick(DATA.WEBHOOK.VALID),
             cache: DATA.integer(DATA.CACHE.REASONABLE),
         };
 
         before(() => {
-            return Register.is_empty();
+            return Shared.empty();
         });
 
         after(() => {
-            return Register.is_empty();
+            return Shared.empty();
         });
 
         it('no connectors are returned for a missing parent entity', () => {
@@ -615,19 +262,19 @@ describe('Register Tests', function() {
         });
 
         it('cannot add a connector to a missing parent entity', () => {
-            return Connector.action_missing(chakram.post, entity1, connector1, details1);
+            return Connector.action_missing(chakram.post, entity1, connector1, values1);
         });
 
         it('cannot update a connector to a missing parent entity', () => {
-            return Connector.action_missing(chakram.put, entity1, connector1, details1);
+            return Connector.action_missing(chakram.put, entity1, connector1, values1);
         });
 
         it('cannot delete a connector to a missing parent entity', () => {
-            return Connector.action_missing(chakram.delete, entity1, connector1, details1);
+            return Connector.action_missing(chakram.delete, entity1, connector1, values1);
         });
 
         it('add the housing entity', () => {
-            return Entity.add(entity1, { description: DATA.text(DATA.DESCRIPTION.REASONABLE) })
+            return Entity.add(entity1)
         });
 
         it('it has no connectors', () => {
@@ -635,45 +282,45 @@ describe('Register Tests', function() {
         });
 
         it('add the connector to the entity', () => {
-            return Connector.add(entity1, connector1, details1);
+            return Connector.add(entity1, connector1, values1);
         });
 
         it('it is present in the entities connector list', () => {
-            return Connector.verify_all(entity1, [{ name: connector1, details: details1 }]);
+            return Connector.verify_all(entity1, [{ name: connector1, values: values1 }]);
         });
 
         it('it is present when the connector is addressed directly', () => {
-            return Connector.verify(entity1, connector1, details1);
+            return Connector.verify(entity1, connector1, values1);
         });
 
         it('cannot add a duplicate connector to the entity', () => {
-            return Connector.duplicate(entity1, connector1, details1);
+            return Connector.duplicate(entity1, connector1, values1);
         });
 
         it('can add a second connector', () => {
-            return Connector.add(entity1, connector2, details2);
+            return Connector.add(entity1, connector2, values2);
         });
 
         it('both are present in the connector list', () => {
             return Connector.verify_all(entity1, [
-                { name: connector1, details: details1 },
-                { name: connector2, details: details2 }
+                { name: connector1, values: values1 },
+                { name: connector2, values: values2 }
             ]);
         });
 
         it('can update a connector', () => {
-            return Connector.update(entity1, connector1, details2);
+            return Connector.update(entity1, connector1, values2);
         });
 
         it('update is present in the connector list', () => {
             return Connector.verify_all(entity1, [
-                { name: connector1, details: details2 },
-                { name: connector2, details: details2 }
+                { name: connector1, values: values2 },
+                { name: connector2, values: values2 }
             ]);
         });
 
         it('update is present when the connector is addressed directly', () => {
-            return Connector.verify(entity1, connector1, details2);
+            return Connector.verify(entity1, connector1, values2);
         });
 
         it('can delete the first connector from the entity', () => {
@@ -682,7 +329,7 @@ describe('Register Tests', function() {
 
         it('it is no longer present in the entities connector list', () => {
             return Connector.verify_all(entity1, [
-                { name: connector2, details: details2 }
+                { name: connector2, values: values2 }
             ]);
         });
 
@@ -728,28 +375,28 @@ describe('Register Tests', function() {
     describe('connector validation tests', () => {
         let entity = DATA.pick(DATA.NAME.VALID);
         let connector = DATA.pick(DATA.NAME.VALID);
-        let details = {
+        let values = {
             description: DATA.text(DATA.DESCRIPTION.REASONABLE),
             webhook: DATA.pick(DATA.WEBHOOK.VALID),
             cache: DATA.integer(DATA.CACHE.REASONABLE),
         };
 
         before(() => {
-            return Register.is_empty();
+            return Shared.empty();
         });
 
         after(() => {
-            return Register.is_empty();
+            return Shared.empty();
         });
 
         it('add the housing entity', () => {
-            return Entity.add(entity, { description: DATA.text(DATA.DESCRIPTION.REASONABLE) })
+            return Entity.add(entity)
         });
 
         it('disallows invalid connector name', () => {
             let tests = [];
             for (let i = 0; i < DATA.NAME.INVALID.length; i++) {
-                tests.push(Connector.bad(entity, DATA.NAME.INVALID[i], details, [{ name: 'invalid format' }]));
+                tests.push(Connector.bad(entity, DATA.NAME.INVALID[i], values, [{ name: 'invalid format' }]));
             }
             return Promise.all(tests);
         });
@@ -757,152 +404,37 @@ describe('Register Tests', function() {
         it('disallows invalid webhook url', () => {
             let tests = [];
             for (let i = 0; i < DATA.WEBHOOK.INVALID.length; i++) {
-                tests.push(Connector.bad(entity, connector, details, [{ url: 'invalid format' }], { webhook: DATA.WEBHOOK.INVALID[i] }));
+                tests.push(Connector.bad(entity, connector, values, [{ url: 'invalid format' }], { webhook: DATA.WEBHOOK.INVALID[i] }));
             }
             return Promise.all(tests);
         });
 
         it('disallows invalid cache', () => {
             let tests = [];
-            tests.push(Connector.bad(entity, connector, details, [{ cache: 'too large' }], { cache: DATA.CACHE.LONGEST + 1 }));
-            tests.push(Connector.bad(entity, connector, details, [{ cache: 'too small' }], { cache: DATA.CACHE.SHORTEST - 1 }));
-            tests.push(Connector.bad(entity, connector, details, [{ cache: 'too small' }], { cache: -1 }));
-            tests.push(Connector.bad(entity, connector, details, [{ cache: 'not an integer' }], { cache: DATA.text() }));
-            tests.push(Connector.bad(entity, connector, details, [{ cache: 'not an integer' }], { cache: DATA.integer().toString() }));
+            tests.push(Connector.bad(entity, connector, values, [{ cache: 'too large' }], { cache: DATA.CACHE.LONGEST + 1 }));
+            tests.push(Connector.bad(entity, connector, values, [{ cache: 'too small' }], { cache: DATA.CACHE.SHORTEST - 1 }));
+            tests.push(Connector.bad(entity, connector, values, [{ cache: 'too small' }], { cache: -1 }));
+            tests.push(Connector.bad(entity, connector, values, [{ cache: 'not an integer' }], { cache: DATA.text() }));
+            tests.push(Connector.bad(entity, connector, values, [{ cache: 'not an integer' }], { cache: DATA.integer().toString() }));
             return Promise.all(tests);
         });
 
         it('disallows invalid description', () => {
             let tests = [];
-            tests.push(Connector.bad(entity, connector, details, [{ description: 'too long' }], { description: DATA.text(DATA.DESCRIPTION.LONGEST + 1) }));
-            tests.push(Connector.bad(entity, connector, details, [{ description: 'too short' }], { description: '' }));
-            tests.push(Connector.bad(entity, connector, details, [{ description: 'too short' }], { description: null }));
+            tests.push(Connector.bad(entity, connector, values, [{ description: 'too long' }], { description: DATA.text(DATA.DESCRIPTION.LONGEST + 1) }));
+            tests.push(Connector.bad(entity, connector, values, [{ description: 'too short' }], { description: '' }));
+            tests.push(Connector.bad(entity, connector, values, [{ description: 'too short' }], { description: null }));
             return Promise.all(tests);
         });
 
         it('disallows multiple invalid paramters', () => {
             let errors = [{ description: 'too short', cache: 'too large', url: 'invalid format' }];
             let delta = { description: '', cache: DATA.CACHE.LONGEST + 1, webhook: DATA.pick(DATA.WEBHOOK.INVALID) };
-            return Connector.bad(entity, connector, details, errors, delta);
+            return Connector.bad(entity, connector, values, errors, delta);
         });
 
         it('can delete the entity type and all its connectors', () => {
             return Entity.delete(entity);
         });
     });
-
-    // --- TODO: complete these tests - connector modification tests
-    /*
-        describe('connector modification tests', () => {
-            let entity = DATA.pick(DATA.NAME.VALID);
-            let connector = DATA.pick(DATA.NAME.VALID);
-            let details = {
-                description: DATA.text(DATA.DESCRIPTION.REASONABLE),
-                webhook: DATA.pick(DATA.WEBHOOK.VALID),
-                cache: DATA.integer(DATA.CACHE.REASONABLE),
-            };
-
-            function modify_connector(settings) {
-                let modified = Object.assign(Object.assign({}, details), settings);
-                return chakram.put(shared.rest('entity', entity, 'connector', connector), modified)
-                .then(response => {
-                    expect(response).to.have.status(204);
-                    return chakram.get(shared.rest('entity', entity, 'connector', connector))
-                    .then(response => {
-                        expect(response).to.have.status(200);
-                        expect(response.body.description).to.be.eq(modified.description);
-                        expect(response.body.webhook).to.be.eq(modified.webhook);
-                        expect(response.body.cache).to.be.eq(modified.cache);
-                    //    expect(response.body.live).to.be.eq(false); // this should never be affected
-                        return chakram.wait();
-                    });
-                });
-            }
-
-            function modify_tests(tests) { // in a sequence, as it's the same connector each time
-                let test = Promise.resolve();
-
-                for (let i = 0; i < tests.length; i++) {
-                    test = test.then(() => {
-                        return modify_connector(tests[i]);
-                    });
-                }
-
-                return test;
-            }
-
-            before(() => {
-                return Register.is_empty();
-            });
-
-            after(() => {
-                return Register.is_empty();
-            });
-
-            it('add the housing entity', () => {
-                return Entity.add(entity, { description: DATA.text(DATA.DESCRIPTION.REASONABLE) })
-            });
-
-            it('cannot modify a connector that is not there', () => {
-                return chakram.put(shared.rest('entity', entity, 'connector', connector), details)
-                .then(response => {
-                    expect(response).to.have.status(404);
-                    return chakram.wait();
-                });
-            });
-
-            it('add the housing connector', () => {
-                return chakram.post(shared.rest('entity', entity, 'connector', connector), details)
-                .then(response => {
-                    expect(response).to.have.status(201);
-                    expect(response).to.have.header('Location', shared.rest('entity', entity, 'connector', connector));
-                    return chakram.wait();
-                });
-            });
-
-            it('can modify the connector without changing details', () => {
-                return modify_connector({});
-            });
-
-            it('can modify the connector cache value', () => {
-                return modify_tests([
-                    { cache: DATA.CACHE.LONGEST },
-                    { cache: DATA.CACHE.SHORTEST },
-                    { cache: DATA.CACHE.REASONABLE },
-                    { cache: null },
-                    { cache: DATA.CACHE.REASONABLE },
-                ]);
-            });
-
-            it('can modify the connector webhook value', () => {
-                let tests = [];
-
-                for (let i = 0; i < DATA.WEBHOOK.VALID.length; i++) {
-                    tests.push({ webhook: DATA.WEBHOOK.VALID[i] });
-                }
-
-                return modify_tests(tests);
-            });
-
-            it('can modify the connector description value', () => {
-                return modify_tests([
-                    { description: DATA.text() },
-                    { description: DATA.text(1) },
-                    { description: DATA.text(10) },
-                    { description: '' },
-                ]);
-            });
-
-            it('can modify multiple connector values in same call', () => {
-                return modify_tests([{
-                    cache: DATA.integer(DATA.CACHE.REASONABLE),
-                    webhook: DATA.pick(DATA.WEBHOOK.VALID),
-                    description: DATA.text(DATA.integer())
-                }]);
-            });
-
-            it('can delete the entity type and all its connectors', () => {
-                return Entity.delete(entity);
-            });
-        });*/
 });

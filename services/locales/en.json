@@ -1,12 +1,16 @@
 {
-    "error.name-short": "The name '%s' is too short.",
-    "error.name-long": "The name '%s' is too long.",
-    "error.desc-short": "The description '%s' is too short.",
-    "error.desc-long": "The description '%s' is too long.",
-    "error.name-invalid": "The name '%s' is an invalid format.",
-    "error.url-long": "The url '%s' is too long.",
-    "error.url-invalid": "The url '%s' is an invalid format.",
-    "error.cache-small": "The cache '%s' is too small.",
+    "error.action-invalid": "The session action '%s' is not recognised.",
+    "error.cache-invalid": "The cache '%s' is not an integer.",
     "error.cache-large": "The cache '%s' is too large.",
-    "error.cache-invalid": "The cache '%s' is not an integer."
+    "error.cache-small": "The cache '%s' is too small.",
+    "error.commit-invalid": "The session commit '%s' is not recognised.",
+    "error.desc-long": "The description '%s' is too long.",
+    "error.desc-short": "The description '%s' is too short.",
+    "error.id-invalid": "The id '%s' is an invalid format.",
+    "error.mode-invalid": "The session mode '%s' is not recognised.",
+    "error.name-invalid": "The name '%s' is an invalid format.",
+    "error.name-long": "The name '%s' is too long.",
+    "error.name-short": "The name '%s' is too short.",
+    "error.url-invalid": "The url '%s' is an invalid format.",
+    "error.url-long": "The url '%s' is too long."
 }

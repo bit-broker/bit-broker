@@ -27,6 +27,7 @@
 
 const Knex = require('knex');
 const Entity = require('./entity.js');
+const Connector = require('./connector.js');
 const Validate = require('./validate.js');
 
 // --- running contexts
@@ -37,5 +38,6 @@ var db = new Knex({ client: 'pg', connection: process.env.DB_CONNECT }); // TODO
 
 module.exports = {
     entity: new Entity(db),
+    connector: new Connector(db),
     validate: new Validate()
 };

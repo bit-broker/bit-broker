@@ -45,6 +45,8 @@ CREATE INDEX idx_entity_name ON entity (name);
 
 -- connector table
 
+CREATE TYPE session_modes AS ENUM ('accrue', 'stream', 'replace');
+
 CREATE TABLE connector
 (
     id SERIAL PRIMARY KEY,
@@ -56,8 +58,8 @@ CREATE TABLE connector
     webhook VARCHAR(255),
     cache INTEGER NOT NULL,
     session_id CHAR(36) UNIQUE,
-    session_created_at TIMESTAMP,
-    session_updated_at TIMESTAMP,
+    session_mode SESSION_MODES,
+    session_started TIMESTAMP,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (entity_id, name)
