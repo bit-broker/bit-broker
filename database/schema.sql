@@ -92,6 +92,38 @@ CREATE INDEX idx_connector_entity_id ON connector (entity_id);
 CREATE INDEX idx_connector_contribution_id ON connector (contribution_id);
 CREATE INDEX idx_connector_session_id ON connector (session_id);
 
+-- catalog table
+
+CREATE TABLE catalog
+(
+    id SERIAL PRIMARY KEY,
+    connector_id SERIAL NOT NULL REFERENCES connector (id) ON DELETE CASCADE,
+    name VARCHAR (64) NOT NULL,
+    record JSONB NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_catalog_name ON catalog (name);
+CREATE INDEX idx_catalog_connector_id ON catalog (connector_id);
+
+-- operation table
+
+CREATE TYPE operation_actions AS ENUM ('upsert', 'delete');
+
+CREATE TABLE operation
+(
+    id SERIAL PRIMARY KEY,
+    session_id CHAR(36) NOT NULL REFERENCES connector (session_id) ON DELETE CASCADE,
+    action OPERATION_ACTIONS NOT NULL,
+    name VARCHAR (64) NOT NULL,
+    record JSONB NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_operation_session_id ON operation (session_id);
+
 -- grant database permissions
 
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO bbk_reader;

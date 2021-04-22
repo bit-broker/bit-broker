@@ -70,14 +70,17 @@ module.exports = class Session {
     // --- processed actions on an open session for a given data connector
 
     action(req, res, next) {
+        log.info('connector', req.params.cid, 'session', req.params.sid, 'action', req.params.action);
         let cid = req.params.cid;
         let sid = req.params.sid;
         let action = req.params.action.toLowerCase();
+        let records = req.body;
         let errors = [];
 
         errors = errors.concat(model.validate.id(cid));
         errors = errors.concat(model.validate.id(sid));
         errors = errors.concat(model.validate.action(action));
+// TODO errors = errors.concat(model.validate.records(records));
 
         if (errors.length) {
             throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
@@ -89,7 +92,11 @@ module.exports = class Session {
             if (!session) throw failure(HTTP.NOT_FOUND);
             if (session.id != sid) throw failure(HTTP.UNAUTHORIZED);
 
-            res.status(HTTP.OK).send();  // TODO - fill this operation in
+            return session.process(action, records)
+
+            .then(() => {
+                res.status(HTTP.NO_CONTENT).send();  // TODO: Some return doc here?
+            });
         })
 
         .catch(error => next(error));
@@ -118,7 +125,7 @@ module.exports = class Session {
             if (!session) throw failure(HTTP.NOT_FOUND);
             if (session.id != sid) throw failure(HTTP.UNAUTHORIZED);
 
-            return session.close(commit == 'true') // converts to a boolean
+            return session.close(commit === 'true') // converts to a boolean
 
             .then(() => {
                 res.status(HTTP.OK).send();
