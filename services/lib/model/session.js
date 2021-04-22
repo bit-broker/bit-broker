@@ -56,6 +56,18 @@ module.exports = class Session {
         return uuidv4();
     }
 
+    // --- connector read context
+
+    get connectors() {
+        return this.db('connector');
+    }
+
+    // --- operations read context
+
+    get operations() {
+        return this.db('operation');
+    }
+
     // --- writes session data
 
     write() {
@@ -66,7 +78,7 @@ module.exports = class Session {
              session_started: this.started
         };
 
-        return this.db('connector').where({ contribution_id }).first().update(values).then(result => result.rowCount > 0);
+        return this.connectors.where({ contribution_id }).first().update(values).then(result => result.rowCount > 0);
     }
 
     // --- opens a new session
@@ -78,7 +90,23 @@ module.exports = class Session {
 
         return this.write();
     }
-    
+
+    // --- processes records on an open session
+
+    process(action, records) {
+        let values = [];
+        for (let i = 0 ; i < records.length ; i++) {
+            values.push ({
+                session_id: this.id,
+                action: action,
+                name: "foo",
+                record: records[i]
+            });
+        }
+
+        return values.length ? this.operations.insert(values).then(result => result.rowCount > 0) : Promise.resolve(true);
+    }
+
     // --- closes an open session
 
     close(commit) {

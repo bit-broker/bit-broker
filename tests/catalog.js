@@ -234,4 +234,45 @@ describe('Catalog Tests', function() {
             return Entity.delete(entity);
         });
     });
+
+    // --- session basic record tests
+
+    describe('session basic record tests', () => {
+
+        let entity = DATA.pick(DATA.NAME.VALID);
+        let connector = DATA.pick(DATA.NAME.VALID);
+        let sid = null;
+
+        before(() => {
+            return Shared.empty();
+        });
+
+        after(() => {
+            return Shared.empty();
+        });
+
+        it('can create the housing entity', () => {
+            return Entity.add(entity);
+        });
+
+        it('can create the housing connector', () => {
+            return Connector.add(entity, connector);
+        });
+
+        it('can now open a session', () => {
+            return Session.open(entity, connector, 'stream', ((session_id) => sid = session_id));
+        });
+
+        it('can post data to a session', () => {
+            return Session.action(entity, connector, sid, 'upsert', []);
+        });
+
+        it('can close the original session', () => {
+            return Session.close(entity, connector, sid, true);
+        });
+
+        it('can delete the housing entity', () => {
+            return Entity.delete(entity);
+        });
+    });
 });

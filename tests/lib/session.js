@@ -90,7 +90,7 @@ module.exports = class Session {
             return chakram.post(Shared.rest('connector', item.contribution.id, 'session', sid, action), data)
             .then(response => {
                 expect(response.body).to.be.undefined;
-                expect(response).to.have.status(HTTP.OK);
+                expect(response).to.have.status(HTTP.NO_CONTENT);
                 return chakram.wait();
             });
         });
