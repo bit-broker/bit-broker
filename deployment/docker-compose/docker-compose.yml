@@ -5,10 +5,34 @@
 version: '3'
 services:
 
+  # Register server
+  bitbroker-register-server:
+    build:
+      context: ../..
+      dockerfile: ./build/register-server/Dockerfile
+    container_name: bitbroker-register-server
+    image: bitbroker-register-server
+    depends_on:
+      - bitbroker-db
+    ports:
+      - 8001:8001
+
+  # Catalog server
+  bitbroker-catalog-server:
+    build:
+      context: ../..
+      dockerfile: ./build/catalog-server/Dockerfile
+    container_name: bitbroker-catalog-server
+    image: bitbroker-catalog-server
+    depends_on:
+      - bitbroker-db
+    ports:
+      - 8002:8002
+
   # The Database
-  db:
+  bitbroker-db:
     image: postgres:13.2
-    container_name: bitbroker_db
+    container_name: bitbroker-db
     volumes:
       - dbdata:/var/lib/postgresql/data
       - ../../database/schema.sql:/docker-entrypoint-initdb.d/init.sql
