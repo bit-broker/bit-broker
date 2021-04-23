@@ -264,7 +264,7 @@ describe('Catalog Tests', function() {
         });
 
         it('can post data to a session', () => {
-            return Session.action(entity, connector, sid, 'upsert', []);
+            return Session.action(entity, connector, sid, 'upsert', [{name: "foo"}, {name: "bar"}]);
         });
 
         it('can close the original session', () => {

@@ -35,6 +35,7 @@
 // --- dependancies
 
 const uuidv4 = require('uuid').v4;
+const Operation = require('./operation.js');
 
 // --- connector class (exported)
 
@@ -48,6 +49,7 @@ module.exports = class Session {
         this.id = item.session_id;
         this.started = item.session_started;
         this.mode = item.session_mode;
+        this.operations = new Operation(this.db, this.id);
     }
 
     // --- generates a unique session id
@@ -56,16 +58,10 @@ module.exports = class Session {
         return uuidv4();
     }
 
-    // --- connector read context
+    // --- table read context
 
-    get connectors() {
+    get rows() {
         return this.db('connector');
-    }
-
-    // --- operations read context
-
-    get operations() {
-        return this.db('operation');
     }
 
     // --- writes session data
@@ -78,42 +74,44 @@ module.exports = class Session {
              session_started: this.started
         };
 
-        return this.connectors.where({ contribution_id }).first().update(values).then(result => result.rowCount > 0);
+        return this.rows.where({ contribution_id }).first().update(values).then(result => result.rowCount > 0);
     }
 
     // --- opens a new session
 
     open(mode) {
-        this.id = Session.UNIQUE_ID;
-        this.mode = mode;
-        this.started = new Date().toISOString();
+        return (this.id ? this.operations.commit(false) : Promise.resolve(true))
 
-        return this.write();
+        .then(result => {
+            this.id = Session.UNIQUE_ID;
+            this.mode = mode;
+            this.started = new Date().toISOString();
+            this.operations = new Operation(this.db, this.id);
+            return this.write();
+        });
     }
 
     // --- processes records on an open session
 
     process(action, records) {
-        let values = [];
-        for (let i = 0 ; i < records.length ; i++) {
-            values.push ({
-                session_id: this.id,
-                action: action,
-                name: "foo",
-                record: records[i]
-            });
-        }
+        return this.operations.insert(action, records)
 
-        return values.length ? this.operations.insert(values).then(result => result.rowCount > 0) : Promise.resolve(true);
+        .then (result => {
+            return this.mode === 'stream' ? this.operations.commit(true) : Promise.resolve(result);
+        });
     }
 
     // --- closes an open session
 
     close(commit) {
-        this.id = null;
-        this.mode = null;
-        this.started = null;
+        return this.operations.commit(commit)
 
-        return this.write();
+        .then (result => {
+            this.id = null;
+            this.mode = null;
+            this.started = null;
+            this.operations = new Operation(this.db, this.id);
+            return this.write();
+        });
     }
 }
