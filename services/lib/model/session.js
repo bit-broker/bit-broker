@@ -37,7 +37,7 @@
 const uuidv4 = require('uuid').v4;
 const Operation = require('./operation.js');
 
-// --- connector class (exported)
+// --- session class (exported)
 
 module.exports = class Session {
 
