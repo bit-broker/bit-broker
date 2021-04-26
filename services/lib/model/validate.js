@@ -43,7 +43,7 @@ module.exports = class Validate {
     static get NAME_FORMAT() { return '^[a-z][a-z0-9_]+$'; }
     static get NAME_MAX_LENGTH() { return 64; }
     static get NAME_MIN_LENGTH() { return 3; }
-    static get SESSION_ACTIONS() { return ['upsert', 'remove']; }
+    static get SESSION_ACTIONS() { return ['upsert', 'delete']; }
     static get SESSION_COMMITS() { return ['true', 'false']; }
     static get SESSION_MODES() { return ['accrue', 'stream', 'replace']; }
     static get URL_FORMAT() { return { protocols: ['http', 'https'], require_tld: status.IS_LIVE, require_protocol: true, require_host: true, require_valid_protocol: true } };
