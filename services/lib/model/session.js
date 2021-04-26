@@ -69,9 +69,9 @@ module.exports = class Session {
     write() {
         let contribution_id = this.connector;
         let values = {
-             session_id: this.id,
-             session_mode: this.mode,
-             session_started: this.started
+            session_id: this.id,
+            session_mode: this.mode,
+            session_started: this.started
         };
 
         return this.rows.where({ contribution_id }).first().update(values).then(result => result.rowCount > 0);
@@ -96,7 +96,7 @@ module.exports = class Session {
     process(action, records) {
         return this.operations.insert(action, records)
 
-        .then (result => {
+        .then(result => {
             return this.mode === 'stream' ? this.operations.commit(true) : Promise.resolve(result);
         });
     }
@@ -106,7 +106,7 @@ module.exports = class Session {
     close(commit) {
         return this.operations.commit(commit)
 
-        .then (result => {
+        .then(result => {
             this.id = null;
             this.mode = null;
             this.started = null;
