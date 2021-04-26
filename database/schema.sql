@@ -98,12 +98,15 @@ CREATE TABLE catalog
 (
     id SERIAL PRIMARY KEY,
     connector_id SERIAL NOT NULL REFERENCES connector (id) ON DELETE CASCADE,
+    vendor_id VARCHAR(255) NOT NULL,
     name VARCHAR (64) NOT NULL,
     record JSONB NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (connector_id, vendor_id)
 );
 
+CREATE INDEX idx_catalog_vendor_id ON catalog (vendor_id);
 CREATE INDEX idx_catalog_name ON catalog (name);
 CREATE INDEX idx_catalog_connector_id ON catalog (connector_id);
 
@@ -116,6 +119,7 @@ CREATE TABLE operation
     id SERIAL PRIMARY KEY,
     session_id CHAR(36) NOT NULL REFERENCES connector (session_id) ON DELETE CASCADE,
     action OPERATION_ACTIONS NOT NULL,
+    vendor_id VARCHAR(255) NOT NULL,
     name VARCHAR (64) NOT NULL,
     record JSONB NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

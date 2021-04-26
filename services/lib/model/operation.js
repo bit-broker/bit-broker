@@ -32,7 +32,11 @@
 
 'use strict'; // code assumes ECMAScript 6
 
-// --- connector class (exported)
+// --- dependancies
+
+const Catalog = require('./catalog.js');
+
+// --- operation class (exported)
 
 module.exports = class Operation {
 
@@ -46,18 +50,20 @@ module.exports = class Operation {
     // --- operations read context
 
     get rows() {
-        return this.db('operation').where({ session_id: this.id });
+        return this.db('operation').where({ session_id: this.id }).orderBy('id'); // order it VERY important for operations
     }
 
     // --- stores operations associated with the given records in the given session
 
     insert(action, records) {
         let values = [];
-        for (let i = 0 ; i < records.length ; i++) {
-            values.push ({
+
+        for (let i = 0; i < records.length; i++) {
+            values.push({
                 session_id: this.id,
                 action: action,
-                name: "foo",  // TODO: take the name from inside the document
+                name: records[i].name, // TODO: handle this more fully
+                vendor_id: records[i].id,
                 record: records[i]
             });
         }
@@ -74,13 +80,39 @@ module.exports = class Operation {
     // --- processes operations associated with the given session
 
     process() {
-        return Promise.resolve(true);  // TODO: Needs implementation
+
+        let catalog = new Catalog(this.db);
+        let connector = this.db.from('connector').select('id').where({ session_id: this.id }).first(); // this will *not* execute here, but is compounded into the SQL below
+        let steps = [];
+        let step = Promise.resolve();  // TODO: Add transaction boundaries
+
+        this.rows.then(items => {
+            for (let i = 0; i < items.length; i++) {
+
+                step = step.then(() => { // chain the operations in strict order and never in parrallel
+
+                    if (items[i].action === 'upsert') {
+                        return catalog.upsert({
+                            connector_id: connector,
+                            vendor_id: items[i].vendor_id,
+                            name: items[i].name,
+                            record: items[i].record
+                        });
+                    } else {
+                        return catalog.delete(connector, items[i].vendor_id);
+                    }
+                });
+
+                steps.push(step);
+            }
+        });
+
+        return Promise.all(steps); // TODO can just wait for last
     }
 
     // --- commits or rollbacks pending operations for the session
 
     commit(commit) {
-        return (commit ? this.process() : Promise.resolve(true))
-        .then (result => this.delete());
+        return (commit ? this.process() : Promise.resolve(true)).then(result => this.delete());
     }
 }

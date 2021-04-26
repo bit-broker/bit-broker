@@ -264,7 +264,15 @@ describe('Catalog Tests', function() {
         });
 
         it('can post data to a session', () => {
-            return Session.action(entity, connector, sid, 'upsert', [{name: "foo"}, {name: "bar"}]);
+            return Session.action(entity, connector, sid, 'upsert', [{id: "123", name: "foo"}, {id: "456", name: "bar"}]);
+        });
+
+        it('can post new and updated data to a session', () => {
+            return Session.action(entity, connector, sid, 'upsert', [{id: "123", name: "bob"}, {id: "456", name: "sue"}, {id: "789", name: "alice"}]);
+        });
+
+        it('can post new and updated data to a session', () => {
+            return Session.action(entity, connector, sid, 'delete', [{id: "789", name: "alice"}]);
         });
 
         it('can close the original session', () => {
