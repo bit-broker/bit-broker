@@ -88,7 +88,7 @@ module.exports = class Operation {
 
             for (let i = 0; i < items.length; i++) {
 
-                step = step.then(() => { // chain the operations in strict order and never in parrallel
+                step = step.then(() => { // chain the operations in *strict order* and hence never in parrallel
 
                     if (items[i].action === 'upsert') {
                         return catalog.upsert({
