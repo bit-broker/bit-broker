@@ -54,8 +54,8 @@ module.exports = class Session {
 
     // --- table read context
 
-    get rows() {
-        return this.db('connector');
+    get row() {
+        return this.db('connector').where({ id: this.connector }).first();
     }
 
     // --- writes session data
@@ -73,7 +73,7 @@ module.exports = class Session {
             session_started: this.started
         };
 
-        return this.rows.where({ id: this.connector }).first().update(values).then(result => result.rowCount > 0);
+        return this.row.update(values).then(result => result.rowCount > 0);
     }
 
     // --- opens a new session
@@ -87,7 +87,7 @@ module.exports = class Session {
 
     process(action, records) {
         return this.operations.insert(action, records)
-        .then(result => this.mode === 'stream' ? this.operations.commit(true) : Promise.resolve(result));
+        .then(result => this.mode === 'stream' ? this.operations.commit(true) : Promise.resolve(result)); // streaming sessions auto commit true on each action
     }
 
     // --- closes an open session
