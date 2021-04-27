@@ -65,7 +65,7 @@ module.exports = class Entity {
     // --- adds a new entity type to the register
 
     insert(req, res, next) {
-        log.info('register', 'entity', "'"+req.params.eid+"'", 'insert');
+        log.info('register', 'entity', req.params.eid, 'insert');
         let eid = req.params.eid.toLowerCase();
         let description = req.body.description || '';
         let errors = [];
