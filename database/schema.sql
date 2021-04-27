@@ -77,7 +77,7 @@ CREATE TABLE connector
     description TEXT NOT NULL,
     contribution_id CHAR(36) UNIQUE,
     contribution_key CHAR(36),
-    webhook VARCHAR(255),
+    webhook VARCHAR(256),
     cache INTEGER NOT NULL,
     session_id CHAR(36) UNIQUE,
     session_mode SESSION_MODES,
@@ -98,8 +98,8 @@ CREATE TABLE catalog
 (
     id SERIAL PRIMARY KEY,
     connector_id SERIAL NOT NULL REFERENCES connector (id) ON DELETE CASCADE,
-    vendor_id VARCHAR(255) NOT NULL,
-    name VARCHAR (64) NOT NULL,
+    vendor_id VARCHAR(256) NOT NULL,
+    name VARCHAR (256) NOT NULL,
     record JSONB NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -119,8 +119,6 @@ CREATE TABLE operation
     id SERIAL PRIMARY KEY,
     session_id CHAR(36) NOT NULL REFERENCES connector (session_id) ON DELETE CASCADE,
     action OPERATION_ACTIONS NOT NULL,
-    vendor_id VARCHAR(255) NOT NULL,
-    name VARCHAR (64) NOT NULL,
     record JSONB NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP

@@ -62,8 +62,6 @@ module.exports = class Operation {
             values.push({
                 session_id: this.id,
                 action: action,
-                name: records[i].name, // TODO: handle this more fully
-                vendor_id: records[i].id,
                 record: records[i]
             });
         }
@@ -81,12 +79,12 @@ module.exports = class Operation {
 
     process() {
 
-        let catalog = new Catalog(this.db);
-        let connector = this.db.from('connector').select('id').where({ session_id: this.id }).first(); // this will *not* execute here, but is compounded into the SQL below
-        let steps = [];
-        let step = Promise.resolve();  // TODO: Add transaction boundaries
+        return this.rows.then(items => {
 
-        this.rows.then(items => {
+            let catalog = new Catalog(this.db);
+            let connector = this.db.from('connector').select('id').where({ session_id: this.id }).first(); // this will *not* execute here, but is compounded into the SQL below
+            let step = Promise.resolve();  // TODO: Add transaction boundaries
+
             for (let i = 0; i < items.length; i++) {
 
                 step = step.then(() => { // chain the operations in strict order and never in parrallel
@@ -94,20 +92,18 @@ module.exports = class Operation {
                     if (items[i].action === 'upsert') {
                         return catalog.upsert({
                             connector_id: connector,
-                            vendor_id: items[i].vendor_id,
-                            name: items[i].name,
+                            vendor_id: items[i].record.id,
+                            name: items[i].record.name,
                             record: items[i].record
                         });
                     } else {
-                        return catalog.delete(connector, items[i].vendor_id);
+                        return catalog.delete(connector, items[i].id);
                     }
                 });
-
-                steps.push(step);
             }
-        });
 
-        return Promise.all(steps); // TODO can just wait for last
+            return step; // return the last step 
+        });
     }
 
     // --- commits or rollbacks pending operations for the session

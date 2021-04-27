@@ -47,7 +47,7 @@ module.exports = class Validate {
     static get SESSION_COMMITS() { return ['true', 'false']; }
     static get SESSION_MODES() { return ['accrue', 'stream', 'replace']; }
     static get URL_FORMAT() { return { protocols: ['http', 'https'], require_tld: status.IS_LIVE, require_protocol: true, require_host: true, require_valid_protocol: true } };
-    static get URL_MAX_LENGTH() { return 255; }
+    static get URL_MAX_LENGTH() { return 256; }
 
     // --- validates a session action
 
