@@ -41,6 +41,7 @@ module.exports = class Session {
         return Connector.with(entity, connector, (item) => {
             return chakram.get(Shared.rest('connector', item.contribution.id, 'session', 'open', mode))
             .then(response => {
+                expect(response.body).to.be.a('string');
                 expect(response.body).to.match(new RegExp(DATA.ID.REGEX));
                 expect(response.body.length).to.be.eq(DATA.ID.SIZE);
                 expect(response).to.have.status(HTTP.OK);
@@ -201,5 +202,18 @@ module.exports = class Session {
                 return chakram.wait();
             });
         });
+    }
+
+    // --- an end-to-end open -> action -> close step
+
+    static records(entity, connector, records, mode, action, commit) {
+        return Session.open(entity, connector, mode, (sid => {
+
+            return Session.action(entity, connector, sid, action, records)
+
+            .then (() => {
+                return Session.close(entity, connector, sid, commit);
+            });
+        }));
     }
 }
