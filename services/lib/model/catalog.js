@@ -44,6 +44,7 @@ module.exports = class Catalog {
     get COLUMNS() {
         return [
             'catalog.id',
+            'catalog.public_id',
             'catalog.vendor_id',
             'catalog.name',
             'entity.name as entity_name',
@@ -60,6 +61,12 @@ module.exports = class Catalog {
         .select(this.COLUMNS)
         .join('connector', 'connector.id', 'catalog.connector_id')
         .join('entity', 'entity.id', 'connector.entity_id');
+    }
+
+    // --- list of entity instances for a given entity type
+
+    list(type) {
+        return this.rows.where({ 'entity.name': type });
     }
 
     // --- upserts a new catalog record

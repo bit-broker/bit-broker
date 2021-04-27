@@ -34,6 +34,7 @@
 
 // --- dependancies
 
+const Permit = require('./permit.js');
 const Catalog = require('./catalog.js');
 
 // --- operation class (exported)
@@ -42,9 +43,10 @@ module.exports = class Operation {
 
     // --- class constructor
 
-    constructor(db, id) {
+    constructor(db, id, connector) {
         this.db = db;
         this.id = id;
+        this.connector = connector;
     }
 
     // --- operations read context
@@ -82,7 +84,6 @@ module.exports = class Operation {
         return this.rows.then(items => {
 
             let catalog = new Catalog(this.db);
-            let connector = this.db.from('connector').select('id').where({ session_id: this.id }).first(); // this will *not* execute here, but is compounded into the SQL below
             let step = Promise.resolve();  // TODO: Add transaction boundaries
 
             for (let i = 0; i < items.length; i++) {
@@ -91,18 +92,19 @@ module.exports = class Operation {
 
                     if (items[i].action === 'upsert') {
                         return catalog.upsert({
-                            connector_id: connector,
+                            connector_id: this.connector,
+                            public_id: Permit.public_key(this.connector, items[i].record.id),
                             vendor_id: items[i].record.id,
                             name: items[i].record.name,
                             record: items[i].record
                         });
                     } else {
-                        return catalog.delete(connector, items[i].id);
+                        return catalog.delete(this.connector, items[i].id);
                     }
                 });
             }
 
-            return step; // return the last step 
+            return step; // return the last step
         });
     }
 

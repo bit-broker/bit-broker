@@ -97,6 +97,7 @@ CREATE INDEX idx_connector_session_id ON connector (session_id);
 CREATE TABLE catalog
 (
     id SERIAL PRIMARY KEY,
+    public_id CHAR(64) NOT NULL UNIQUE,
     connector_id SERIAL NOT NULL REFERENCES connector (id) ON DELETE CASCADE,
     vendor_id VARCHAR(256) NOT NULL,
     name VARCHAR (256) NOT NULL,
@@ -106,9 +107,10 @@ CREATE TABLE catalog
     UNIQUE (connector_id, vendor_id)
 );
 
+CREATE INDEX idx_catalog_public_id ON catalog (public_id);
 CREATE INDEX idx_catalog_vendor_id ON catalog (vendor_id);
-CREATE INDEX idx_catalog_name ON catalog (name);
 CREATE INDEX idx_catalog_connector_id ON catalog (connector_id);
+CREATE INDEX idx_catalog_name ON catalog (name);
 
 -- operation table
 

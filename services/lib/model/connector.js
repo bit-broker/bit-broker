@@ -34,7 +34,7 @@
 
 // --- dependancies
 
-const uuidv4 = require('uuid').v4;
+const Permit = require('./permit.js');
 const Session = require('./session.js');
 
 // --- connector class (exported)
@@ -46,12 +46,6 @@ module.exports = class Connector {
     constructor(db, name = null) {
         this.db = db;
         this.entity_name = name;
-    }
-
-    // --- generates a unique contribution id
-
-    static get UNIQUE_ID() {
-        return uuidv4();
     }
 
     // --- select column list
@@ -100,7 +94,7 @@ module.exports = class Connector {
     insert(name, values) {
         values.name = name;
         values.webhook = values.webhook.length ? values.webhook : null;
-        values.contribution_id = Connector.UNIQUE_ID;
+        values.contribution_id = Permit.CONTRIBUTION_ID;
         values.entity_id = this.db.from('entity').select('id').where({ name: this.entity_name }).first(); // this will *not* execute here, but is compounded into the SQL below
         return this.write.insert(values).then(result => result.rowCount > 0);
     }
