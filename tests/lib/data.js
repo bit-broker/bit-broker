@@ -26,8 +26,8 @@
 
 const DATA = {
 
-    integer: function(max = 100) {
-        return Math.floor(Math.random() * max);
+    integer: function(max = 100, min = 0) {
+        return Math.floor(Math.random() * (max - min) + min); // max is exclusive - min is inclusive
     },
 
     shuffle: function(array) {
@@ -51,7 +51,7 @@ const DATA = {
         for (let i = 0; i < count; i++) {
             items.push(this.shuffle(array).pop());
         }
-        return items;
+        return items.filter(function (e) { return e; });
     },
 
     text: function(size = 128) {
