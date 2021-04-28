@@ -33,7 +33,7 @@ const Mocha = require('mocha');
 
 var mocha = new Mocha();
 
-// --- test case list in preferred order - do NOT include the development script
+// --- test case list in preferred order - do NOT include the 'seed' script as this is for developmemnt testing only
 
 mocha.addFile('./register.js');
 mocha.addFile('./catalog.js');
