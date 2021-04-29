@@ -29,6 +29,7 @@ const Entity = require('./entity.js');
 const Connector = require('./connector.js');
 const Session = require('./session.js');
 const Consumer = require('./consumer.js');
+const Policy = require('./policy.js');
 
 // --- exports
 
@@ -36,5 +37,6 @@ module.exports = {
     entity: new Entity(),
     connector: new Connector(),
     session: new Session(),
-    consumer: new Consumer()
+    consumer: new Consumer(),
+    policy: new Policy()
 };

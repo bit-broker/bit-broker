@@ -128,6 +128,19 @@ CREATE TABLE operation
 
 CREATE INDEX idx_operation_session_id ON operation (session_id);
 
+-- policy table
+
+CREATE TABLE policy
+(
+    id SERIAL PRIMARY KEY,
+    slug VARCHAR (64) UNIQUE NOT NULL,
+    record JSONB NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_policy_slug ON policy (slug);
+
 -- grant database permissions
 
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO bbk_reader;

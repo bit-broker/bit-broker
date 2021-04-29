@@ -29,6 +29,7 @@ const Knex = require('knex');
 const Entity = require('./entity.js');
 const Connector = require('./connector.js');
 const Catalog = require('./catalog.js');
+const Policy = require('./policy.js');
 const Validate = require('./validate.js');
 
 // --- running contexts
@@ -41,5 +42,6 @@ module.exports = {
     entity: new Entity(db),
     connector: new Connector(db),
     catalog: new Catalog(db),
+    policy: new Policy(db),
     validate: new Validate()
 };

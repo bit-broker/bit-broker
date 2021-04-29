@@ -44,20 +44,29 @@ class Shared {
     constructor() {
         this.catalog = process.env.CATALOG_SERVER_BASE.replace(/\/$/g, ''); // without trailing slash
         this.register = process.env.REGISTER_SERVER_BASE.replace(/\/$/g, ''); // without trailing slash
+        this.policy = process.env.POLICY_SERVER_BASE.replace(/\/$/g, ''); // without trailing slash
         this.db = null;
     }
 
     // --- returns a restful url to either the catalog or register service
 
     rest(...resources) {
-        resources.unshift(resources.length && resources[0] === 'entity' ? this.register : this.catalog);
+        resources.unshift(resources.length && (resources[0] === 'entity' ? this.register : (resources[0] === 'policy' ? this.policy : this.catalog)));
         return resources.join('/');
     }
 
     // --- resets the underlying database - use with care!
+    /*
+        nuke() {
+            return this.db('entity').delete();
+        }
 
+    */
     nuke() {
-        return this.db('entity').delete();
+        return this.db('entity').delete()
+        .then(() => {
+            return this.db('policy').delete();
+        });
     }
 
     // --- resets the catalog - use with care!

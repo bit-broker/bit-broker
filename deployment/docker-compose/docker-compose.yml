@@ -2,9 +2,8 @@
 # Name:        docker-compose.yml
 ##################################################################################
 
-version: '3'
+version: "3"
 services:
-
   # Register server
   bitbroker-register-server:
     build:
@@ -29,6 +28,18 @@ services:
     ports:
       - 8002:8002
 
+  # Policy server
+  bitbroker-policy-server:
+    build:
+      context: ../..
+      dockerfile: ./build/policy-server/Dockerfile
+    container_name: bitbroker-policy-server
+    image: bitbroker-policy-server
+    depends_on:
+      - bitbroker-db
+    ports:
+      - 8003:8003
+
   # The Database
   bitbroker-db:
     image: postgres:13.2
@@ -37,7 +48,7 @@ services:
       - dbdata:/var/lib/postgresql/data
       - ../../database/schema.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
-      POSTGRES_PASSWORD: 'bitbr0ker'
+      POSTGRES_PASSWORD: "bitbr0ker"
     ports:
       - "5432:5432"
 

@@ -39,6 +39,7 @@ mocha.addFile('./register.js');
 mocha.addFile('./catalog.js');
 //mocha.addFile('./session.js');
 //mocha.addFile('./records.js');
+mocha.addFile('./policy.js');
 
 // --- run the tests
 

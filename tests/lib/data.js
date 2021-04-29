@@ -51,7 +51,7 @@ const DATA = {
         for (let i = 0; i < count; i++) {
             items.push(this.shuffle(array).pop());
         }
-        return items.filter(function (e) { return e; });
+        return items.filter(function(e) { return e; });
     },
 
     text: function(size = 128) {
@@ -248,6 +248,41 @@ const DATA = {
         { id: '0070735', name: 'The Sting', entity: { rank: 99, year: 1973, rating: 8.3, director: 'George Roy Hill' } },
         { id: '0435761', name: 'Toy Story 3', entity: { rank: 100, year: 2010, rating: 8.3, director: 'Lee Unkrich' } },
     ],
+
+    DSP_ID_1: "access_all_areas",
+    DSP_ID_2: "movies_only_no_ratings",
+    DSP_1: {
+        "name": "Access all areas",
+        "description": "Access all entities in the catalog, no fields hidden",
+        "access_control": {
+            "enabled": true,
+            "quota": {
+                "max_number": 24000,
+                "interval_type": "day"
+            },
+            "rate": 1000
+        },
+        "segment_query": {},
+        "hidden_types": [],
+        "field_masks": [],
+        "legal_context": [{ "type": "attribution", "text": "test harness attribution", "link": "https://cto-github.cisco.com/Team6/kalydo/tree/master/policy-distribution/test-harness" }]
+    },
+    DSP_2: {
+        "name": "Movies only no ratings",
+        "description": "Access to movie entities only, excluding ratings data",
+        "access_control": {
+            "enabled": true,
+            "quota": {
+                "max_number": 24000,
+                "interval_type": "day"
+            },
+            "rate": 1000
+        },
+        "segment_query": { "type": "movie" },
+        "hidden_types": [],
+        "field_masks": ["movie.rating"],
+        "legal_context": [{ "type": "attribution", "text": "test harness attribution", "link": "https://cto-github.cisco.com/Team6/kalydo/tree/master/policy-distribution/test-harness" }]
+    },
 };
 
 module.exports = DATA;

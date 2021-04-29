@@ -59,6 +59,29 @@ class Controller extends View {
 
         return doc;
     }
+
+    // --- a policy
+
+    static policy(item) {
+        return {
+            id: item.slug,
+            name: item.record.name,
+            url: this.rest(process.env.POLICY_SERVER_BASE, 'policy', item.slug),
+            policy: item.record
+        };
+    }
+
+    // --- a list of policy ids
+
+    static policies(items) {
+        let doc = [];
+
+        for (let i = 0; i < items.length; i++) {
+            doc.push(this.policy(items[i]));
+        }
+
+        return doc;
+    }
 }
 
 // --- contributor class (embedded)
