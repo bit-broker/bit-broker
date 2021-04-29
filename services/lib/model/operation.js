@@ -79,12 +79,12 @@ module.exports = class Operation {
 
     // --- processes operations associated with the given session
 
-    process() {
+    process(wipe = false) {
 
         return this.rows.then(items => {
 
             let catalog = new Catalog(this.db);
-            let step = Promise.resolve();  // TODO: Add transaction boundaries
+            let step = wipe ? catalog.wipe(this.connector) : Promise.resolve();  // TODO: Add transaction boundaries
 
             for (let i = 0; i < items.length; i++) {
 
@@ -99,7 +99,8 @@ module.exports = class Operation {
                             record: items[i].record
                         });
                     } else {
-                        return catalog.delete(this.connector, items[i].id);
+
+                        return catalog.delete(this.connector, items[i].record.id);
                     }
                 });
             }
@@ -110,7 +111,7 @@ module.exports = class Operation {
 
     // --- commits or rollbacks pending operations for the session
 
-    commit(commit) {
-        return (commit ? this.process() : Promise.resolve(true)).then(result => this.delete());
+    commit(commit, wipe = false) {
+        return (commit ? this.process(wipe) : Promise.resolve(true)).then(result => this.delete());
     }
 }

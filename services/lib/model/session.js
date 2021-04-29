@@ -93,7 +93,7 @@ module.exports = class Session {
     // --- closes an open session
 
     close(commit) {
-        return this.operations.commit(commit)
+        return this.operations.commit(commit, this.mode === 'replace')
         .then(result => this.write(null, null));
     }
 }

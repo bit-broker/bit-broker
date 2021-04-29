@@ -60,6 +60,12 @@ class Shared {
         return this.db('entity').delete();
     }
 
+    // --- resets the catalog - use with care!
+
+    wipe() {
+        return this.db('catalog').delete();
+    }
+
     // --- before any tests are run
 
     before_any() {

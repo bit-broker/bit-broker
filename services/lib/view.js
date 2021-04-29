@@ -23,48 +23,34 @@
 
 'use strict'; // code assumes ECMAScript 6
 
-// --- view class
+// --- view class (inherited)
 
 class View {
 
-    // --- constructor
+    // --- returns a restful url
 
-    constructor(base_register, base_catalog) {
-        this.base_register = base_register.replace(/\/$/g, ''); // without trailing slash
-        this.base_catalog = base_catalog.replace(/\/$/g, ''); // without trailing slash
+    static rest(...resources) {
+        return resources.join('/');
     }
+}
 
-    // --- entity url
+// --- controller class (embedded)
 
-    url_entity(eid) {
-        return `${ this.base_register }/entity/${ eid }`;
-    }
-
-    // --- connector url
-
-    url_connector(eid, cid) {
-        return `${ this.url_entity(eid) }/connector/${ cid }`;
-    }
-
-    // --- contribution url
-
-    url_contribution(id) {
-        return id === null ? null : `${ this.base_catalog }/connector/${ id }`;
-    }
+class Controller extends View {
 
     // --- an entity type
 
-    entity(item) {
+    static entity(item) {
         return {
             id: item.name,
-            url: this.url_entity(item.name),
+            url: this.rest(process.env.REGISTER_SERVER_BASE, 'entity', item.name),
             description: item.description
         };
     }
 
     // --- a list of entity types
 
-    entities(items) {
+    static entities(items) {
         let doc = [];
 
         for (let i = 0; i < items.length; i++) {
@@ -73,13 +59,18 @@ class View {
 
         return doc;
     }
+}
+
+// --- contributor class (embedded)
+
+class Contributor extends View {
 
     // --- a connector
 
-    connector(item, full = true) {
+    static connector(item, full = true) {
         let doc = {
             id: item.name,
-            url: this.url_connector(item.entity_name, item.name),
+            url: this.rest(process.env.REGISTER_SERVER_BASE, 'entity', item.entity_name, 'connector', item.name),
             description: item.description
         };
 
@@ -87,11 +78,11 @@ class View {
             doc = Object.assign(doc, {
                 entity: {
                     id: item.entity_name,
-                    url: this.url_entity(item.entity_name),
+                    url: this.rest(process.env.REGISTER_SERVER_BASE, 'entity', item.entity_name),
                 },
                 contribution: {
                     id: item.contribution_id,
-                    url: this.url_contribution(item.contribution_id),
+                    url: item.contribution_id === null ? null : this.rest(process.env.CATALOG_SERVER_BASE, 'connector', item.contribution_id),
                 },
                 webhook: item.webhook,
                 cache: item.cache,
@@ -104,7 +95,7 @@ class View {
 
     // --- a list of connectors
 
-    connectors(items) {
+    static connectors(items) {
         let doc = [];
 
         for (let i = 0; i < items.length; i++) {
@@ -115,6 +106,66 @@ class View {
     }
 }
 
+// --- consumer class (embedded)
+
+class Consumer extends View {
+
+    // --- an entity type
+
+    static entity(item) {
+        return {
+            id: item.name,
+            url: this.rest(process.env.CONSUMER_SERVER_BASE, 'entity', item.name),
+            description: item.description
+        };
+    }
+
+    // --- a list of entity types
+
+    static entities(items) {
+        let doc = [];
+
+        for (let i = 0; i < items.length; i++) {
+            doc.push(this.entity(items[i]));
+        }
+
+        return doc;
+    }
+
+    // --- an entity instance
+
+    static instance(item, full = true) {
+        let doc = {
+            id: item.public_id,
+            url: this.rest(process.env.CONSUMER_SERVER_BASE, 'entity', item.entity_name, item.public_id),
+            type: item.entity_name,
+            name: item.name
+        };
+
+        if (full) {
+            doc = Object.assign(doc, { entity: item.record.entity });
+        }
+
+        return doc;
+    }
+
+    // --- a list of entity instances
+
+    static instances(items) {
+        let doc = [];
+
+        for (let i = 0; i < items.length; i++) {
+            doc.push(this.instance(items[i], false));
+        }
+
+        return doc;
+    }
+}
+
 // --- exports
 
-module.exports = new View(process.env.REGISTER_SERVER_BASE, process.env.CATALOG_SERVER_BASE);
+module.exports = {
+    controller: Controller,
+    contributor: Contributor,
+    consumer: Consumer
+};

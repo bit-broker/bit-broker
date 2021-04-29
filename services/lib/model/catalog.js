@@ -69,6 +69,12 @@ module.exports = class Catalog {
         return this.rows.where({ 'entity.name': type });
     }
 
+    // --- find an entity instances by id for a given entity type
+
+    find(type, id) {
+        return this.list(type).where({ 'catalog.public_id': id }).first();
+    }
+
     // --- upserts a new catalog record
 
     upsert(values) {
@@ -80,5 +86,11 @@ module.exports = class Catalog {
 
     delete(connector_id, vendor_id) {
         return this.rows.where({ connector_id, vendor_id }).delete().then(result => result.rowCount > 0);
+    }
+
+    // --- deletes all records for the given connector
+
+    wipe(connector_id) {
+        return this.rows.where({ connector_id }).delete().then(result => result.rowCount > 0);
     }
 }

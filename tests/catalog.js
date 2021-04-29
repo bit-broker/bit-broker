@@ -260,7 +260,7 @@ describe('Catalog Tests', function() {
         });
 
         it('can now open a session', () => {
-            return Session.open(entity, connector, 'stream', ((session_id) => sid = session_id));
+            return Session.open(entity, connector, 'stream', (session_id => sid = session_id));
         });
 
         it('can post data to a session', () => {

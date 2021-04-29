@@ -41,7 +41,7 @@ module.exports = class Entity {
         model.entity.list()
 
         .then(items => {
-            res.json(view.entities(items));
+            res.json(view.controller.entities(items));
         })
 
         .catch(error => next(error));
@@ -56,7 +56,7 @@ module.exports = class Entity {
 
         .then(item => {
             if (!item) throw failure(HTTP.NOT_FOUND);
-            res.json(view.entity(item));
+            res.json(view.controller.entity(item));
         })
 
         .catch(error => next(error));

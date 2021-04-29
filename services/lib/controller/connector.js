@@ -47,7 +47,7 @@ module.exports = class Connector {
         })
 
         .then(items => {
-            res.json(view.connectors(items));
+            res.json(view.contributor.connectors(items));
         })
 
         .catch(error => next(error));
@@ -68,7 +68,7 @@ module.exports = class Connector {
 
         .then(item => {
             if (!item) throw failure(HTTP.NOT_FOUND);
-            res.json(view.connector(item));
+            res.json(view.contributor.connector(item));
         })
 
         .catch(error => next(error));
