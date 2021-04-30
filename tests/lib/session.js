@@ -16,7 +16,7 @@
 
   ----------------------------------------------------------------------------
 
-  Shared session methods used by all test scripts
+  Shared session test methods
 
 */
 
@@ -31,7 +31,7 @@ const Connector = require('./connector.js');
 const chakram = require('chakram');
 const expect = chakram.expect;
 
-// --- entity test class (exported)
+// --- session test class (exported)
 
 module.exports = class Session {
 
@@ -53,7 +53,7 @@ module.exports = class Session {
 
     // --- attempts to open a not known session
 
-    static open_missing(entity, connector, cid ) {
+    static open_missing(entity, connector, cid) {
         return Connector.with(entity, connector, (item) => {
             return chakram.get(Shared.rest('connector', cid, 'session', 'open', 'stream'))
             .then(response => {
@@ -208,10 +208,8 @@ module.exports = class Session {
 
     static records(entity, connector, records, mode, action, commit) {
         return Session.open(entity, connector, mode, (sid => {
-
             return Session.action(entity, connector, sid, action, records)
-
-            .then (() => {
+            .then(() => {
                 return Session.close(entity, connector, sid, commit);
             });
         }));

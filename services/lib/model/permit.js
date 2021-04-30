@@ -16,9 +16,8 @@
 
   ----------------------------------------------------------------------------
 
-  This class is responsible for opaquely generating IDs and keys used by other
-  components. Those components should make no assumptions as to how these are
-  generated other than their type and length.
+  Provides opaquely generated of IDs and keys, of which components should make
+  no assumptions other than their type and length.
 
 */
 
@@ -38,7 +37,7 @@ module.exports = class Permit {
         return crypto.randomUUID();
     }
 
-    // --- generates a unique conntribution id
+    // --- generates a unique contribution id
 
     static get CONTRIBUTION_ID() {
         return crypto.randomUUID();

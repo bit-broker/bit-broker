@@ -1,7 +1,7 @@
 {
-  "name": "register",
+  "name": "coordinator",
   "version": "1.0.0",
-  "description": "bit-broker register server",
+  "description": "bit-broker coordinator server",
   "main": "index.js",
   "scripts": {
     "test": "echo 'tests are only available in development builds'",

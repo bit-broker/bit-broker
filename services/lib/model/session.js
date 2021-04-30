@@ -18,11 +18,11 @@
 
   The connector session model abstraction.
 
+  Provides database abstraction for all bit-broker services, who should all
+  come via this model and never access the database directly.
+
   NOTE: All model methods assume that parameters have been validated and any
   required presence check has been completed by the controller.
-
-  NOTE: It is assumed that the controller is performing checks on the
-  existence of the housing entity and not relying upon SQL constraint errors.
 
   NOTE: Never use strings manipulation via knex.raw, as this will introduce
   SQL injection vulnerabilities. Also use either native knex methods or knex
@@ -58,7 +58,7 @@ module.exports = class Session {
         return this.db('connector').where({ id: this.connector }).first();
     }
 
-    // --- writes session data
+    // --- writes session state
 
     write(id, mode) {
 

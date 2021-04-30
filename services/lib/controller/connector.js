@@ -18,6 +18,9 @@
 
   The connector process controller.
 
+  Provides process control abstraction for all bit-broker services, who should
+  all come via this model and never manipulate the domain entities directly.
+
 */
 
 'use strict'; // code assumes ECMAScript 6
@@ -27,14 +30,14 @@
 const HTTP = require('http-status-codes');
 const failure = require('http-errors');
 const model = require('../model/index.js');
-const view = require('../view.js');
+const view = require('../view/index.js');
 const log = require('../logger.js').Logger;
 
 // --- connector class (exported)
 
 module.exports = class Connector {
 
-    // --- lists all the connectors for a named entity type
+    // --- lists all the connectors for the named entity type
 
     list(req, res, next) {
         let eid = req.params.eid.toLowerCase();
@@ -53,7 +56,7 @@ module.exports = class Connector {
         .catch(error => next(error));
     }
 
-    // --- gets details of a named connector on a named entity type
+    // --- gets details of a named connector on the named entity type
 
     get(req, res, next) {
         let eid = req.params.eid.toLowerCase();
@@ -74,10 +77,10 @@ module.exports = class Connector {
         .catch(error => next(error));
     }
 
-    // --- adds a new connector to a named entity type
+    // --- adds a new connector to the named entity type
 
     insert(req, res, next) {
-        log.info('register', 'entity', req.params.eid, 'connector', req.params.cid, 'insert');
+        log.info('coordinator', 'entity', req.params.eid, 'connector', req.params.cid, 'insert');
 
         let eid = req.params.eid.toLowerCase();
         let cid = req.params.cid.toLowerCase();
@@ -103,7 +106,7 @@ module.exports = class Connector {
 
             .then(item => {
                 if (item) {
-                    log.info('register', 'entity', eid, 'connector', cid, 'insert', 'duplicate');
+                    log.info('coordinator', 'entity', eid, 'connector', cid, 'insert', 'duplicate');
                     throw failure(HTTP.CONFLICT);
                 }
 
@@ -112,7 +115,7 @@ module.exports = class Connector {
         })
 
         .then(() => {
-            log.info('register', 'entity', eid, 'connector', cid, 'insert', 'complete');
+            log.info('coordinator', 'entity', eid, 'connector', cid, 'insert', 'complete');
             let href = `${ req.protocol }://${ req.get('host') }${ req.originalUrl }`;
             res.set({ 'Location': href }).status(HTTP.CREATED).send();
         })
@@ -123,7 +126,7 @@ module.exports = class Connector {
     // --- modifies an existing connector on the named entity type
 
     update(req, res, next) {
-        log.info('register', 'entity', req.params.eid, 'connector', req.params.cid, 'update');
+        log.info('coordinator', 'entity', req.params.eid, 'connector', req.params.cid, 'update');
 
         let eid = req.params.eid.toLowerCase();
         let cid = req.params.cid.toLowerCase();
@@ -153,7 +156,7 @@ module.exports = class Connector {
         })
 
         .then(() => {
-            log.info('register', 'entity', eid, 'connector', cid, 'update', 'complete');
+            log.info('coordinator', 'entity', eid, 'connector', cid, 'update', 'complete');
             res.status(HTTP.NO_CONTENT).send();
         })
 
@@ -163,7 +166,7 @@ module.exports = class Connector {
     // --- deletes a connector on the named entity type
 
     delete(req, res, next) {
-        log.info('register', 'entity', req.params.eid, 'connector', req.params.cid, 'delete');
+        log.info('coordinator', 'entity', req.params.eid, 'connector', req.params.cid, 'delete');
 
         let eid = req.params.eid.toLowerCase();
         let cid = req.params.cid.toLowerCase();
@@ -181,7 +184,7 @@ module.exports = class Connector {
         })
 
         .then(() => {
-            log.info('register', 'entity', eid, 'connector', cid, 'delete', 'complete');
+            log.info('coordinator', 'entity', eid, 'connector', cid, 'delete', 'complete');
             res.status(HTTP.NO_CONTENT).send();
         })
 

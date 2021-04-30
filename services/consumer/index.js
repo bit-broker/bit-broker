@@ -16,8 +16,8 @@
 
   ----------------------------------------------------------------------------
 
-  The bit-broker consumer api server, offering controlled access to the
-  catalog, entities and timeseries.
+  The bit-broker consumer server - offering controlled access to the catalog,
+  entities and timeseries.
 
 */
 
@@ -28,9 +28,10 @@
 const PATH_LIB = process.env.PATH_LIB || '../lib';
 const PATH_CFG = process.env.PATH_CFG || '../..';
 
-// --- load configuration
+// --- load configuration - do this first
 
 require('dotenv').config({ path: `${ PATH_CFG }/.env` });
+process.env.DATABASE = process.env.DATABASE.replace('CREDENTIALS', process.env.CONSUMER_USER);
 
 // --- dependancies
 
@@ -39,7 +40,7 @@ const controller = require(`${ PATH_LIB }/controller/index.js`);
 
 // --- running contexts
 
-var api = new Server(process.env.CONSUMER_SERVER_NAME, process.env.CONSUMER_SERVER_BASE);
+var api = new Server(process.env.CONSUMER_NAME, process.env.CONSUMER_BASE);
 
 // --- endpoints
 

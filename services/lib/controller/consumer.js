@@ -16,7 +16,10 @@
 
   ----------------------------------------------------------------------------
 
-  The consumer api controller.
+  The consumer process controller.
+
+  Provides process control abstraction for all bit-broker services, who should
+  all come via this model and never manipulate the domain entities directly.
 
 */
 
@@ -27,7 +30,7 @@
 const HTTP = require('http-status-codes');
 const failure = require('http-errors');
 const model = require('../model/index.js');
-const view = require('../view.js');
+const view = require('../view/index.js');
 const log = require('../logger.js').Logger;
 
 // --- timeseries class (embedded)
@@ -87,7 +90,7 @@ module.exports = class Consumer {
         .catch(error => next(error));
     }
 
-    // --- lists all the entity instances for the given type
+    // --- lists all the entity instances for the given entity type
 
     list(req, res, next) {
         let type = req.params.type.toLowerCase();

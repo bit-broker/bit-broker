@@ -16,7 +16,7 @@
 
   ----------------------------------------------------------------------------
 
-  The register server test harness - use command 'mocha register'
+  The coordinator test harness - use command 'mocha coordinator'
 
   WARNING: Running this script will reset the entire database!
 
@@ -36,7 +36,7 @@ const expect = chakram.expect;
 
 // --- the test cases
 
-describe('Register Tests', function() {
+describe('Coordinator Tests', function() {
 
     this.timeout(0); // we are not interested in non-functional tests here
 
@@ -57,11 +57,11 @@ describe('Register Tests', function() {
     describe('start up tests', () => {
 
         it('the server is up', () => {
-            return Shared.up(Shared.register);
+            return Shared.up(Shared.coordinator);
         });
 
         it('it responds to an announce request', () => {
-            return Shared.announce(Shared.register, process.env.REGISTER_SERVER_NAME, process.env.REGISTER_SERVER_BASE);
+            return Shared.announce(Shared.coordinator, process.env.COORDINATOR_NAME, process.env.COORDINATOR_BASE);
         });
 
         it('it responds to unknown restful resources', () => {
@@ -73,9 +73,9 @@ describe('Register Tests', function() {
         });
     });
 
-    // --- register manipulation tests
+    // --- coordinator manipulation tests
 
-    describe('register manipulation tests', () => {
+    describe('coordinator manipulation tests', () => {
 
         let name1 = DATA.pluck(DATA.NAME.VALID); // pluck - so as to never get duplicate
         let name2 = DATA.pick(DATA.NAME.VALID);
@@ -162,9 +162,9 @@ describe('Register Tests', function() {
         });
     });
 
-    // --- register validation tests
+    // --- coordinator validation tests
 
-    describe('register validation tests', () => {
+    describe('coordinator validation tests', () => {
 
         before(() => {
             return Shared.empty();

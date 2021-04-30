@@ -16,7 +16,8 @@
 
   ----------------------------------------------------------------------------
 
-  The bit-broker policy server, offering services to manipulate data sharing policies
+  The bit-broker policy server, offering services to manipulate data sharing
+  policies
 
 */
 
@@ -27,9 +28,10 @@
 const PATH_LIB = process.env.PATH_LIB || '../lib';
 const PATH_CFG = process.env.PATH_CFG || '../..';
 
-// --- load configuration
+// --- load configuration - do this first
 
 require('dotenv').config({ path: `${ PATH_CFG }/.env` });
+process.env.DATABASE = process.env.DATABASE.replace('CREDENTIALS', process.env.POLICY_USER);
 
 // --- dependancies
 
@@ -38,7 +40,7 @@ const controller = require(`${ PATH_LIB }/controller/index.js`);
 
 // --- running contexts
 
-var api = new Server(process.env.POLICY_SERVER_NAME, process.env.POLICY_SERVER_BASE);
+var api = new Server(process.env.POLICY_NAME, process.env.POLICY_BASE);
 
 // --- policy endpoints
 

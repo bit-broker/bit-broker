@@ -16,7 +16,7 @@
 
   ----------------------------------------------------------------------------
 
-  The bit-broker catalog server, offering data contribution services to
+  The bit-broker contribution server - offering data contribution services to
   registered data connectors.
 
 */
@@ -28,9 +28,10 @@
 const PATH_LIB = process.env.PATH_LIB || '../lib';
 const PATH_CFG = process.env.PATH_CFG || '../..';
 
-// --- load configuration
+// --- load configuration - do this first
 
 require('dotenv').config({ path: `${ PATH_CFG }/.env` });
+process.env.DATABASE = process.env.DATABASE.replace('CREDENTIALS', process.env.CONTRIBUTOR_USER);
 
 // --- dependancies
 
@@ -39,7 +40,7 @@ const controller = require(`${ PATH_LIB }/controller/index.js`);
 
 // --- running contexts
 
-var api = new Server(process.env.CATALOG_SERVER_NAME, process.env.CATALOG_SERVER_BASE);
+var api = new Server(process.env.CONTRIBUTOR_NAME, process.env.CONTRIBUTOR_BASE);
 
 // --- catalog endpoints
 

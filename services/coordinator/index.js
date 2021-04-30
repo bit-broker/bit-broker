@@ -16,8 +16,8 @@
 
   ----------------------------------------------------------------------------
 
-  The bit-broker register server, offering services to manipulate the entity
-  register and associated connectors.
+  The bit-broker coordinator server - offering services to add, remove and
+  update entity types and their associated connectors.
 
 */
 
@@ -28,9 +28,10 @@
 const PATH_LIB = process.env.PATH_LIB || '../lib';
 const PATH_CFG = process.env.PATH_CFG || '../..';
 
-// --- load configuration
+// --- load configuration - do this first
 
 require('dotenv').config({ path: `${ PATH_CFG }/.env` });
+process.env.DATABASE = process.env.DATABASE.replace('CREDENTIALS', process.env.COORDINATOR_USER);
 
 // --- dependancies
 
@@ -39,7 +40,7 @@ const controller = require(`${ PATH_LIB }/controller/index.js`);
 
 // --- running contexts
 
-var api = new Server(process.env.REGISTER_SERVER_NAME, process.env.REGISTER_SERVER_BASE);
+var api = new Server(process.env.COORDINATOR_NAME, process.env.COORDINATOR_BASE);
 
 // --- entity endpoints
 

@@ -16,15 +16,16 @@
 
   ----------------------------------------------------------------------------
 
-  Shared general methods used by all test scripts
+  Shared methods used by all test scripts
 
 */
 
 'use strict'; // code assumes ECMAScript 6
 
-// --- load configuration
+// --- load configuration - do this first
 
 require('dotenv').config({ path: '../.env' });
+process.env.DATABASE = process.env.DATABASE.replace('CREDENTIALS', process.env.TESTS_USER);
 
 // --- dependancies
 
@@ -42,34 +43,31 @@ class Shared {
     // --- class constructor
 
     constructor() {
-        this.catalog = process.env.CATALOG_SERVER_BASE.replace(/\/$/g, ''); // without trailing slash
-        this.register = process.env.REGISTER_SERVER_BASE.replace(/\/$/g, ''); // without trailing slash
-        this.policy = process.env.POLICY_SERVER_BASE.replace(/\/$/g, ''); // without trailing slash
+        this.coordinator = process.env.COORDINATOR_BASE.replace(/\/$/g, ''); // all urls without trailing slash
+        this.contributor = process.env.CONTRIBUTOR_BASE.replace(/\/$/g, '');
+        this.consumer = process.env.CONSUMER_BASE.replace(/\/$/g, '');
+        this.policy = process.env.POLICY_BASE.replace(/\/$/g, '');
         this.db = null;
     }
 
     // --- returns a restful url to either the catalog or register service
 
-    rest(...resources) {
-        resources.unshift(resources.length && (resources[0] === 'entity' ? this.register : (resources[0] === 'policy' ? this.policy : this.catalog)));
+    rest(...resources) {  // TODO - line below is ugly - do it another way
+        resources.unshift(resources.length && (resources[0] === 'entity' ? this.coordinator : (resources[0] === 'policy' ? this.policy : this.contributor)));
         return resources.join('/');
     }
 
-    // --- resets the underlying database - use with care!
-    /*
-        nuke() {
-            return this.db('entity').delete();
-        }
+    // --- resets the underlying database
 
-    */
     nuke() {
         return this.db('entity').delete()
+
         .then(() => {
             return this.db('policy').delete();
         });
     }
 
-    // --- resets the catalog - use with care!
+    // --- resets the catalog
 
     wipe() {
         return this.db('catalog').delete();
@@ -78,7 +76,7 @@ class Shared {
     // --- before any tests are run
 
     before_any() {
-        this.db = new Knex({ client: 'pg', connection: process.env.DB_CONNECT });
+        this.db = new Knex({ client: 'pg', connection: process.env.DATABASE });
         return this.nuke();
     }
 

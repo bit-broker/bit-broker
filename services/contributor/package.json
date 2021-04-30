@@ -1,7 +1,7 @@
 {
-  "name": "catalog",
+  "name": "contributor",
   "version": "1.0.0",
-  "description": "bit-broker catalog server",
+  "description": "bit-broker contributor server",
   "main": "index.js",
   "scripts": {
     "test": "echo 'tests are only available in development builds'",

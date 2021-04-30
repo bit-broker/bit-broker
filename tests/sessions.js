@@ -66,7 +66,7 @@ describe('Connector Session Tests', function() {
         ]);
     });
 
-     it('OS > U1 > CF', () => {
+    it('OS > U1 > CF', () => {
         return script.run([
             'open stream',
             'upsert 1',
@@ -793,24 +793,24 @@ describe('Connector Session Tests', function() {
 
         let steps = [];
 
-        for (let i=0; i < COUNT_STEPS ; i++) {
+        for (let i = 0; i < COUNT_STEPS; i++) {
             let params1 = [];
             let params2 = [];
 
-            for (let j=0; j < COUNT_RECORDS ; j++) {
-                params1.push(DATA.anindex ());
-                params2.push(DATA.anindex ());
+            for (let j = 0; j < COUNT_RECORDS; j++) {
+                params1.push(DATA.anindex());
+                params2.push(DATA.anindex());
             }
 
-            steps.push ('open ' + (DATA.flip () ? 'stream' : (DATA.flip () ? 'accrue' : 'replace')));
-            steps.push ('upsert ' + params1.join(',') + ',' + params2.join(','));
-            steps.push ('modify ' + params1.join(','));
-            steps.push ('upsert ' + params1.join(','));
-            steps.push ('delete ' + params2.join(','));
-            steps.push ('close ' + (DATA.flip () ? 'true' : 'false'));
+            steps.push('open ' + (DATA.flip() ? 'stream' : (DATA.flip() ? 'accrue' : 'replace')));
+            steps.push('upsert ' + params1.join(',') + ',' + params2.join(','));
+            steps.push('modify ' + params1.join(','));
+            steps.push('upsert ' + params1.join(','));
+            steps.push('delete ' + params2.join(','));
+            steps.push('close ' + (DATA.flip() ? 'true' : 'false'));
         }
 
-//            console.log (steps);
+        //            console.log (steps);
         return script.run(steps);
     });
 

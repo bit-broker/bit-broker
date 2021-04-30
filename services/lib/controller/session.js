@@ -16,7 +16,10 @@
 
   ----------------------------------------------------------------------------
 
-  The data connector session process controller.
+  The session process controller.
+
+  Provides process control abstraction for all bit-broker services, who should
+  all come via this model and never manipulate the domain entities directly.
 
 */
 
@@ -27,14 +30,14 @@
 const HTTP = require('http-status-codes');
 const failure = require('http-errors');
 const model = require('../model/index.js');
-const view = require('../view.js');
+const view = require('../view/index.js');
 const log = require('../logger.js').Logger;
 
 // --- session class (exported)
 
 module.exports = class Session {
 
-    // --- opens a session for a given data connector
+    // --- opens a session for the given data connector
 
     open(req, res, next) {
         log.info('connector', req.params.cid, 'session', 'open', req.params.mode);
@@ -67,7 +70,7 @@ module.exports = class Session {
         .catch(error => next(error));
     }
 
-    // --- processed actions on an open session for a given data connector
+    // --- processed actions on an open session for the given data connector
 
     action(req, res, next) {
         log.info('connector', req.params.cid, 'session', req.params.sid, 'action', req.params.action);
@@ -80,7 +83,7 @@ module.exports = class Session {
         errors = errors.concat(model.validate.id(cid));
         errors = errors.concat(model.validate.id(sid));
         errors = errors.concat(model.validate.action(action));
-// TODO errors = errors.concat(model.validate.records(records));
+        // TODO errors = errors.concat(model.validate.records(records));
 
         if (errors.length) {
             throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
@@ -95,14 +98,14 @@ module.exports = class Session {
             return session.process(action, records)
 
             .then(() => {
-                res.status(HTTP.NO_CONTENT).send();  // TODO: Some return doc here?
+                res.status(HTTP.NO_CONTENT).send(); // TODO: Some return doc here?
             });
         })
 
         .catch(error => next(error));
     }
 
-    // --- closes a session for a given data connector
+    // --- closes a session for the given data connector
 
     close(req, res, next) {
         log.info('connector', req.params.cid, 'session', req.params.sid, 'close', req.params.commit);

@@ -18,6 +18,9 @@
 
   The policy process controller.
 
+  Provides process control abstraction for all bit-broker services, who should
+  all come via this model and never manipulate the domain entities directly.
+
 */
 
 'use strict'; // code assumes ECMAScript 6
@@ -27,7 +30,7 @@
 const HTTP = require('http-status-codes');
 const failure = require('http-errors');
 const model = require('../model/index.js');
-const view = require('../view.js');
+const view = require('../view/index.js');
 const log = require('../logger.js').Logger;
 
 // --- policy class (exported)
@@ -41,7 +44,7 @@ module.exports = class Policy {
         model.policy.list()
 
         .then(items => {
-            res.json(view.controller.policies(items));
+            res.json(view.policy.policies(items));
         })
 
         .catch(error => next(error));
@@ -56,7 +59,7 @@ module.exports = class Policy {
 
         .then(item => {
             if (!item) throw failure(HTTP.NOT_FOUND);
-            res.json(view.controller.policy(item));
+            res.json(view.policy.policy(item));
         })
 
         .catch(error => next(error));
@@ -65,7 +68,7 @@ module.exports = class Policy {
     // --- adds a new policy
 
     insert(req, res, next) {
-        log.info('policy', "'" + req.params.pid + "'", 'insert');
+        log.info('policy', req.params.pid, 'insert');
         let pid = req.params.pid.toLowerCase();
         let record = req.body || '';
         let errors = [];
@@ -97,7 +100,7 @@ module.exports = class Policy {
         .catch(error => next(error));
     }
 
-    // --- modifies an existing policy 
+    // --- modifies an existing policy
 
     update(req, res, next) {
         log.info('policy', req.params.pid, 'update');

@@ -22,7 +22,7 @@
 
 'use strict'; // code assumes ECMAScript 6
 
-// --- data used for tests
+// --- data used for tests (exported)
 
 const DATA = {
 
@@ -89,7 +89,7 @@ const DATA = {
         return Math.floor(Math.random() * DATA.RECORDS.length);
     },
 
-    keys: function(records) {
+    keys: function(records) { // TODO - needed?
         let keys = [];
         records.forEach(record => keys.push(record.id));
         return keys;
@@ -282,7 +282,7 @@ const DATA = {
         "hidden_types": [],
         "field_masks": ["movie.rating"],
         "legal_context": [{ "type": "attribution", "text": "test harness attribution", "link": "https://cto-github.cisco.com/Team6/kalydo/tree/master/policy-distribution/test-harness" }]
-    },
+    },    
 };
 
 module.exports = DATA;

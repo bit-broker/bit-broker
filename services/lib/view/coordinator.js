@@ -16,32 +16,42 @@
 
   ----------------------------------------------------------------------------
 
-  The high level test runner, which executes all the scripts in the preferred
-  order - use command 'node start'
+  The coordinator view
 
-  WARNING: Running this script will reset the entire database!
+  Formats the output for all bit-brokers services in order to ensure there is
+  consistency in representation.
 
 */
 
 'use strict'; // code assumes ECMAScript 6
 
-// -- dependancies
+// --- dependancies
 
-const Mocha = require('mocha');
+const View = require('./view.js');
 
-// --- running contexts
+// --- coordinator class (embedded)
 
-var mocha = new Mocha();
+module.exports = class Coordinator extends View {
 
-// --- test case list in preferred order - do NOT include the 'seed' script as this is for developmemnt testing only
+    // --- an entity type
 
-mocha.addFile('./coordinator.js');
-mocha.addFile('./contributor.js');
-mocha.addFile('./sessions.js');
-mocha.addFile('./policy.js');
+    static entity(item) {
+        return {
+            id: item.name,
+            url: this.rest(process.env.COORDINATOR_BASE, 'entity', item.name),
+            description: item.description
+        };
+    }
 
-// --- run the tests
+    // --- a list of entity types
 
-mocha.run(failures => {
-    process.exitCode = failures ? 1 : 0;
-});
+    static entities(items) {
+        let doc = [];
+
+        for (let i = 0; i < items.length; i++) {
+            doc.push(this.entity(items[i]));
+        }
+
+        return doc;
+    }
+}

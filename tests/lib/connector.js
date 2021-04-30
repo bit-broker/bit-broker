@@ -16,7 +16,7 @@
 
   ----------------------------------------------------------------------------
 
-  Shared connector methods used by all test scripts
+  Shared connector test methods
 
 */
 
@@ -30,7 +30,7 @@ const Shared = require('./shared.js');
 const chakram = require('chakram');
 const expect = chakram.expect;
 
-// --- connector test class
+// --- connector test class (exported)
 
 module.exports = class Connector {
 

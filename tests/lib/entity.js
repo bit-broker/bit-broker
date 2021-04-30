@@ -16,7 +16,7 @@
 
   ----------------------------------------------------------------------------
 
-  Shared entity methods used by all test scripts
+  Shared entity test methods 
 
 */
 

@@ -37,7 +37,7 @@ const expect = chakram.expect;
 
 // --- the test cases
 
-describe('Catalog Tests', function() {
+describe('Contributor Tests', function() {
 
     this.timeout(0); // we are not interested in non-functional tests here
 
@@ -58,11 +58,11 @@ describe('Catalog Tests', function() {
     describe('start up tests', () => {
 
         it('the server is up', () => {
-            return Shared.up(Shared.catalog);
+            return Shared.up(Shared.contributor);
         });
 
         it('it responds to an announce request', () => {
-            return Shared.announce(Shared.catalog, process.env.CATALOG_SERVER_NAME, process.env.CATALOG_SERVER_BASE);
+            return Shared.announce(Shared.contributor, process.env.CONTRIBUTOR_NAME, process.env.CONTRIBUTOR_BASE);
         });
 
         it('it responds to unknown restful resources', () => {
@@ -99,7 +99,7 @@ describe('Catalog Tests', function() {
         });
 
         it('can open a session', () => {
-            return Session.open(entity, connector, 'stream', ((session_id) => sid = session_id));
+            return Session.open(entity, connector, 'stream', (session_id => sid = session_id));
         });
 
         it('can post data to a session', () => {
@@ -111,7 +111,7 @@ describe('Catalog Tests', function() {
         });
 
         it('can open a new session', () => {
-            return Session.open(entity, connector, 'stream', ((session_id) => sid = session_id));
+            return Session.open(entity, connector, 'stream', (session_id => sid = session_id));
         });
 
         it('can post data to a session', () => {
@@ -119,8 +119,7 @@ describe('Catalog Tests', function() {
         });
 
         it('can open a new session, overwriting previous', () => {
-            return Session.open(entity, connector, 'stream', ((session_id) =>
-            {
+            return Session.open(entity, connector, 'stream', (session_id => {
                 expect(session_id).to.not.be.eq(sid); // different session id as overwritten
                 sid = session_id;
             }));
@@ -164,7 +163,7 @@ describe('Catalog Tests', function() {
         });
 
         it('can now open a session', () => {
-            return Session.open(entity, connector, 'stream', ((session_id) => sid = session_id));
+            return Session.open(entity, connector, 'stream', (session_id => sid = session_id));
         });
 
         it('cannot open a session with an unknown contribution id', () => {
@@ -172,16 +171,16 @@ describe('Catalog Tests', function() {
         });
 
         it('cannot open a session with an invalid contribution id', () => {
-            return Session.open_bad(entity, connector, DATA.ID.UNKNOWN + 'X', 'stream', [{ id: 'invalid format'}]);
+            return Session.open_bad(entity, connector, DATA.ID.UNKNOWN + 'X', 'stream', [{ id: 'invalid format' }]);
         });
 
         it('cannot open a session with an unknown mode', () => {
             let mode = DATA.name();
-            return Session.open_bad(entity, connector, null, mode, [{ mode: 'not recognised'}]);
+            return Session.open_bad(entity, connector, null, mode, [{ mode: 'not recognised' }]);
         });
 
         it('can now open a session', () => {
-            return Session.open(entity, connector, 'stream', ((session_id) => sid = session_id));
+            return Session.open(entity, connector, 'stream', (session_id => sid = session_id));
         });
 
         it('cannot post data with an unknown contribution id', () => {
@@ -193,16 +192,16 @@ describe('Catalog Tests', function() {
         });
 
         it('cannot post data an invalid contribution id', () => {
-            return Session.action_bad(entity, connector, DATA.ID.UNKNOWN + 'X', sid, 'upsert', [], [{ id: 'invalid format'}]);
+            return Session.action_bad(entity, connector, DATA.ID.UNKNOWN + 'X', sid, 'upsert', [], [{ id: 'invalid format' }]);
         });
 
         it('cannot post data an invalid session id', () => {
-            return Session.action_bad(entity, connector, null, DATA.ID.UNKNOWN + 'X', 'upsert', [], [{ id: 'invalid format'}]);
+            return Session.action_bad(entity, connector, null, DATA.ID.UNKNOWN + 'X', 'upsert', [], [{ id: 'invalid format' }]);
         });
 
         it('cannot post data with an unknown action', () => {
             let action = DATA.name();
-            return Session.action_bad(entity, connector, null, sid, action, [], [{ action: 'not recognised'}]);
+            return Session.action_bad(entity, connector, null, sid, action, [], [{ action: 'not recognised' }]);
         });
 
         it('cannot close a session with an unknown contribution id', () => {
@@ -214,16 +213,16 @@ describe('Catalog Tests', function() {
         });
 
         it('cannot close a session with an invalid contribution id', () => {
-            return Session.close_bad(entity, connector, DATA.ID.UNKNOWN + 'X', sid, 'true', [{ id: 'invalid format'}]);
+            return Session.close_bad(entity, connector, DATA.ID.UNKNOWN + 'X', sid, 'true', [{ id: 'invalid format' }]);
         });
 
         it('cannot close a session with an invalid session id', () => {
-            return Session.close_bad(entity, connector, null, DATA.ID.UNKNOWN + 'X', 'true', [{ id: 'invalid format'}]);
+            return Session.close_bad(entity, connector, null, DATA.ID.UNKNOWN + 'X', 'true', [{ id: 'invalid format' }]);
         });
 
         it('cannot close a session with an invalid commit mode', () => {
             let commit = DATA.name();
-            return Session.close_bad(entity, connector, null, sid, commit, [{ commit: 'not recognised'}]);
+            return Session.close_bad(entity, connector, null, sid, commit, [{ commit: 'not recognised' }]);
         });
 
         it('can close the original session', () => {
@@ -264,15 +263,15 @@ describe('Catalog Tests', function() {
         });
 
         it('can post data to a session', () => {
-            return Session.action(entity, connector, sid, 'upsert', [{id: "123", name: "foo"}, {id: "456", name: "bar"}]);
+            return Session.action(entity, connector, sid, 'upsert', [{ id: "123", name: "foo" }, { id: "456", name: "bar" }]);
         });
 
         it('can post new and updated data to a session', () => {
-            return Session.action(entity, connector, sid, 'upsert', [{id: "123", name: "bob"}, {id: "456", name: "sue"}, {id: "789", name: "alice"}]);
+            return Session.action(entity, connector, sid, 'upsert', [{ id: "123", name: "bob" }, { id: "456", name: "sue" }, { id: "789", name: "alice" }]);
         });
 
         it('can post new and updated data to a session', () => {
-            return Session.action(entity, connector, sid, 'delete', [{id: "789", name: "alice"}]);
+            return Session.action(entity, connector, sid, 'delete', [{ id: "789", name: "alice" }]);
         });
 
         it('can close the original session', () => {

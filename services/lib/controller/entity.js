@@ -18,6 +18,9 @@
 
   The entity process controller.
 
+  Provides process control abstraction for all bit-broker services, who should
+  all come via this model and never manipulate the domain entities directly.
+
 */
 
 'use strict'; // code assumes ECMAScript 6
@@ -27,21 +30,21 @@
 const HTTP = require('http-status-codes');
 const failure = require('http-errors');
 const model = require('../model/index.js');
-const view = require('../view.js');
+const view = require('../view/index.js');
 const log = require('../logger.js').Logger;
 
 // --- entity class (exported)
 
 module.exports = class Entity {
 
-    // --- lists all entity types in the register
+    // --- lists all entity types
 
     list(req, res, next) {
 
         model.entity.list()
 
         .then(items => {
-            res.json(view.controller.entities(items));
+            res.json(view.coordinator.entities(items));
         })
 
         .catch(error => next(error));
@@ -56,16 +59,16 @@ module.exports = class Entity {
 
         .then(item => {
             if (!item) throw failure(HTTP.NOT_FOUND);
-            res.json(view.controller.entity(item));
+            res.json(view.coordinator.entity(item));
         })
 
         .catch(error => next(error));
     }
 
-    // --- adds a new entity type to the register
+    // --- adds a new entity type
 
     insert(req, res, next) {
-        log.info('register', 'entity', req.params.eid, 'insert');
+        log.info('coordinator', 'entity', req.params.eid, 'insert');
         let eid = req.params.eid.toLowerCase();
         let description = req.body.description || '';
         let errors = [];
@@ -81,7 +84,7 @@ module.exports = class Entity {
 
         .then(item => {
             if (item) {
-                log.info('register', 'entity', eid, 'insert', 'duplicate');
+                log.info('coordinator', 'entity', eid, 'insert', 'duplicate');
                 throw failure(HTTP.CONFLICT);
             }
 
@@ -89,7 +92,7 @@ module.exports = class Entity {
         })
 
         .then(() => {
-            log.info('register', 'entity', eid, 'insert', 'complete');
+            log.info('coordinator', 'entity', eid, 'insert', 'complete');
             let href = `${ req.protocol }://${ req.get('host') }${ req.originalUrl }`;
             res.set({ 'Location': href }).status(HTTP.CREATED).send();
         })
@@ -97,10 +100,10 @@ module.exports = class Entity {
         .catch(error => next(error));
     }
 
-    // --- modifies an existing entity type in the register
+    // --- modifies an existing entity type
 
     update(req, res, next) {
-        log.info('register', 'entity', req.params.eid, 'update');
+        log.info('coordinator', 'entity', req.params.eid, 'update');
         let eid = req.params.eid.toLowerCase();
         let description = req.body.description || '';
         let errors = [];
@@ -119,17 +122,17 @@ module.exports = class Entity {
         })
 
         .then(() => {
-            log.info('register', 'entity', eid, 'update', 'complete');
+            log.info('coordinator', 'entity', eid, 'update', 'complete');
             res.status(HTTP.NO_CONTENT).send();
         })
 
         .catch(error => next(error));
     }
 
-    // --- deletes an entity type from the register
+    // --- deletes an entity type
 
     delete(req, res, next) {
-        log.info('register', 'entity', req.params.eid, 'delete');
+        log.info('coordinator', 'entity', req.params.eid, 'delete');
         let eid = req.params.eid.toLowerCase();
 
         model.entity.find(eid)
@@ -140,7 +143,7 @@ module.exports = class Entity {
         })
 
         .then(() => {
-            log.info('register', 'entity', eid, 'delete', 'complete');
+            log.info('coordinator', 'entity', eid, 'delete', 'complete');
             res.status(HTTP.NO_CONTENT).send();
         })
 

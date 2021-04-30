@@ -17,6 +17,9 @@
   ----------------------------------------------------------------------------
 
   The connector model abstraction.
+  
+  Provides database abstraction for all bit-broker services, who should all
+  come via this model and never access the database directly.
 
   NOTE: All model methods assume that parameters have been validated and any
   required presence check has been completed by the controller.

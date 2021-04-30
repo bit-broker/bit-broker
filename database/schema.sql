@@ -25,11 +25,14 @@
 
 -- clean up any previous assets - for development only
 
-DROP DATABASE IF EXISTS bitbroker;
+DROP DATABASE IF EXISTS bit_broker;
 
-DROP USER IF EXISTS bbk_adm;
-DROP USER IF EXISTS bbk_api;
-DROP USER IF EXISTS bbk_www;
+DROP USER IF EXISTS bbk_admin;
+DROP USER IF EXISTS bbk_tests;
+DROP USER IF EXISTS bbk_coordinator;
+DROP USER IF EXISTS bbk_contributor;
+DROP USER IF EXISTS bbk_consumer;
+DROP USER IF EXISTS bbk_policy;
 
 DROP ROLE IF EXISTS bbk_reader;
 DROP ROLE IF EXISTS bbk_writer;
@@ -39,18 +42,21 @@ DROP ROLE IF EXISTS bbk_writer;
 CREATE ROLE bbk_reader;
 CREATE ROLE bbk_writer;
 
-CREATE USER bbk_adm WITH ENCRYPTED PASSWORD 'bbk_adm_pwd';
-CREATE USER bbk_api WITH ENCRYPTED PASSWORD 'bbk_api_pwd';
-CREATE USER bbk_www WITH ENCRYPTED PASSWORD 'bbk_www_pwd';
+CREATE USER bbk_admin WITH ENCRYPTED PASSWORD 'bbk_admin_pwd';
+CREATE USER bbk_tests WITH ENCRYPTED PASSWORD 'bbk_test_pwd';
+CREATE USER bbk_coordinator WITH ENCRYPTED PASSWORD 'bbk_coordinator_pwd';
+CREATE USER bbk_contributor WITH ENCRYPTED PASSWORD 'bbk_contributor_pwd';
+CREATE USER bbk_consumer WITH ENCRYPTED PASSWORD 'bbk_consumer_pwd';
+CREATE USER bbk_policy WITH ENCRYPTED PASSWORD 'bbk_policy_pwd';
 
-GRANT bbk_reader TO bbk_www;
-GRANT bbk_writer TO bbk_adm, bbk_api;
+GRANT bbk_reader TO bbk_consumer;
+GRANT bbk_writer TO bbk_admin, bbk_tests, bbk_coordinator, bbk_contributor, bbk_policy;
 
 -- create the database
 
-CREATE DATABASE bitbroker WITH ENCODING = 'UTF8' OWNER = bbk_adm;
+CREATE DATABASE bit_broker WITH ENCODING = 'UTF8' OWNER = bbk_admin;
 
-\connect bitbroker
+\connect bit_broker
 
 -- entity table
 
@@ -141,7 +147,7 @@ CREATE TABLE policy
 
 CREATE INDEX idx_policy_slug ON policy (slug);
 
--- grant database permissions
+-- grant permissions - TODO allocate more specific grants based on each user
 
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO bbk_reader;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO bbk_writer;

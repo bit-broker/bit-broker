@@ -18,11 +18,11 @@
 
   The session operations model abstraction.
 
+  Provides database abstraction for all bit-broker services, who should all
+  come via this model and never access the database directly.
+
   NOTE: All model methods assume that parameters have been validated and any
   required presence check has been completed by the controller.
-
-  NOTE: It is assumed that the controller is performing checks on the
-  existence of the housing entity and not relying upon SQL constraint errors.
 
   NOTE: Never use strings manipulation via knex.raw, as this will introduce
   SQL injection vulnerabilities. Also use either native knex methods or knex
@@ -84,7 +84,7 @@ module.exports = class Operation {
         return this.rows.then(items => {
 
             let catalog = new Catalog(this.db);
-            let step = wipe ? catalog.wipe(this.connector) : Promise.resolve();  // TODO: Add transaction boundaries
+            let step = wipe ? catalog.wipe(this.connector) : Promise.resolve(); // TODO: Add transaction boundaries
 
             for (let i = 0; i < items.length; i++) {
 

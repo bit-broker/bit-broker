@@ -30,7 +30,7 @@ const Session = require('./session.js');
 const chakram = require('chakram');
 const expect = chakram.expect;
 
-// --- script class
+// --- script class module.exports
 
 module.exports = class Script {
 
@@ -63,11 +63,11 @@ module.exports = class Script {
     // --- check records are present or absent
 
     _op_check(given, present) {
-        return chakram.get(`http://localhost:8003/v1/entity/${ this.entity }`)  // TODO - fix embedded URL
+        return chakram.get(`http://localhost:8003/v1/entity/${ this.entity }`) // TODO - fix embedded URL
         .then(response => {
             expect(response.body).to.be.an('array');
 
-            for (let i = 0 ; i < given.length ; i++) {
+            for (let i = 0; i < given.length; i++) {
                 let found = response.body.find(e => e.name === given[i].name);
                 present ? expect(found).to.be.an('object') : expect(found).to.be.undefined;
             }
@@ -91,7 +91,7 @@ module.exports = class Script {
     // --- modify records
 
     _op_modify(indexes, add) {
-        for (let i = 0 ; i < indexes.length ; i++) {
+        for (let i = 0; i < indexes.length; i++) {
             let index = indexes[i];
             let current = DATA.record(index).name;
             DATA.record(index).name = add ? current + '_' : current.slice(0, -1);

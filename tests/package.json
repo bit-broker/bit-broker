@@ -1,5 +1,5 @@
 {
-  "name": "bit-broker-tests",
+  "name": "tests",
   "version": "1.0.0",
   "description": "bit-broker test scripts",
   "main": "all.js",

@@ -34,7 +34,7 @@ const Validate = require('./validate.js');
 
 // --- running contexts
 
-var db = new Knex({ client: 'pg', connection: process.env.DB_CONNECT }); // TODO: should we fix the client version here?
+var db = new Knex({ client: 'pg', connection: process.env.DATABASE }); // TODO: should we fix the client version here?
 
 // --- exports
 
@@ -42,6 +42,6 @@ module.exports = {
     entity: new Entity(db),
     connector: new Connector(db),
     catalog: new Catalog(db),
-    policy: new Policy(db),
+    policy: new Policy(db),    
     validate: new Validate()
 };

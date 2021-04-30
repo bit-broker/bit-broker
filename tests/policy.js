@@ -60,7 +60,7 @@ describe('Policy Tests', function() {
         });
 
         it('it responds to an announce request', () => {
-            return Shared.announce(Shared.policy, process.env.POLICY_SERVER_NAME, process.env.POLICY_SERVER_BASE);
+            return Shared.announce(Shared.policy, process.env.POLICY_NAME, process.env.POLICY_BASE);
         });
 
         it('it responds to unknown restful resources', () => {

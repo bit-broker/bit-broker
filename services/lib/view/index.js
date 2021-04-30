@@ -16,32 +16,25 @@
 
   ----------------------------------------------------------------------------
 
-  The high level test runner, which executes all the scripts in the preferred
-  order - use command 'node start'
-
-  WARNING: Running this script will reset the entire database!
+  Formats the output for all bit-brokers services in order to ensure there is
+  consistency in representation.
 
 */
 
 'use strict'; // code assumes ECMAScript 6
 
-// -- dependancies
+// --- dependancies
 
-const Mocha = require('mocha');
+const Coordinator = require('./coordinator.js');
+const Contributor = require('./contributor.js');
+const Consumer = require('./consumer.js');
+const Policy = require('./policy.js');
 
-// --- running contexts
+// --- exports
 
-var mocha = new Mocha();
-
-// --- test case list in preferred order - do NOT include the 'seed' script as this is for developmemnt testing only
-
-mocha.addFile('./coordinator.js');
-mocha.addFile('./contributor.js');
-mocha.addFile('./sessions.js');
-mocha.addFile('./policy.js');
-
-// --- run the tests
-
-mocha.run(failures => {
-    process.exitCode = failures ? 1 : 0;
-});
+module.exports = {
+    coordinator: Coordinator,
+    contributor: Contributor,
+    consumer: Consumer,
+    policy: Policy
+};

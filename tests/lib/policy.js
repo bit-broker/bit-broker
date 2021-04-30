@@ -16,8 +16,8 @@
 
   ----------------------------------------------------------------------------
 
-  Shared policy methods used by all test scripts
-
+  Shared policy test methods
+  
 */
 
 'use strict'; // code assumes ECMAScript 6
