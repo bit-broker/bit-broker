@@ -1,7 +1,7 @@
 #!/bin/bash -e
 # Syntax build-docker.sh [-i|--image imagename]
 
-PROJECT=bitbroker-register-server
+PROJECT=bitbroker-contributor
 DOCKER_IMAGE=${PROJECT}:latest
 BASE_DOCKER_IMAGE=${PROJECT}:base
 
@@ -37,5 +37,5 @@ echo BUILDING DOCKER ${DOCKER_IMAGE}
 
 docker build --no-cache \
     -t ${DOCKER_IMAGE} \
-    -f build/register-server/Dockerfile \
+    -f build/contributor/Dockerfile \
     .
