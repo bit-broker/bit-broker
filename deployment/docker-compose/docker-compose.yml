@@ -4,37 +4,37 @@
 
 version: "3"
 services:
-  # Register server
-  bitbroker-register-server:
+  # Bitbroker Coordinator
+  bitbroker-coordinator:
     build:
       context: ../..
-      dockerfile: ./build/register-server/Dockerfile
-    container_name: bitbroker-register-server
-    image: bitbroker-register-server
+      dockerfile: ./build/coordinator/Dockerfile
+    container_name: bitbroker-coordinator
+    image: bitbroker-coordinator
     depends_on:
       - bitbroker-db
     ports:
       - 8001:8001
 
-  # Catalog server
-  bitbroker-catalog-server:
+  # Bitbroker Contributor
+  bitbroker-contributor:
     build:
       context: ../..
-      dockerfile: ./build/catalog-server/Dockerfile
-    container_name: bitbroker-catalog-server
-    image: bitbroker-catalog-server
+      dockerfile: ./build/contributor/Dockerfile
+    container_name: bitbroker-contributor
+    image: bitbroker-contributor
     depends_on:
       - bitbroker-db
     ports:
       - 8002:8002
 
-  # Policy server
-  bitbroker-policy-server:
+  # Bitbroker Consumer
+  bitbroker-consumer:
     build:
       context: ../..
-      dockerfile: ./build/policy-server/Dockerfile
-    container_name: bitbroker-policy-server
-    image: bitbroker-policy-server
+      dockerfile: ./build/consumer/Dockerfile
+    container_name: bitbroker-consumer
+    image: bitbroker-consumer
     depends_on:
       - bitbroker-db
     ports:
