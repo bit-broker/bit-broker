@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.bbcoordinator.name }}
+  labels:
+    group: {{ .Values.bbcoordinator.group }}
+spec:
+  type: {{ .Values.bbcoordinator.service.type }}
+  selector:
+    app: {{ .Values.bbcoordinator.name }}
+  ports:
+    - port: {{ .Values.bbcoordinator.service.port }}
+      targetPort: {{ .Values.bbcoordinator.container.port }}
+      {{ if eq .Values.bbcoordinator.service.type "NodePort" }}nodePort: {{ .Values.bbcoordinator.service.nodeport }}{{ end }}

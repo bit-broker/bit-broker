@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.bbcontributor.name }}
+  labels:
+    app: {{ .Values.bbcontributor.name }}
+    group: {{ .Values.bbcontributor.group }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.bbcontributor.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.bbcontributor.name }}
+        group: {{ .Values.bbcontributor.group }}
+    spec:
+      volumes:
+        - name: {{ .Values.bbcontributor.volume.name }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.bbcontributor.volume.pvc.name }}
+      securityContext:
+        runAsUser: {{ .Values.bbcontributor.securityContext.runAsUser }}
+        fsGroup: {{ .Values.bbcontributor.securityContext.fsGroup }}
+      containers:
+        - name: {{ .Values.bbcontributor.name }}
+          image: {{ .Values.bbcontributor.container.image }}
+          imagePullPolicy: {{ .Values.bbcontributor.imagePullPolicy }}
+          ports:
+            - containerPort: {{ .Values.bbcontributor.container.port }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-configmap
+          volumeMounts:
+              - name: {{ .Values.bbcontributor.volume.name }}
+                mountPath: {{ .Values.bbcontributor.volume.mountPath }}
+                subPath: {{ .Values.bbcontributor.volume.subPath }}

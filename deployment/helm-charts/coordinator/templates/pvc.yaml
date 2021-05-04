@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: {{ .Values.bbcoordinator.volume.kind }}
+metadata:
+  name: {{ .Values.bbcoordinator.volume.pvc.name }}
+spec:
+  accessModes:
+    - {{ .Values.bbcoordinator.volume.pvc.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.bbcoordinator.volume.pvc.storage }}
