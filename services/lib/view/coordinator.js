@@ -35,12 +35,21 @@ module.exports = class Coordinator extends View {
 
     // --- an entity type
 
-    static entity(item) {
-        return {
-            id: item.name,
-            url: this.rest(process.env.COORDINATOR_BASE, 'entity', item.name),
-            description: item.description
+    static entity(item, full = true) {
+        let doc = {
+            id: item.slug,
+            url: this.rest(process.env.COORDINATOR_BASE, 'entity', item.slug),
+            name: item.properties.name,
+            description: item.properties.description
         };
+
+        if (full) {
+            doc = Object.assign(doc, {
+                schema: item.properties.schema
+            });
+        }
+
+        return doc;
     }
 
     // --- a list of entity types
@@ -49,7 +58,7 @@ module.exports = class Coordinator extends View {
         let doc = [];
 
         for (let i = 0; i < items.length; i++) {
-            doc.push(this.entity(items[i]));
+            doc.push(this.entity(items[i], false));
         }
 
         return doc;

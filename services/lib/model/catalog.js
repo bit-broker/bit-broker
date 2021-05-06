@@ -20,7 +20,7 @@
 
   Provides database abstraction for all bit-broker services, who should all
   come via this model and never access the database directly.
-  
+
   NOTE: All model methods assume that parameters have been validated and any
   required presence check has been completed by the controller.
 
@@ -50,7 +50,7 @@ module.exports = class Catalog {
             'catalog.public_id',
             'catalog.vendor_id',
             'catalog.name',
-            'entity.name as entity_name',
+            'entity.slug as entity_slug',
             'catalog.record',
             'catalog.created_at',
             'catalog.updated_at'
@@ -69,7 +69,7 @@ module.exports = class Catalog {
     // --- list of entity instances for a given entity type
 
     list(type) {
-        return this.rows.where({ 'entity.name': type });
+        return this.rows.where({ 'entity.slug': type });
     }
 
     // --- find an entity instances by id for a given entity type

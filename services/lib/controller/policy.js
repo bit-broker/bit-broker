@@ -37,6 +37,16 @@ const log = require('../logger.js').Logger;
 
 module.exports = class Policy {
 
+    // --- extracts a properties object from a req body, removes extraneous properties that maybe present and sets default values
+
+    static properties(body) {
+        return {
+            name: body.name || '',
+            description: body.description || '',
+            policy: body.policy || {}
+        };
+    }
+
     // --- lists all policies
 
     list(req, res, next) {
@@ -70,11 +80,11 @@ module.exports = class Policy {
     insert(req, res, next) {
         log.info('policy', req.params.pid, 'insert');
         let pid = req.params.pid.toLowerCase();
-        let record = req.body || '';
+        let properties = Policy.properties(req.body);
         let errors = [];
 
-        errors = errors.concat(model.validate.name(pid));
-        // ToDo validate JSON body...
+        errors = errors.concat(model.validate.slug(pid));
+        errors = errors.concat(model.validate.policy(properties));
 
         if (errors.length) {
             throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
@@ -88,7 +98,7 @@ module.exports = class Policy {
                 throw failure(HTTP.CONFLICT);
             }
 
-            return model.policy.insert(pid, { record });
+            return model.policy.insert(pid, { properties });
         })
 
         .then(() => {
@@ -105,10 +115,10 @@ module.exports = class Policy {
     update(req, res, next) {
         log.info('policy', req.params.pid, 'update');
         let pid = req.params.pid.toLowerCase();
-        let record = req.body || '';
+        let properties = Policy.properties(req.body);
         let errors = [];
 
-        // ToDo validate JSON body...
+        errors = errors.concat(model.validate.policy(properties));
 
         if (errors.length) {
             throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
@@ -118,7 +128,7 @@ module.exports = class Policy {
 
         .then(item => {
             if (!item) throw failure(HTTP.NOT_FOUND);
-            return model.policy.update(pid, { record });
+            return model.policy.update(pid, { properties });
         })
 
         .then(() => {

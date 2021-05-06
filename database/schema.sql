@@ -43,7 +43,7 @@ CREATE ROLE bbk_reader;
 CREATE ROLE bbk_writer;
 
 CREATE USER bbk_admin WITH ENCRYPTED PASSWORD 'bbk_admin_pwd';
-CREATE USER bbk_tests WITH ENCRYPTED PASSWORD 'bbk_test_pwd';
+CREATE USER bbk_tests WITH ENCRYPTED PASSWORD 'bbk_tests_pwd';
 CREATE USER bbk_coordinator WITH ENCRYPTED PASSWORD 'bbk_coordinator_pwd';
 CREATE USER bbk_contributor WITH ENCRYPTED PASSWORD 'bbk_contributor_pwd';
 CREATE USER bbk_consumer WITH ENCRYPTED PASSWORD 'bbk_consumer_pwd';
@@ -63,13 +63,13 @@ CREATE DATABASE bit_broker WITH ENCODING = 'UTF8' OWNER = bbk_admin;
 CREATE TABLE entity
 (
     id SERIAL PRIMARY KEY,
-    name VARCHAR (64) UNIQUE NOT NULL,
-    description TEXT NOT NULL,
+    slug VARCHAR (32) UNIQUE NOT NULL,
+    properties JSONB NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_entity_name ON entity (name);
+CREATE INDEX idx_entity_slug ON entity (slug);
 
 -- connector table
 
@@ -79,21 +79,19 @@ CREATE TABLE connector
 (
     id SERIAL PRIMARY KEY,
     entity_id SERIAL NOT NULL REFERENCES entity (id) ON DELETE CASCADE,
-    name VARCHAR (64) NOT NULL,
-    description TEXT NOT NULL,
+    slug VARCHAR (32) UNIQUE NOT NULL,
+    properties JSONB NOT NULL,
     contribution_id CHAR(36) UNIQUE,
     contribution_key CHAR(36),
-    webhook VARCHAR(256),
-    cache INTEGER NOT NULL,
     session_id CHAR(36) UNIQUE,
     session_mode SESSION_MODES,
     session_started TIMESTAMP,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE (entity_id, name)
+    UNIQUE (entity_id, slug)
 );
 
-CREATE INDEX idx_connector_name ON connector (name);
+CREATE INDEX idx_connector_slug ON connector (slug);
 CREATE INDEX idx_connector_entity_id ON connector (entity_id);
 CREATE INDEX idx_connector_contribution_id ON connector (contribution_id);
 CREATE INDEX idx_connector_session_id ON connector (session_id);
@@ -139,8 +137,8 @@ CREATE INDEX idx_operation_session_id ON operation (session_id);
 CREATE TABLE policy
 (
     id SERIAL PRIMARY KEY,
-    slug VARCHAR (64) UNIQUE NOT NULL,
-    record JSONB NOT NULL,
+    slug VARCHAR (32) UNIQUE NOT NULL,
+    properties JSONB NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

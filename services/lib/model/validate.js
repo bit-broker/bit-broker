@@ -24,9 +24,16 @@
 
 // --- dependancies
 
-const validator = require('validator');
+const schema = require('jsonschema').validate; // specifically NOT json-schema
 const locales = require('../locales.js');
-const status = require('../status.js');
+const fs = require('fs');
+
+// --- constants - loaded once at startup
+
+const SCHEMA_SLUG = JSON.parse(fs.readFileSync(`${__dirname}/validation/slug.json`));
+const SCHEMA_ENTITY = JSON.parse(fs.readFileSync(`${__dirname}/validation/entity.json`));
+const SCHEMA_CONNECTOR = JSON.parse(fs.readFileSync(`${__dirname}/validation/connector.json`));
+const SCHEMA_POLICY = JSON.parse(fs.readFileSync(`${__dirname}/validation/policy.json`));
 
 // --- validate class (exported)
 
@@ -34,20 +41,48 @@ module.exports = class Validate {
 
     // --- validation constants - if you change any of these, remember to update the test harness too
 
-    static get CACHE_MAX() { return 31536000 }; // one year in seconds
-    static get CACHE_MIN() { return 0; }
-    static get DESC_MAX_LENGTH() { return 8192; }
-    static get DESC_MIN_LENGTH() { return 1; }
     static get ID_FORMAT() { return '^[a-z0-9][a-z0-9-]+$'; }
     static get ID_LENGTH() { return 36; }
-    static get NAME_FORMAT() { return '^[a-z][a-z0-9_]+$'; }
-    static get NAME_MAX_LENGTH() { return 64; }
-    static get NAME_MIN_LENGTH() { return 3; }
     static get SESSION_ACTIONS() { return ['upsert', 'delete']; }
     static get SESSION_COMMITS() { return ['true', 'false']; }
     static get SESSION_MODES() { return ['accrue', 'stream', 'replace']; }
-    static get URL_FORMAT() { return { protocols: ['http', 'https'], require_tld: status.IS_LIVE, require_protocol: true, require_host: true, require_valid_protocol: true } };
-    static get URL_MAX_LENGTH() { return 256; }
+
+    // --- checks a document against a schema and gathers human readable error messages
+
+    scheme(scheme, instance, name = '') {
+        let errs = schema(scheme, instance).errors;
+        let msgs = [];
+
+        for (let i = 0; i < errs.length; i++) {
+            msgs.push(errs[i].stack.replace(/^instance[\.]?/, name).trim());
+        }
+
+        return msgs;
+    }
+
+    // --- validates a slug
+
+    slug(item) {
+        return this.scheme(item, SCHEMA_SLUG, 'slug');
+    }
+
+    // --- validates entity properties
+
+    entity(properties) {
+        return this.scheme(properties, SCHEMA_ENTITY);
+    }
+
+    // --- validates connector properties
+
+    connector(properties) {
+        return this.scheme(properties, SCHEMA_CONNECTOR);
+    }
+
+    // --- validates policy properties
+
+    policy(properties) {
+        return this.scheme(properties, SCHEMA_POLICY);
+    }
 
     // --- validates a session action
 
@@ -59,39 +94,12 @@ module.exports = class Validate {
         return errors;
     }
 
-    // --- validates a cache - can be zero
-
-    cache(item) {
-        let errors = [];
-        let isnum = Number.isInteger(item);
-
-        if (isnum) {
-            if (item < Validate.CACHE_MIN) errors.push(locales.__('error.cache-small', item));
-            if (item > Validate.CACHE_MAX) errors.push(locales.__('error.cache-large', item));
-        } else {
-            errors.push(locales.__('error.cache-invalid', item));
-        }
-
-        return errors;
-    }
-
     // --- validates a session commit
 
     commit(item) {
         let errors = [];
 
         if (Validate.SESSION_COMMITS.includes(item) === false) errors.push(locales.__('error.commit-invalid', item));
-
-        return errors;
-    }
-
-    // --- validates an entity description
-
-    description(item) {
-        let errors = [];
-
-        if (item.length < Validate.DESC_MIN_LENGTH) errors.push(locales.__('error.desc-short', item));
-        if (item.length > Validate.DESC_MAX_LENGTH) errors.push(locales.__('error.desc-long', item));
 
         return errors;
     }
@@ -112,29 +120,6 @@ module.exports = class Validate {
         let errors = [];
 
         if (Validate.SESSION_MODES.includes(item) === false) errors.push(locales.__('error.mode-invalid', item));
-
-        return errors;
-    }
-
-    // --- validates an entity name
-
-    name(item) {
-        let errors = [];
-
-        if (item.length < Validate.NAME_MIN_LENGTH) errors.push(locales.__('error.name-short', item));
-        if (item.length > Validate.NAME_MAX_LENGTH) errors.push(locales.__('error.name-long', item));
-        if (new RegExp(Validate.NAME_FORMAT).test(item) === false) errors.push(locales.__('error.name-invalid', item));
-
-        return errors;
-    }
-
-    // --- validates a webhook - can be empty
-
-    webhook(item) {
-        let errors = [];
-
-        if (item.length > Validate.URL_MAX_LENGTH) errors.push(locales.__('error.url-long', item));
-        if (item.length > 0 && false === validator.isURL(item, Validate.URL_FORMAT)) errors.push(locales.__('error.url-invalid', item));
 
         return errors;
     }

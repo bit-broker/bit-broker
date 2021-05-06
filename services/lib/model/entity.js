@@ -20,7 +20,7 @@
 
   Provides database abstraction for all bit-broker services, who should all
   come via this model and never access the database directly.
-  
+
   NOTE: All model methods assume that parameters have been validated and any
   required presence check has been completed by the controller.
 
@@ -50,8 +50,8 @@ module.exports = class Entity {
 
     get COLUMNS() {
         return [
-            'name',
-            'description',
+            'slug',
+            'properties',
             'created_at',
             'updated_at'
         ];
@@ -66,37 +66,37 @@ module.exports = class Entity {
     // --- all entity types
 
     list() {
-        return this.rows.orderBy('name');
+        return this.rows.orderBy('slug');
     }
 
-    // --- find an entity type by name
+    // --- find an entity type by slug
 
-    find(name) {
-        return this.rows.where({ name }).first();
+    find(slug) {
+        return this.rows.where({ slug }).first();
     }
 
     // --- inserts a new entity type
 
-    insert(name, values) {
-        values.name = name
+    insert(slug, values) {
+        values.slug = slug
         return this.rows.insert(values).then(result => result.rowCount > 0);
     }
 
     // --- updates an existing entity type
 
-    update(name, values) {
-        return this.find(name).update(values).then(result => result.rowCount > 0);
+    update(slug, values) {
+        return this.find(slug).update(values).then(result => result.rowCount > 0);
     }
 
     // --- deletes an existing entity type
 
-    delete(name) {
-        return this.find(name).delete().then(result => result.rowCount > 0);
+    delete(slug) {
+        return this.find(slug).delete().then(result => result.rowCount > 0);
     }
 
     // --- gets the connector sub-model
 
-    connector(name) {
-        return this.find(name).then(item => item ? new Connector(this.db, name) : null);
+    connector(slug) {
+        return this.find(slug).then(item => item ? new Connector(this.db, slug) : null);
     }
 }

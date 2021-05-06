@@ -42,6 +42,6 @@ module.exports = {
     entity: new Entity(db),
     connector: new Connector(db),
     catalog: new Catalog(db),
-    policy: new Policy(db),    
+    policy: new Policy(db),
     validate: new Validate()
 };

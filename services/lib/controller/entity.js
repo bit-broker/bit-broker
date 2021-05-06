@@ -37,6 +37,16 @@ const log = require('../logger.js').Logger;
 
 module.exports = class Entity {
 
+    // --- extracts a properties object from a req body, removes extraneous properties that maybe present and sets default values
+
+    static properties(body) {
+        return {
+            name: body.name || '',
+            description: body.description || '',
+            schema: body.schema || {}
+        };
+    }
+
     // --- lists all entity types
 
     list(req, res, next) {
@@ -70,11 +80,11 @@ module.exports = class Entity {
     insert(req, res, next) {
         log.info('coordinator', 'entity', req.params.eid, 'insert');
         let eid = req.params.eid.toLowerCase();
-        let description = req.body.description || '';
+        let properties = Entity.properties(req.body);
         let errors = [];
 
-        errors = errors.concat(model.validate.name(eid));
-        errors = errors.concat(model.validate.description(description));
+        errors = errors.concat(model.validate.slug(eid));
+        errors = errors.concat(model.validate.entity(properties));
 
         if (errors.length) {
             throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
@@ -88,7 +98,7 @@ module.exports = class Entity {
                 throw failure(HTTP.CONFLICT);
             }
 
-            return model.entity.insert(eid, { description });
+            return model.entity.insert(eid, { properties });
         })
 
         .then(() => {
@@ -105,10 +115,10 @@ module.exports = class Entity {
     update(req, res, next) {
         log.info('coordinator', 'entity', req.params.eid, 'update');
         let eid = req.params.eid.toLowerCase();
-        let description = req.body.description || '';
+        let properties = Entity.properties(req.body);
         let errors = [];
 
-        errors = errors.concat(model.validate.description(description));
+        errors = errors.concat(model.validate.entity(properties));
 
         if (errors.length) {
             throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
@@ -118,7 +128,7 @@ module.exports = class Entity {
 
         .then(item => {
             if (!item) throw failure(HTTP.NOT_FOUND);
-            return model.entity.update(eid, { description });
+            return model.entity.update(eid, { properties });
         })
 
         .then(() => {

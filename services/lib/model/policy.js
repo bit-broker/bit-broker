@@ -44,7 +44,7 @@ module.exports = class Policy {
     get COLUMNS() {
         return [
             'slug',
-            'record',
+            'properties',
             'created_at',
             'updated_at'
         ];

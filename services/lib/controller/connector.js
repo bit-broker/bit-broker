@@ -37,6 +37,17 @@ const log = require('../logger.js').Logger;
 
 module.exports = class Connector {
 
+    // --- extracts a properties object from a req body, removes extraneous properties that maybe present and sets default values
+
+    static properties(body) {
+        return {
+            name: body.name || '',
+            description: body.description || '',
+            webhook: body.webhook || null,
+            cache: body.cache || 0
+        };
+    }
+
     // --- lists all the connectors for the named entity type
 
     list(req, res, next) {
@@ -84,15 +95,11 @@ module.exports = class Connector {
 
         let eid = req.params.eid.toLowerCase();
         let cid = req.params.cid.toLowerCase();
-        let description = req.body.description || '';
-        let webhook = req.body.webhook || '';
-        let cache = req.body.cache || 0;
+        let properties = Connector.properties(req.body);
         let errors = [];
 
-        errors = errors.concat(model.validate.name(cid));
-        errors = errors.concat(model.validate.description(description));
-        errors = errors.concat(model.validate.webhook(webhook));
-        errors = errors.concat(model.validate.cache(cache));
+        errors = errors.concat(model.validate.slug(cid));
+        errors = errors.concat(model.validate.connector(properties));
 
         if (errors.length) {
             throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
@@ -110,7 +117,7 @@ module.exports = class Connector {
                     throw failure(HTTP.CONFLICT);
                 }
 
-                return connectors.insert(cid, { description, webhook, cache });
+                return connectors.insert(cid, { properties });
             });
         })
 
@@ -130,14 +137,10 @@ module.exports = class Connector {
 
         let eid = req.params.eid.toLowerCase();
         let cid = req.params.cid.toLowerCase();
-        let description = req.body.description || '';
-        let webhook = req.body.webhook || '';
-        let cache = req.body.cache || 0;
+        let properties = Connector.properties(req.body);
         let errors = [];
 
-        errors = errors.concat(model.validate.description(description));
-        errors = errors.concat(model.validate.webhook(webhook));
-        errors = errors.concat(model.validate.cache(cache));
+        errors = errors.concat(model.validate.connector(properties));
 
         if (errors.length) {
             throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
@@ -151,7 +154,7 @@ module.exports = class Connector {
 
             .then(item => {
                 if (!item) throw failure(HTTP.NOT_FOUND);
-                return connectors.update(cid, { description, webhook, cache });
+                return connectors.update(cid, { properties });
             });
         })
 

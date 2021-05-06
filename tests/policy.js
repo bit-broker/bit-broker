@@ -64,7 +64,7 @@ describe('Policy Tests', function() {
         });
 
         it('it responds to unknown restful resources', () => {
-            return Shared.bad_route(Shared.rest('policy', DATA.name()));
+            return Shared.bad_route(Shared.rest('policy', DATA.slug()));
         });
 
         it('the database is empty', () => {
@@ -95,7 +95,7 @@ describe('Policy Tests', function() {
         });
 
         it('it is present in the policy list', () => {
-            return Policy.verify_all([{ name: DATA.DSP_ID_1, dsp: DATA.DSP_1 }]);
+            return Policy.verify_all([{ slug: DATA.DSP_ID_1, dsp: DATA.DSP_1 }]);
         });
 
         it('it is present when addressed directly', () => {
@@ -113,7 +113,7 @@ describe('Policy Tests', function() {
         });
 
         it('new values are present in the policy list', () => {
-            return Policy.verify_all([{ name: DATA.DSP_ID_1, dsp: DATA.DSP_2 }]);
+            return Policy.verify_all([{ slug: DATA.DSP_ID_1, dsp: DATA.DSP_2 }]);
         });
 
         it('new values are present when addressed directly', () => {
@@ -130,8 +130,8 @@ describe('Policy Tests', function() {
 
         it('both are present in the policy list', () => {
             return Policy.verify_all([
-                { name: DATA.DSP_ID_1, dsp: DATA.DSP_2 },
-                { name: DATA.DSP_ID_2, dsp: DATA.DSP_2 }
+                { slug: DATA.DSP_ID_1, dsp: DATA.DSP_2 },
+                { slug: DATA.DSP_ID_2, dsp: DATA.DSP_2 }
             ]);
         });
 
@@ -140,7 +140,7 @@ describe('Policy Tests', function() {
         });
 
         it('it is gone from the policy list', () => {
-            return Policy.verify_all([{ name: DATA.DSP_ID_2, dsp: DATA.DSP_2 }]);
+            return Policy.verify_all([{ slug: DATA.DSP_ID_2, dsp: DATA.DSP_2 }]);
         });
 
         it('the policy is gone when addressed directly', () => {

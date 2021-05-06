@@ -37,23 +37,24 @@ module.exports = class Contributor extends View {
 
     static connector(item, full = true) {
         let doc = {
-            id: item.name,
-            url: this.rest(process.env.COORDINATOR_BASE, 'entity', item.entity_name, 'connector', item.name),
-            description: item.description
+            id: item.slug,
+            url: this.rest(process.env.COORDINATOR_BASE, 'entity', item.entity_slug, 'connector', item.slug),
+            name: item.properties.name,
+            description: item.properties.description
         };
 
         if (full) {
             doc = Object.assign(doc, {
                 entity: {
-                    id: item.entity_name,
-                    url: this.rest(process.env.COORDINATOR_BASE, 'entity', item.entity_name),
+                    id: item.entity_slug,
+                    url: this.rest(process.env.COORDINATOR_BASE, 'entity', item.entity_slug),
                 },
                 contribution: {
                     id: item.contribution_id,
                     url: item.contribution_id === null ? null : this.rest(process.env.CONTRIBUTOR_BASE, 'connector', item.contribution_id),
                 },
-                webhook: item.webhook,
-                cache: item.cache,
+                webhook: item.properties.webhook,
+                cache: item.properties.cache,
                 in_session: item.in_session
             });
         }

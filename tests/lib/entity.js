@@ -16,7 +16,7 @@
 
   ----------------------------------------------------------------------------
 
-  Shared entity test methods 
+  Shared entity test methods
 
 */
 
@@ -34,22 +34,31 @@ const expect = chakram.expect;
 
 module.exports = class Entity {
 
+    // --- returns an example entity properties body
+
+    static get example() {
+        return {
+            name: "foo",
+            description: DATA.text(DATA.DESCRIPTION.REASONABLE)
+        };
+    }
+
     // --- adds an entity type
 
-    static add(name, values = null) {
-        return chakram.post(Shared.rest('entity', name), values || { description: DATA.text(DATA.DESCRIPTION.REASONABLE) })
+    static add(slug, values = null) {
+        return chakram.post(Shared.rest('entity', slug), values || this.example)
         .then(response => {
             expect(response.body).to.be.undefined;
             expect(response).to.have.status(HTTP.CREATED);
-            expect(response).to.have.header('Location', Shared.rest('entity', name));
+            expect(response).to.have.header('Location', Shared.rest('entity', slug));
             return chakram.wait();
         });
     }
 
     // --- updates an entity type
 
-    static update(name, values) {
-        return chakram.put(Shared.rest('entity', name), values)
+    static update(slug, values) {
+        return chakram.put(Shared.rest('entity', slug), values)
         .then(response => {
             expect(response.body).to.be.undefined;
             expect(response).to.have.status(HTTP.NO_CONTENT);
@@ -59,8 +68,8 @@ module.exports = class Entity {
 
     // --- attempts to add a duplicate entity type
 
-    static duplicate(name, values) {
-        return chakram.post(Shared.rest('entity', name), values)
+    static duplicate(slug, values) {
+        return chakram.post(Shared.rest('entity', slug), values)
         .then(response => {
             expect(response.body).to.be.a('string');
             expect(response.body.toLowerCase()).to.contain('conflict');
@@ -71,8 +80,8 @@ module.exports = class Entity {
 
     // --- deletes an entity type
 
-    static delete(name) {
-        return chakram.delete(Shared.rest('entity', name))
+    static delete(slug) {
+        return chakram.delete(Shared.rest('entity', slug))
         .then(response => {
             expect(response.body).to.be.undefined;
             expect(response).to.have.status(HTTP.NO_CONTENT);
@@ -82,8 +91,8 @@ module.exports = class Entity {
 
     // --- attempts to action an missing entity type
 
-    static action_missing(action, name, values) {
-        return action(Shared.rest('entity', name), values)
+    static action_missing(action, slug, values) {
+        return action(Shared.rest('entity', slug), values)
         .then(response => {
             expect(response.body).to.be.a('string');
             expect(response.body.toLowerCase()).to.contain('not found');
@@ -94,8 +103,8 @@ module.exports = class Entity {
 
     // --- checks an entity type is not there
 
-    static missing(name) {
-        return chakram.get(Shared.rest('entity', name))
+    static missing(slug) {
+        return chakram.get(Shared.rest('entity', slug))
         .then(response => {
             expect(response.body).to.be.a('string');
             expect(response.body.toLowerCase()).to.contain('not found');
@@ -106,12 +115,12 @@ module.exports = class Entity {
 
     // --- verifies an entity type
 
-    static verify(name, values) {
-        return chakram.get(Shared.rest('entity', name))
+    static verify(slug, values) {
+        return chakram.get(Shared.rest('entity', slug))
         .then(response => {
             expect(response.body).to.be.an('object');
-            expect(response.body.id).to.be.eq(name);
-            expect(response.body.url).to.be.eq(Shared.rest('entity', name));
+            expect(response.body.id).to.be.eq(slug);
+            expect(response.body.url).to.be.eq(Shared.rest('entity', slug));
             expect(response.body.description).to.be.eq(values.description);
             expect(response).to.have.status(HTTP.OK);
             return chakram.wait();
@@ -121,15 +130,15 @@ module.exports = class Entity {
     // --- verifies the entire entity type list
 
     static verify_all(entities) {
-        entities.sort((a, b) => a.name.localeCompare(b.name)); // in name order
+        entities.sort((a, b) => a.slug.localeCompare(b.slug)); // in slug order
         return chakram.get(Shared.rest('entity'))
         .then(response => {
             expect(response.body).to.be.an('array');
             expect(response.body.length).to.be.eq(entities.length);
             for (let i = 0; i < entities.length; i++) {
                 expect(response.body[i]).to.be.an('object');
-                expect(response.body[i].id).to.be.eq(entities[i].name);
-                expect(response.body[i].url).to.be.eq(Shared.rest('entity', entities[i].name));
+                expect(response.body[i].id).to.be.eq(entities[i].slug);
+                expect(response.body[i].url).to.be.eq(Shared.rest('entity', entities[i].slug));
                 expect(response.body[i].description).to.be.eq(entities[i].values.description);
             }
             expect(response).to.have.status(HTTP.OK);
@@ -137,13 +146,13 @@ module.exports = class Entity {
         });
     }
 
-    // --- adds and then deleted an entity with a good name
+    // --- adds and then deleted an entity with a good slug
 
-    static good(action, name, values = null) {
-        return action(Shared.rest('entity', name), values || { description: DATA.text(DATA.DESCRIPTION.REASONABLE) })
+    static good(action, slug, values = null) {
+        return action(Shared.rest('entity', slug), values || this.example)
         .then(response => {
             expect(response).to.have.status(action == chakram.post ? HTTP.CREATED : HTTP.NO_CONTENT);
-            return chakram.delete(Shared.rest('entity', name.toLowerCase().trim()))
+            return chakram.delete(Shared.rest('entity', slug.toLowerCase().trim()))
             .then(response => {
                 expect(response.body).to.be.undefined;
                 expect(response).to.have.status(HTTP.NO_CONTENT);
@@ -152,15 +161,15 @@ module.exports = class Entity {
         });
     }
 
-    // --- attemps to add an entity with a bad name
+    // --- attemps to add an entity with a bad slug
 
-    static bad(action, name, type, error, values = null) {
-        return action(Shared.rest('entity', name), values || { description: DATA.text(DATA.DESCRIPTION.REASONABLE) })
+    static bad(action, slug, type, error, values = null) {
+        return action(Shared.rest('entity', slug), values || this.example)
         .then(response => {
             expect(response.body).to.contain(type);
             expect(response.body).to.contain(error);
             expect(response).to.have.status(HTTP.BAD_REQUEST);
-            return chakram.get(Shared.rest('entity', name))
+            return chakram.get(Shared.rest('entity', slug))
             .then(response => {
                 expect(response.body).to.be.a('string');
                 expect(response.body.toLowerCase()).to.contain('not found');

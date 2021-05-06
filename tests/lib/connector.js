@@ -34,16 +34,21 @@ const expect = chakram.expect;
 
 module.exports = class Connector {
 
-    // --- adds a connector to an entity type
+    // --- returns an example entity properties body
 
-    static add(entity, connector, values = null) {
-        let details = {
+    static get example() {
+        return {
+            name: "foo",
             description: DATA.text(DATA.DESCRIPTION.REASONABLE),
             webhook: DATA.pick(DATA.WEBHOOK.VALID),
             cache: DATA.integer(DATA.CACHE.REASONABLE),
         };
+    }
 
-        return chakram.post(Shared.rest('entity', entity, 'connector', connector), values || details)
+    // --- adds a connector to an entity type
+
+    static add(entity, connector, values = null) {
+        return chakram.post(Shared.rest('entity', entity, 'connector', connector), values || this.example)
         .then(response => {
             expect(response.body).to.be.undefined;
             expect(response).to.have.status(HTTP.CREATED);
@@ -184,15 +189,15 @@ module.exports = class Connector {
     // --- verifies the entire connector list for an entity type
 
     static verify_all(entity, connectors) {
-        connectors.sort((a, b) => a.name.localeCompare(b.name)); // in name order
+        connectors.sort((a, b) => a.slug.localeCompare(b.slug)); // in slug order
         return chakram.get(Shared.rest('entity', entity, 'connector'))
         .then(response => {
             expect(response.body).to.be.an('array');
             expect(response.body.length).to.be.eq(connectors.length);
             for (let i = 0; i < connectors.length; i++) {
                 expect(response.body[i]).to.be.an('object');
-                expect(response.body[i].id).to.be.eq(connectors[i].name);
-                expect(response.body[i].url).to.be.eq(Shared.rest('entity', entity, 'connector', connectors[i].name));
+                expect(response.body[i].id).to.be.eq(connectors[i].slug);
+                expect(response.body[i].url).to.be.eq(Shared.rest('entity', entity, 'connector', connectors[i].slug));
                 expect(response.body[i].description).to.be.eq(connectors[i].values.description);
             }
             expect(response).to.have.status(HTTP.OK);

@@ -35,13 +35,21 @@ module.exports = class Policy extends View {
 
     // --- a policy
 
-    static policy(item) {
-        return {
+    static policy(item, full = true) {
+        let doc = {
             id: item.slug,
-            name: item.record.name,
             url: this.rest(process.env.POLICY_BASE, 'policy', item.slug),
-            policy: item.record
+            name: item.properties.name,
+            description: item.properties.description
         };
+
+        if (full) {
+            doc = Object.assign(doc, {
+                policy: item.properties.policy
+            });
+        }
+
+        return doc;
     }
 
     // --- a list of policy ids
@@ -50,7 +58,7 @@ module.exports = class Policy extends View {
         let doc = [];
 
         for (let i = 0; i < items.length; i++) {
-            doc.push(this.policy(items[i]));
+            doc.push(this.policy(items[i], false));
         }
 
         return doc;

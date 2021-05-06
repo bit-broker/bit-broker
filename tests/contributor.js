@@ -66,7 +66,7 @@ describe('Contributor Tests', function() {
         });
 
         it('it responds to unknown restful resources', () => {
-            return Shared.bad_route(Shared.rest('catalog', DATA.name()));
+            return Shared.bad_route(Shared.rest('catalog', DATA.slug()));
         });
 
         it('the database is empty', () => {
@@ -78,8 +78,8 @@ describe('Contributor Tests', function() {
 
     describe('session open and close tests', () => {
 
-        let entity = DATA.pick(DATA.NAME.VALID);
-        let connector = DATA.pick(DATA.NAME.VALID);
+        let entity = DATA.pick(DATA.SLUG.VALID);
+        let connector = DATA.pick(DATA.SLUG.VALID);
         let sid = null;
 
         before(() => {
@@ -142,8 +142,8 @@ describe('Contributor Tests', function() {
 
     describe('session validation tests', () => {
 
-        let entity = DATA.pick(DATA.NAME.VALID);
-        let connector = DATA.pick(DATA.NAME.VALID);
+        let entity = DATA.pick(DATA.SLUG.VALID);
+        let connector = DATA.pick(DATA.SLUG.VALID);
         let sid = null;
 
         before(() => {
@@ -175,7 +175,7 @@ describe('Contributor Tests', function() {
         });
 
         it('cannot open a session with an unknown mode', () => {
-            let mode = DATA.name();
+            let mode = DATA.slug();
             return Session.open_bad(entity, connector, null, mode, [{ mode: 'not recognised' }]);
         });
 
@@ -200,7 +200,7 @@ describe('Contributor Tests', function() {
         });
 
         it('cannot post data with an unknown action', () => {
-            let action = DATA.name();
+            let action = DATA.slug();
             return Session.action_bad(entity, connector, null, sid, action, [], [{ action: 'not recognised' }]);
         });
 
@@ -221,7 +221,7 @@ describe('Contributor Tests', function() {
         });
 
         it('cannot close a session with an invalid commit mode', () => {
-            let commit = DATA.name();
+            let commit = DATA.slug();
             return Session.close_bad(entity, connector, null, sid, commit, [{ commit: 'not recognised' }]);
         });
 
@@ -238,8 +238,8 @@ describe('Contributor Tests', function() {
 
     describe('session basic record tests', () => {
 
-        let entity = DATA.pick(DATA.NAME.VALID);
-        let connector = DATA.pick(DATA.NAME.VALID);
+        let entity = DATA.pick(DATA.SLUG.VALID);
+        let connector = DATA.pick(DATA.SLUG.VALID);
         let sid = null;
 
         before(() => {

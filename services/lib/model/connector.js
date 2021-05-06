@@ -17,7 +17,7 @@
   ----------------------------------------------------------------------------
 
   The connector model abstraction.
-  
+
   Provides database abstraction for all bit-broker services, who should all
   come via this model and never access the database directly.
 
@@ -46,22 +46,20 @@ module.exports = class Connector {
 
     // --- class constructor
 
-    constructor(db, name = null) {
+    constructor(db, entity = null) {
         this.db = db;
-        this.entity_name = name;
+        this.entity = entity;
     }
 
     // --- select column list
 
     get COLUMNS() {
         return [
-            'connector.name',
-            'entity.name as entity_name',
-            'connector.description',
+            'connector.slug',
+            'connector.properties',
+            'entity.slug as entity_slug',
             'connector.contribution_id',
             'connector.contribution_key',
-            'connector.webhook',
-            'connector.cache',
             this.db.raw('CASE WHEN connector.session_id IS NULL THEN false ELSE true END AS in_session'),
             'connector.created_at',
             'connector.updated_at'
@@ -71,48 +69,46 @@ module.exports = class Connector {
     // --- table read context
 
     get rows() {
-        return this.db('connector').select(this.COLUMNS).join('entity', 'entity.id', 'connector.entity_id').where({ 'entity.name': this.entity_name });
+        return this.db('connector').select(this.COLUMNS).join('entity', 'entity.id', 'connector.entity_id').where({ 'entity.slug': this.entity });
     }
 
     // --- table write context
 
     get write() {
-        return this.db('connector').where('entity_id', this.db('entity').select('id').where({ name: this.entity_name }));
+        return this.db('connector').where('entity_id', this.db('entity').select('id').where({ 'entity.slug': this.entity }));
     }
 
     // --- all connectors on the instance entity type
 
     list() {
-        return this.rows.orderBy('connector.name');
+        return this.rows.orderBy('connector.slug');
     }
 
-    // --- find a connector by name on the instance entity type
+    // --- find a connector by slug on the instance entity type
 
-    find(name) {
-        return this.rows.where({ 'connector.name': name }).first();
+    find(slug) {
+        return this.rows.where({ 'connector.slug': slug }).first();
     }
 
     // --- inserts a new connector on the instance entity type
 
-    insert(name, values) {
-        values.name = name;
-        values.webhook = values.webhook.length ? values.webhook : null;
+    insert(slug, values) {
+        values.slug = slug
         values.contribution_id = Permit.CONTRIBUTION_ID;
-        values.entity_id = this.db.from('entity').select('id').where({ name: this.entity_name }).first(); // this will *not* execute here, but is compounded into the SQL below
+        values.entity_id = this.db.from('entity').select('id').where({ slug: this.entity }).first(); // this will *not* execute here, but is compounded into the SQL below
         return this.write.insert(values).then(result => result.rowCount > 0);
     }
 
     // --- updates a connector on the instance entity type
 
-    update(name, values) {
-        values.webhook = values.webhook.length ? values.webhook : null;
-        return this.write.where({ name }).update(values).then(result => result.rowCount > 0);
+    update(slug, values) {
+        return this.write.where({ slug }).update(values).then(result => result.rowCount > 0);
     }
 
     // --- deletes a connector on the instance entity type
 
-    delete(name) {
-        return this.write.where({ name }).delete().then(result => result.rowCount > 0);
+    delete(slug) {
+        return this.write.where({ slug }).delete().then(result => result.rowCount > 0);
     }
 
     // --- gets the session sub-model

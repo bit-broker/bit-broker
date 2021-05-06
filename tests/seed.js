@@ -77,11 +77,11 @@ describe('Database Seeding', function() {
 
         for (let e = 0; e < e_count; e++) {
             let c_count = DATA.integer(MAX_CONNECTOR, MIN_CONNECTOR);
-            entities.push({ name: DATA.pluck(DATA.NAME.VALID), connectors: [] });
+            entities.push({ name: DATA.pluck(DATA.SLUG.VALID), connectors: [] });
 
             for (let c = 0; c < c_count; c++) {
                 let r_count = DATA.integer(MAX_RECORD, MIN_RECORD);
-                entities[e].connectors.push({ name: DATA.pluck(DATA.NAME.VALID), records: DATA.someof(DATA.RECORDS, r_count) });
+                entities[e].connectors.push({ name: DATA.pluck(DATA.SLUG.VALID), records: DATA.someof(DATA.RECORDS, r_count) });
             }
         }
 

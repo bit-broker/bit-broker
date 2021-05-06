@@ -65,14 +65,14 @@ const DATA = {
         return text.substring(0, size).replace(/\s$/, 'x'); // changes trailing spaces to 'x' in order to preserve desired size
     },
 
-    name: function(size = 16) {
-        let name = '';
+    slug: function(size = 16) {
+        let slug = '';
 
-        while (name.length < size) {
-            name = name.concat(DATA.NAME.CHARS);
+        while (slug.length < size) {
+            slug = slug.concat(DATA.SLUG.CHARS);
         }
 
-        return name.substring(0, size);
+        return slug.substring(0, size);
     },
 
     record: function(index) {
@@ -124,10 +124,10 @@ const DATA = {
         REGEX: "^[a-z0-9]+$",
     },
 
-    NAME: {
+    SLUG: {
         SHORTEST: 3,
         REASONABLE: 16,
-        LONGEST: 64,
+        LONGEST: 32,
         CHARS: 'abcdefghijklmnopqrstuvwxyz0123456789_',
         VALID: ['astaire', 'bacall', 'bergman', 'bogart', 'brando', 'cagney', 'chaplin', 'cooper', 'crawford', 'davis', 'dietrich', 'douglas', 'fonda', 'fontaine', 'gable', 'garbo', 'garland', 'grant', 'hardy', 'hayworth', 'hepburn', 'kelly', 'laurel', 'monroe', 'olivier', 'rogers', 'stewart', 'taylor', 'tracy', 'wayne'],
         INVALID: ['0_number_at_start', '_starts_with_undescore', 'has spaces', 'has_invalid_chars!'],
@@ -249,40 +249,44 @@ const DATA = {
         { id: '0435761', name: 'Toy Story 3', entity: { rank: 100, year: 2010, rating: 8.3, director: 'Lee Unkrich' } },
     ],
 
-    DSP_ID_1: "access_all_areas",
-    DSP_ID_2: "movies_only_no_ratings",
+    DSP_ID_1: "access-all-areas",
+    DSP_ID_2: "movies-only-no-ratings",
     DSP_1: {
         "name": "Access all areas",
         "description": "Access all entities in the catalog, no fields hidden",
-        "access_control": {
-            "enabled": true,
-            "quota": {
-                "max_number": 24000,
-                "interval_type": "day"
+        "policy": {
+            "access_control": {
+                "enabled": true,
+                "quota": {
+                    "max_number": 24000,
+                    "interval_type": "day"
+                },
+                "rate": 1000
             },
-            "rate": 1000
-        },
-        "segment_query": {},
-        "hidden_types": [],
-        "field_masks": [],
-        "legal_context": [{ "type": "attribution", "text": "test harness attribution", "link": "https://cto-github.cisco.com/Team6/kalydo/tree/master/policy-distribution/test-harness" }]
+            "segment_query": {},
+            "hidden_types": [],
+            "field_masks": [],
+            "legal_context": [{ "type": "attribution", "text": "test harness attribution", "link": "https://cto-github.cisco.com/Team6/kalydo/tree/master/policy-distribution/test-harness" }]
+        }
     },
     DSP_2: {
         "name": "Movies only no ratings",
         "description": "Access to movie entities only, excluding ratings data",
-        "access_control": {
-            "enabled": true,
-            "quota": {
-                "max_number": 24000,
-                "interval_type": "day"
+        "policy": {
+            "access_control": {
+                "enabled": true,
+                "quota": {
+                    "max_number": 24000,
+                    "interval_type": "day"
+                },
+                "rate": 1000
             },
-            "rate": 1000
-        },
-        "segment_query": { "type": "movie" },
-        "hidden_types": [],
-        "field_masks": ["movie.rating"],
-        "legal_context": [{ "type": "attribution", "text": "test harness attribution", "link": "https://cto-github.cisco.com/Team6/kalydo/tree/master/policy-distribution/test-harness" }]
-    },    
+            "segment_query": { "type": "movie" },
+            "hidden_types": [],
+            "field_masks": ["movie.rating"],
+            "legal_context": [{ "type": "attribution", "text": "test harness attribution", "link": "https://cto-github.cisco.com/Team6/kalydo/tree/master/policy-distribution/test-harness" }]
+        }
+    },
 };
 
 module.exports = DATA;
