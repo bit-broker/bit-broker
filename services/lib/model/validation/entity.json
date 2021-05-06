@@ -1,18 +1,10 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://bit-broker.io/validation/entity/schema.json",
+    "$id": "bbk://entity",
     "type": "object",
     "properties": {
-        "name": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 64
-        },
-        "description": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 8192
-        },
+        "name": { "$ref": "bbk://name" },
+        "description": { "$ref": "bbk://description" },
         "schema": {
             "type": "object"
         }

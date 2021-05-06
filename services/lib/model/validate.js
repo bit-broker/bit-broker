@@ -24,20 +24,27 @@
 
 // --- dependancies
 
-const schema = require('jsonschema').validate; // specifically NOT json-schema
+const Validator = require('jsonschema').Validator; // specifically NOT json-schema
 const locales = require('../locales.js');
 const fs = require('fs');
 
-// --- constants - loaded once at startup
+// --- scheme listß
 
-const SCHEMA_SLUG = JSON.parse(fs.readFileSync(`${__dirname}/validation/slug.json`));
-const SCHEMA_ENTITY = JSON.parse(fs.readFileSync(`${__dirname}/validation/entity.json`));
-const SCHEMA_CONNECTOR = JSON.parse(fs.readFileSync(`${__dirname}/validation/connector.json`));
-const SCHEMA_POLICY = JSON.parse(fs.readFileSync(`${__dirname}/validation/policy.json`));
+const SCHEMES = [ 'slug', 'name', 'description', 'entity', 'connector', 'policy' ]; // we name them here, rather than just iterate the directory
 
 // --- validate class (exported)
 
 module.exports = class Validate {
+
+    // --- consructor
+
+    constructor() {
+        this.schema = new Validator();
+
+        for (let i = 0 ; i < SCHEMES.length ; i++) {
+            this.schema.addSchema(JSON.parse(fs.readFileSync(`${__dirname}/validation/${ SCHEMES[i] }.json`)), `bbk://${ SCHEMES[i] }`);
+        }
+    }
 
     // --- validation constants - if you change any of these, remember to update the test harness too
 
@@ -49,8 +56,8 @@ module.exports = class Validate {
 
     // --- checks a document against a schema and gathers human readable error messages
 
-    scheme(scheme, instance, name = '') {
-        let errs = schema(scheme, instance).errors;
+    scheme(instance, scheme, name = '') {
+        let errs = this.schema.validate(instance, { "$ref": `bbk://${ scheme }` }).errors;
         let msgs = [];
 
         for (let i = 0; i < errs.length; i++) {
@@ -63,25 +70,25 @@ module.exports = class Validate {
     // --- validates a slug
 
     slug(item) {
-        return this.scheme(item, SCHEMA_SLUG, 'slug');
+        return this.scheme(item, 'slug', 'slug');
     }
 
     // --- validates entity properties
 
     entity(properties) {
-        return this.scheme(properties, SCHEMA_ENTITY);
+        return this.scheme(properties, 'entity');
     }
 
     // --- validates connector properties
 
     connector(properties) {
-        return this.scheme(properties, SCHEMA_CONNECTOR);
+        return this.scheme(properties, 'connector');
     }
 
     // --- validates policy properties
 
     policy(properties) {
-        return this.scheme(properties, SCHEMA_POLICY);
+        return this.scheme(properties, 'policy');
     }
 
     // --- validates a session action

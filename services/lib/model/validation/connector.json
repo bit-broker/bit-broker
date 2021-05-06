@@ -1,18 +1,10 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://bit-broker.io/validation/connector/schema.json",
+    "$id": "bbk://connector",
     "type": "object",
     "properties": {
-        "name": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 64
-        },
-        "description": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 8192
-        },
+        "name": { "$ref": "bbk://name" },
+        "description": { "$ref": "bbk://description" },
         "cache": {
             "type": "integer",
             "minimum": 0,
