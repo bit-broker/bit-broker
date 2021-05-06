@@ -30,7 +30,7 @@ const fs = require('fs');
 
 // --- scheme listß
 
-const SCHEMES = [ 'slug', 'name', 'description', 'entity', 'connector', 'policy' ]; // we name them here, rather than just iterate the directory
+const SCHEMES = [ 'id', 'slug', 'name', 'description', 'entity', 'connector', 'session', 'policy' ]; // we name them here, rather than just iterate the directory
 
 // --- validate class (exported)
 
@@ -42,17 +42,9 @@ module.exports = class Validate {
         this.schema = new Validator();
 
         for (let i = 0 ; i < SCHEMES.length ; i++) {
-            this.schema.addSchema(JSON.parse(fs.readFileSync(`${__dirname}/validation/${ SCHEMES[i] }.json`)), `bbk://${ SCHEMES[i] }`);
+            this.schema.addSchema(JSON.parse(fs.readFileSync(`${ __dirname }/validation/${ SCHEMES[i] }.json`)), `bbk://${ SCHEMES[i] }`);
         }
     }
-
-    // --- validation constants - if you change any of these, remember to update the test harness too
-
-    static get ID_FORMAT() { return '^[a-z0-9][a-z0-9-]+$'; }
-    static get ID_LENGTH() { return 36; }
-    static get SESSION_ACTIONS() { return ['upsert', 'delete']; }
-    static get SESSION_COMMITS() { return ['true', 'false']; }
-    static get SESSION_MODES() { return ['accrue', 'stream', 'replace']; }
 
     // --- checks a document against a schema and gathers human readable error messages
 
@@ -65,6 +57,12 @@ module.exports = class Validate {
         }
 
         return msgs;
+    }
+
+    // --- validates an id
+
+    id(item) {
+        return this.scheme(item, 'id', 'id');
     }
 
     // --- validates a slug
@@ -91,43 +89,21 @@ module.exports = class Validate {
         return this.scheme(properties, 'policy');
     }
 
+    // --- validates a session mode
+
+    mode(item) {
+        return this.scheme(item, 'session#/mode', 'mode');
+    }
+
     // --- validates a session action
 
     action(item) {
-        let errors = [];
-
-        if (Validate.SESSION_ACTIONS.includes(item) === false) errors.push(locales.__('error.action-invalid', item));
-
-        return errors;
+        return this.scheme(item, 'session#/action', 'action');
     }
 
     // --- validates a session commit
 
     commit(item) {
-        let errors = [];
-
-        if (Validate.SESSION_COMMITS.includes(item) === false) errors.push(locales.__('error.commit-invalid', item));
-
-        return errors;
-    }
-
-    // --- validates an id
-
-    id(item) {
-        let errors = [];
-
-        if (item.length != Validate.ID_LENGTH || new RegExp(Validate.ID_FORMAT).test(item) === false) errors.push(locales.__('error.id-invalid', item));
-
-        return errors;
-    }
-
-    // --- validates a session mode
-
-    mode(item) {
-        let errors = [];
-
-        if (Validate.SESSION_MODES.includes(item) === false) errors.push(locales.__('error.mode-invalid', item));
-
-        return errors;
+        return this.scheme(item, 'session#/commit', 'commit');
     }
 }

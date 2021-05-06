@@ -171,12 +171,12 @@ describe('Contributor Tests', function() {
         });
 
         it('cannot open a session with an invalid contribution id', () => {
-            return Session.open_bad(entity, connector, DATA.ID.UNKNOWN + 'X', 'stream', [{ id: 'invalid format' }]);
+            return Session.open_bad(entity, connector, DATA.ID.UNKNOWN + 'x', 'stream', [{ id: 'not meet maximum length' }]);
         });
 
         it('cannot open a session with an unknown mode', () => {
             let mode = DATA.slug();
-            return Session.open_bad(entity, connector, null, mode, [{ mode: 'not recognised' }]);
+            return Session.open_bad(entity, connector, null, mode, [{ mode: 'not one of enum' }]);
         });
 
         it('can now open a session', () => {
@@ -191,17 +191,17 @@ describe('Contributor Tests', function() {
             return Session.action_not_auth(entity, connector, DATA.ID.UNKNOWN, 'upsert', []);
         });
 
-        it('cannot post data an invalid contribution id', () => {
-            return Session.action_bad(entity, connector, DATA.ID.UNKNOWN + 'X', sid, 'upsert', [], [{ id: 'invalid format' }]);
+        it('cannot post data an invalid contribution id', () => {  // TODO - also add invalid char test
+            return Session.action_bad(entity, connector, DATA.ID.UNKNOWN + 'x', sid, 'upsert', [], [{ id: 'not meet maximum length' }]);
         });
 
         it('cannot post data an invalid session id', () => {
-            return Session.action_bad(entity, connector, null, DATA.ID.UNKNOWN + 'X', 'upsert', [], [{ id: 'invalid format' }]);
+            return Session.action_bad(entity, connector, null, DATA.ID.UNKNOWN + 'x', 'upsert', [], [{ id: 'not meet maximum length' }]);
         });
 
         it('cannot post data with an unknown action', () => {
             let action = DATA.slug();
-            return Session.action_bad(entity, connector, null, sid, action, [], [{ action: 'not recognised' }]);
+            return Session.action_bad(entity, connector, null, sid, action, [], [{ action: 'not one of enum' }]);
         });
 
         it('cannot close a session with an unknown contribution id', () => {
@@ -213,16 +213,16 @@ describe('Contributor Tests', function() {
         });
 
         it('cannot close a session with an invalid contribution id', () => {
-            return Session.close_bad(entity, connector, DATA.ID.UNKNOWN + 'X', sid, 'true', [{ id: 'invalid format' }]);
+            return Session.close_bad(entity, connector, DATA.ID.UNKNOWN + 'x', sid, 'true', [{ id: 'not meet maximum length' }]);
         });
 
         it('cannot close a session with an invalid session id', () => {
-            return Session.close_bad(entity, connector, null, DATA.ID.UNKNOWN + 'X', 'true', [{ id: 'invalid format' }]);
+            return Session.close_bad(entity, connector, null, DATA.ID.UNKNOWN + 'x', 'true', [{ id: 'not meet maximum length' }]);
         });
 
         it('cannot close a session with an invalid commit mode', () => {
             let commit = DATA.slug();
-            return Session.close_bad(entity, connector, null, sid, commit, [{ commit: 'not recognised' }]);
+            return Session.close_bad(entity, connector, null, sid, commit, [{ commit: 'not one of enum' }]);
         });
 
         it('can close the original session', () => {

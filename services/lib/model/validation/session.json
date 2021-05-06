@@ -1,0 +1,16 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "bbk://session",
+    "mode": {
+        "type": "string",
+        "enum": ["accrue", "stream", "replace"]
+    },
+    "action": {
+        "type": "string",
+        "enum": ["upsert", "delete"]
+    },
+    "commit": {
+        "type": "string",
+        "enum": ["true", "false"]
+    }
+}
