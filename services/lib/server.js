@@ -59,7 +59,7 @@ module.exports = class Server {
             res.status(HTTP.BAD_REQUEST).send(error.message || '');
 
         } else { // some other kind of error
-            let text = error.message || error;
+            let text = error.message || error.toString();
             let show = status.IS_LIVE ? '' : text; // we *dont* send the internal error text back with the response when in production mode
 
             res.status(HTTP.INTERNAL_SERVER_ERROR).send(show);
