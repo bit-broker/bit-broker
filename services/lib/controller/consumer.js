@@ -27,11 +27,13 @@
 
 // --- dependancies
 
+const Helper = require('../helper.js');
 const HTTP = require('http-status-codes');
 const failure = require('http-errors');
 const model = require('../model/index.js');
 const view = require('../view/index.js');
 const log = require('../logger.js').Logger;
+const convert = require ('mongo-query-to-postgres-jsonb');
 
 // --- timeseries class (embedded)
 
@@ -43,9 +45,7 @@ class Timeseries {
         let type = req.params.type.toLowerCase();
         let id = req.params.id.toLowerCase();
 
-        // TODO
-
-        res.status(HTTP.OK).send('TODO');
+        res.json([]); // TODO
     }
 
     // --- gets details of a named timeseries on the given entity instance
@@ -55,9 +55,7 @@ class Timeseries {
         let id = req.params.id.toLowerCase();
         let tsid = req.params.tsid.toLowerCase();
 
-        // TODO
-
-        res.status(HTTP.OK).send('TODO');
+        throw failure(HTTP.NOT_FOUND); // TODO
     }
 }
 
@@ -74,8 +72,21 @@ module.exports = class Consumer {
     // --- performs a catalog query
 
     catalog(req, res, next) {
-        let q = req.params.q.toLowerCase(); // TODO is a URL query paramater
-        res.status(HTTP.OK).send();
+        let q = req.query.q || {};
+
+        if (Helper.is_json(q)) {
+            let w = convert ('record', JSON.parse(q));
+
+            model.catalog.query(w)
+
+            .then(items => {
+                res.json(items);
+            })
+
+            .catch(error => next(error));
+        } else {
+            throw failure(HTTP.BAD_REQUEST);
+        }
     }
 
     // --- lists all the entity types

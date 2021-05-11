@@ -50,6 +50,7 @@ module.exports = class Entity {
 
     get COLUMNS() {
         return [
+            'id',
             'slug',
             'properties',
             'created_at',
@@ -97,6 +98,6 @@ module.exports = class Entity {
     // --- gets the connector sub-model
 
     connector(slug) {
-        return this.find(slug).then(item => item ? new Connector(this.db, slug) : null);
+        return this.find(slug).then(item => item ? new Connector(this.db, item) : null);
     }
 }

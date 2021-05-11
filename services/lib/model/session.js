@@ -45,7 +45,7 @@ module.exports = class Session {
 
     constructor(db, item) {
         this.db = db;
-        this.connector = item.id;
+        this.connector = item;
         this.id = item.session_id;
         this.started = item.session_started;
         this.mode = item.session_mode;
@@ -55,7 +55,7 @@ module.exports = class Session {
     // --- table read context
 
     get row() {
-        return this.db('connector').where({ id: this.connector }).first();
+        return this.db('connector').where({ id: this.connector.id }).first();
     }
 
     // --- writes session state
@@ -65,7 +65,7 @@ module.exports = class Session {
         this.id = id;
         this.mode = mode;
         this.started = id ? new Date().toISOString() : null;
-        this.operations = new Operation(this.db, this.id, this.connector);
+        this.operations = new Operation(this.db, this.id, this.connector.id);
 
         let values = {
             session_id: this.id,

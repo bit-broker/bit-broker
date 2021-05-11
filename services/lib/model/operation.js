@@ -61,10 +61,15 @@ module.exports = class Operation {
         let values = [];
 
         for (let i = 0; i < records.length; i++) {
+            let record = records[i];
+
+            record.id = Permit.public_key(this.connector.id, record.id);
+            record.type = this.connector.entity_slug;
+
             values.push({
                 session_id: this.id,
                 action: action,
-                record: records[i]
+                record: record
             });
         }
 
@@ -84,7 +89,7 @@ module.exports = class Operation {
         return this.rows.then(items => {
 
             let catalog = new Catalog(this.db);
-            let step = wipe ? catalog.wipe(this.connector) : Promise.resolve(); // TODO: Add transaction boundaries
+            let step = wipe ? catalog.wipe(this.connector.id) : Promise.resolve(); // TODO: Add transaction boundaries
 
             for (let i = 0; i < items.length; i++) {
 
@@ -92,15 +97,14 @@ module.exports = class Operation {
 
                     if (items[i].action === 'upsert') {
                         return catalog.upsert({
-                            connector_id: this.connector,
-                            public_id: Permit.public_key(this.connector, items[i].record.id),
+                            connector_id: this.connector.id,
+                            public_id: Permit.public_key(this.connector.id, items[i].record.id),
                             vendor_id: items[i].record.id,
-                            name: items[i].record.name,
                             record: items[i].record
                         });
                     } else {
 
-                        return catalog.delete(this.connector, items[i].record.id);
+                        return catalog.delete(this.connector.id, items[i].record.id);
                     }
                 });
             }

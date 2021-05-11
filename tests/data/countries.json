@@ -1,0 +1,3138 @@
+[
+    {
+        "id": "AF",
+        "name": "Afghanistan",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    67.709953,
+                    33.93911
+                ]
+            },
+            "capital": "Kabul",
+            "population": 31575018,
+            "code": "AF"
+        }
+    },
+    {
+        "id": "AL",
+        "name": "Albania",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    20.168331,
+                    41.153332
+                ]
+            },
+            "capital": "Tirana (Tirane)",
+            "population": 2870324,
+            "code": "AL"
+        }
+    },
+    {
+        "id": "DZ",
+        "name": "Algeria",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    1.659626,
+                    28.033886
+                ]
+            },
+            "capital": "Algiers",
+            "population": 43378027,
+            "code": "DZ"
+        }
+    },
+    {
+        "id": "AD",
+        "name": "Andorra",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    1.601554,
+                    42.546245
+                ]
+            },
+            "capital": "Andorra la Vella",
+            "population": 74794,
+            "code": "AD"
+        }
+    },
+    {
+        "id": "AO",
+        "name": "Angola",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    17.873887,
+                    -11.202692
+                ]
+            },
+            "capital": "Luanda",
+            "population": 30175553,
+            "code": "AO"
+        }
+    },
+    {
+        "id": "AG",
+        "name": "Antigua and Barbuda",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -61.796428,
+                    17.060816
+                ]
+            },
+            "capital": "Saint John's",
+            "population": 104084,
+            "code": "AG"
+        }
+    },
+    {
+        "id": "AR",
+        "name": "Argentina",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -63.616672,
+                    -38.416097
+                ]
+            },
+            "capital": "Buenos Aires",
+            "population": 44938712,
+            "code": "AR"
+        }
+    },
+    {
+        "id": "AM",
+        "name": "Armenia",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    45.038189,
+                    40.069099
+                ]
+            },
+            "capital": "Yerevan",
+            "population": 2969200,
+            "code": "AM"
+        }
+    },
+    {
+        "id": "AU",
+        "name": "Australia",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    133.775136,
+                    -25.274398
+                ]
+            },
+            "capital": "Canberra",
+            "population": 25294500,
+            "code": "AU"
+        }
+    },
+    {
+        "id": "AT",
+        "name": "Austria",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    14.550072,
+                    47.516231
+                ]
+            },
+            "capital": "Vienna",
+            "population": 8859992,
+            "code": "AT"
+        }
+    },
+    {
+        "id": "AZ",
+        "name": "Azerbaijan",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    47.576927,
+                    40.143105
+                ]
+            },
+            "capital": "Baku",
+            "population": 9981457,
+            "code": "AZ"
+        }
+    },
+    {
+        "id": "BS",
+        "name": "Bahamas",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -77.39628,
+                    25.03428
+                ]
+            },
+            "capital": "Nassau",
+            "population": 385340,
+            "code": "BS"
+        }
+    },
+    {
+        "id": "BH",
+        "name": "Bahrain",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    50.637772,
+                    25.930414
+                ]
+            },
+            "capital": "Manama",
+            "population": 1543300,
+            "code": "BH"
+        }
+    },
+    {
+        "id": "BD",
+        "name": "Bangladesh",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    90.356331,
+                    23.684994
+                ]
+            },
+            "capital": "Dhaka",
+            "population": 166234000,
+            "code": "BD"
+        }
+    },
+    {
+        "id": "BB",
+        "name": "Barbados",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -59.543198,
+                    13.193887
+                ]
+            },
+            "capital": "Bridgetown",
+            "population": 287010,
+            "code": "BB"
+        }
+    },
+    {
+        "id": "BY",
+        "name": "Belarus",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    27.953389,
+                    53.709807
+                ]
+            },
+            "capital": "Minsk",
+            "population": 9475200,
+            "code": "BY"
+        }
+    },
+    {
+        "id": "BE",
+        "name": "Belgium",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    4.469936,
+                    50.503887
+                ]
+            },
+            "capital": "Brussels",
+            "population": 11455358,
+            "code": "BE"
+        }
+    },
+    {
+        "id": "BZ",
+        "name": "Belize",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -88.49765,
+                    17.189877
+                ]
+            },
+            "capital": "Belmopan",
+            "population": 398050,
+            "code": "BZ"
+        }
+    },
+    {
+        "id": "BJ",
+        "name": "Benin",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    2.315834,
+                    9.30769
+                ]
+            },
+            "capital": "Porto Novo",
+            "population": 11733059,
+            "code": "BJ"
+        }
+    },
+    {
+        "id": "BM",
+        "name": "Bermuda",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -64.75737,
+                    32.321384
+                ]
+            },
+            "capital": "Hamilton",
+            "population": 64027,
+            "code": "BM"
+        }
+    },
+    {
+        "id": "BT",
+        "name": "Bhutan",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    90.433601,
+                    27.514162
+                ]
+            },
+            "capital": "Thimphu",
+            "population": 741672,
+            "code": "BT"
+        }
+    },
+    {
+        "id": "BO",
+        "name": "Bolivia",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -63.588653,
+                    -16.290154
+                ]
+            },
+            "capital": "La Paz",
+            "population": 11469896,
+            "code": "BO"
+        }
+    },
+    {
+        "id": "BA",
+        "name": "Bosnia and Herzegovina",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    17.679076,
+                    43.915886
+                ]
+            },
+            "capital": "Sarajevo",
+            "population": 3502550,
+            "code": "BA"
+        }
+    },
+    {
+        "id": "BW",
+        "name": "Botswana",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    24.684866,
+                    -22.328474
+                ]
+            },
+            "capital": "Gaborone",
+            "population": 2338851,
+            "code": "BW"
+        }
+    },
+    {
+        "id": "BR",
+        "name": "Brazil",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -51.92528,
+                    -14.235004
+                ]
+            },
+            "capital": "Brasilia",
+            "population": 209659000,
+            "code": "BR"
+        }
+    },
+    {
+        "id": "BN",
+        "name": "Brunei",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    114.727669,
+                    4.535277
+                ]
+            },
+            "capital": "Bandar Seri Begawan",
+            "population": 421300,
+            "code": "BN"
+        }
+    },
+    {
+        "id": "BG",
+        "name": "Bulgaria",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    25.48583,
+                    42.733883
+                ]
+            },
+            "capital": "Sofia",
+            "population": 7050034,
+            "code": "BG"
+        }
+    },
+    {
+        "id": "BF",
+        "name": "Burkina Faso",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -1.561593,
+                    12.238333
+                ]
+            },
+            "capital": "Ouagadougou",
+            "population": 20870060,
+            "code": "BF"
+        }
+    },
+    {
+        "id": "BI",
+        "name": "Burundi",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    29.918886,
+                    -3.373056
+                ]
+            },
+            "capital": "Bujumbura",
+            "population": 10953317,
+            "code": "BI"
+        }
+    },
+    {
+        "id": "KH",
+        "name": "Cambodia",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    104.990963,
+                    12.565679
+                ]
+            },
+            "capital": "Phnom Penh",
+            "population": 16289270,
+            "code": "KH"
+        }
+    },
+    {
+        "id": "CM",
+        "name": "Cameroon",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    12.354722,
+                    7.369722
+                ]
+            },
+            "capital": "Yaounde",
+            "population": 24348251,
+            "code": "CM"
+        }
+    },
+    {
+        "id": "CA",
+        "name": "Canada",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -106.346771,
+                    56.130366
+                ]
+            },
+            "capital": "Ottawa",
+            "population": 37410400,
+            "code": "CA"
+        }
+    },
+    {
+        "id": "CV",
+        "name": "Cape Verde",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -24.013197,
+                    16.002082
+                ]
+            },
+            "capital": "Praia",
+            "population": 550483,
+            "code": "CV"
+        }
+    },
+    {
+        "id": "CF",
+        "name": "Central African Republic",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    20.939444,
+                    6.611111
+                ]
+            },
+            "capital": "Bangui",
+            "population": 5496011,
+            "code": "CF"
+        }
+    },
+    {
+        "id": "TD",
+        "name": "Chad",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    18.732207,
+                    15.454166
+                ]
+            },
+            "capital": "N'Djamena",
+            "population": 15692969,
+            "code": "TD"
+        }
+    },
+    {
+        "id": "CL",
+        "name": "Chile",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -71.542969,
+                    -35.675147
+                ]
+            },
+            "capital": "Santiago",
+            "population": 19107216,
+            "code": "CL"
+        }
+    },
+    {
+        "id": "CN",
+        "name": "China",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    104.195397,
+                    35.86166
+                ]
+            },
+            "capital": "Beijing",
+            "population": 1394900000,
+            "code": "CN"
+        }
+    },
+    {
+        "id": "CO",
+        "name": "Colombia",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -74.297333,
+                    4.570868
+                ]
+            },
+            "capital": "Bogota",
+            "population": 45500000,
+            "code": "CO"
+        }
+    },
+    {
+        "id": "KM",
+        "name": "Comoros",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    43.872219,
+                    -11.875001
+                ]
+            },
+            "capital": "Moroni",
+            "population": 873724,
+            "code": "KM"
+        }
+    },
+    {
+        "id": "CD",
+        "name": "Congo, Democratic Republic of the",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    21.758664,
+                    -4.038333
+                ]
+            },
+            "capital": "Kinshasa",
+            "population": 91931000,
+            "code": "CD"
+        }
+    },
+    {
+        "id": "CG",
+        "name": "Congo, Republic of the",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    15.827659,
+                    -0.228021
+                ]
+            },
+            "capital": "Brazzaville",
+            "population": 5128170,
+            "code": "CG"
+        }
+    },
+    {
+        "id": "CR",
+        "name": "Costa Rica",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -83.753428,
+                    9.748917
+                ]
+            },
+            "capital": "San Jose",
+            "population": 5058007,
+            "code": "CR"
+        }
+    },
+    {
+        "id": "HR",
+        "name": "Croatia",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    15.2,
+                    45.1
+                ]
+            },
+            "capital": "Zagreb",
+            "population": 4105493,
+            "code": "HR"
+        }
+    },
+    {
+        "id": "CU",
+        "name": "Cuba",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -77.781167,
+                    21.521757
+                ]
+            },
+            "capital": "Havana",
+            "population": 11221060,
+            "code": "CU"
+        }
+    },
+    {
+        "id": "CY",
+        "name": "Cyprus",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    33.429859,
+                    35.126413
+                ]
+            },
+            "capital": "Nicosia",
+            "population": 864200,
+            "code": "CY"
+        }
+    },
+    {
+        "id": "CZ",
+        "name": "Czech Republic",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    15.472962,
+                    49.817492
+                ]
+            },
+            "capital": "Prague",
+            "population": 10637794,
+            "code": "CZ"
+        }
+    },
+    {
+        "id": "DK",
+        "name": "Denmark",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    9.501785,
+                    56.26392
+                ]
+            },
+            "capital": "Copenhagen",
+            "population": 5806081,
+            "code": "DK"
+        }
+    },
+    {
+        "id": "DJ",
+        "name": "Djibouti",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    42.590275,
+                    11.825138
+                ]
+            },
+            "capital": "Djibouti",
+            "population": 1078373,
+            "code": "DJ"
+        }
+    },
+    {
+        "id": "DM",
+        "name": "Dominica",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -61.370976,
+                    15.414999
+                ]
+            },
+            "capital": "Roseau",
+            "population": 74679,
+            "code": "DM"
+        }
+    },
+    {
+        "id": "DO",
+        "name": "Dominican Republic",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -70.162651,
+                    18.735693
+                ]
+            },
+            "capital": "Santo Domingo",
+            "population": 10358320,
+            "code": "DO"
+        }
+    },
+    {
+        "id": "EC",
+        "name": "Ecuador",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -78.183406,
+                    -1.831239
+                ]
+            },
+            "capital": "Quito",
+            "population": 17199800,
+            "code": "EC"
+        }
+    },
+    {
+        "id": "EG",
+        "name": "Egypt",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    30.802498,
+                    26.820553
+                ]
+            },
+            "capital": "Cairo",
+            "population": 98415800,
+            "code": "EG"
+        }
+    },
+    {
+        "id": "SV",
+        "name": "El Salvador",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -88.89653,
+                    13.794185
+                ]
+            },
+            "capital": "San Salvador",
+            "population": 6704864,
+            "code": "SV"
+        }
+    },
+    {
+        "id": "GQ",
+        "name": "Equatorial Guinea",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    10.267895,
+                    1.650801
+                ]
+            },
+            "capital": "Malabo",
+            "population": 1358276,
+            "code": "GQ"
+        }
+    },
+    {
+        "id": "ER",
+        "name": "Eritrea",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    39.782334,
+                    15.179384
+                ]
+            },
+            "capital": "Asmara",
+            "population": 6159000,
+            "code": "ER"
+        }
+    },
+    {
+        "id": "EE",
+        "name": "Estonia",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    25.013607,
+                    58.595272
+                ]
+            },
+            "capital": "Tallinn",
+            "population": 1323820,
+            "code": "EE"
+        }
+    },
+    {
+        "id": "ET",
+        "name": "Ethiopia",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    40.489673,
+                    9.145
+                ]
+            },
+            "capital": "Addis Ababa",
+            "population": 98665000,
+            "code": "ET"
+        }
+    },
+    {
+        "id": "FI",
+        "name": "Finland",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    25.748151,
+                    61.92411
+                ]
+            },
+            "capital": "Helsinki",
+            "population": 5521773,
+            "code": "FI"
+        }
+    },
+    {
+        "id": "GF",
+        "name": "French Guiana",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -53.125782,
+                    3.933889
+                ]
+            },
+            "capital": "Cayenne",
+            "population": 296711,
+            "code": "GF"
+        }
+    },
+    {
+        "id": "GA",
+        "name": "Gabon",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    11.609444,
+                    -0.803689
+                ]
+            },
+            "capital": "Libreville",
+            "population": 2096970,
+            "code": "GA"
+        }
+    },
+    {
+        "id": "GM",
+        "name": "Gambia",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -15.310139,
+                    13.443182
+                ]
+            },
+            "capital": "Banjul",
+            "population": 2101000,
+            "code": "GM"
+        }
+    },
+    {
+        "id": "GE",
+        "name": "Georgia",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    43.356892,
+                    42.315407
+                ]
+            },
+            "capital": "Tbilisi",
+            "population": 3729600,
+            "code": "GE"
+        }
+    },
+    {
+        "id": "DE",
+        "name": "Germany",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    10.451526,
+                    51.165691
+                ]
+            },
+            "capital": "Berlin",
+            "population": 82979100,
+            "code": "DE"
+        }
+    },
+    {
+        "id": "GH",
+        "name": "Ghana",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -1.023194,
+                    7.946527
+                ]
+            },
+            "capital": "Accra",
+            "population": 30280811,
+            "code": "GH"
+        }
+    },
+    {
+        "id": "GR",
+        "name": "Greece",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    21.824312,
+                    39.074208
+                ]
+            },
+            "capital": "Athens",
+            "population": 10741165,
+            "code": "GR"
+        }
+    },
+    {
+        "id": "GL",
+        "name": "Greenland",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -42.604303,
+                    71.706936
+                ]
+            },
+            "capital": "Nuuk",
+            "population": 55992,
+            "code": "GL"
+        }
+    },
+    {
+        "id": "GD",
+        "name": "Grenada",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -61.604171,
+                    12.262776
+                ]
+            },
+            "capital": "Saint George's",
+            "population": 108825,
+            "code": "GD"
+        }
+    },
+    {
+        "id": "GT",
+        "name": "Guatemala",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -90.230759,
+                    15.783471
+                ]
+            },
+            "capital": "Guatemala City",
+            "population": 17679735,
+            "code": "GT"
+        }
+    },
+    {
+        "id": "GN",
+        "name": "Guinea",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -9.696645,
+                    9.945587
+                ]
+            },
+            "capital": "Conakry",
+            "population": 12218357,
+            "code": "GN"
+        }
+    },
+    {
+        "id": "GW",
+        "name": "Guinea-Bissau",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -15.180413,
+                    11.803749
+                ]
+            },
+            "capital": "Bissau",
+            "population": 1604528,
+            "code": "GW"
+        }
+    },
+    {
+        "id": "GY",
+        "name": "Guyana",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -58.93018,
+                    4.860416
+                ]
+            },
+            "capital": "Georgetown",
+            "population": 786508,
+            "code": "GY"
+        }
+    },
+    {
+        "id": "HT",
+        "name": "Haiti",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -72.285215,
+                    18.971187
+                ]
+            },
+            "capital": "Port au Prince",
+            "population": 11577779,
+            "code": "HT"
+        }
+    },
+    {
+        "id": "HN",
+        "name": "Honduras",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -86.241905,
+                    15.199999
+                ]
+            },
+            "capital": "Tegucigalpa",
+            "population": 9158345,
+            "code": "HN"
+        }
+    },
+    {
+        "id": "HK",
+        "name": "Hong Kong",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    114.109497,
+                    22.396428
+                ]
+            },
+            "capital": "Central",
+            "population": 7482500,
+            "code": "HK"
+        }
+    },
+    {
+        "id": "HU",
+        "name": "Hungary",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    19.503304,
+                    47.162494
+                ]
+            },
+            "capital": "Budapest",
+            "population": 9771000,
+            "code": "HU"
+        }
+    },
+    {
+        "id": "IS",
+        "name": "Iceland",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -19.020835,
+                    64.963051
+                ]
+            },
+            "capital": "Reykjavik",
+            "population": 357050,
+            "code": "IS"
+        }
+    },
+    {
+        "id": "IN",
+        "name": "India",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    78.96288,
+                    20.593684
+                ]
+            },
+            "capital": "New Delhi",
+            "population": 1344860000,
+            "code": "IN"
+        }
+    },
+    {
+        "id": "ID",
+        "name": "Indonesia",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    113.921327,
+                    -0.789275
+                ]
+            },
+            "capital": "Jakarta",
+            "population": 268074600,
+            "code": "ID"
+        }
+    },
+    {
+        "id": "IR",
+        "name": "Iran",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    53.688046,
+                    32.427908
+                ]
+            },
+            "capital": "Tehran",
+            "population": 82294300,
+            "code": "IR"
+        }
+    },
+    {
+        "id": "IQ",
+        "name": "Iraq",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    43.679291,
+                    33.223191
+                ]
+            },
+            "capital": "Baghdad",
+            "population": 39127900,
+            "code": "IQ"
+        }
+    },
+    {
+        "id": "IE",
+        "name": "Ireland",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -8.24389,
+                    53.41291
+                ]
+            },
+            "capital": "Dublin",
+            "population": 4857000,
+            "code": "IE"
+        }
+    },
+    {
+        "id": "IL",
+        "name": "Israel",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    34.851612,
+                    31.046051
+                ]
+            },
+            "capital": "Jerusalem",
+            "population": 9006090,
+            "code": "IL"
+        }
+    },
+    {
+        "id": "IT",
+        "name": "Italy",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    12.56738,
+                    41.87194
+                ]
+            },
+            "capital": "Rome",
+            "population": 60377663,
+            "code": "IT"
+        }
+    },
+    {
+        "id": "JM",
+        "name": "Jamaica",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -77.297508,
+                    18.109581
+                ]
+            },
+            "capital": "Kingston",
+            "population": 2728864,
+            "code": "JM"
+        }
+    },
+    {
+        "id": "JP",
+        "name": "Japan",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    138.252924,
+                    36.204824
+                ]
+            },
+            "capital": "Tokyo",
+            "population": 126330000,
+            "code": "JP"
+        }
+    },
+    {
+        "id": "JO",
+        "name": "Jordan",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    36.238414,
+                    30.585164
+                ]
+            },
+            "capital": "Amman",
+            "population": 10374300,
+            "code": "JO"
+        }
+    },
+    {
+        "id": "KZ",
+        "name": "Kazakhstan",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    66.923684,
+                    48.019573
+                ]
+            },
+            "capital": "Astana",
+            "population": 18415500,
+            "code": "KZ"
+        }
+    },
+    {
+        "id": "KE",
+        "name": "Kenya",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    37.906193,
+                    -0.023559
+                ]
+            },
+            "capital": "Nairobi",
+            "population": 49364000,
+            "code": "KE"
+        }
+    },
+    {
+        "id": "KI",
+        "name": "Kiribati",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -168.734039,
+                    -3.370417
+                ]
+            },
+            "capital": "Tarawa Atoll",
+            "population": 120100,
+            "code": "KI"
+        }
+    },
+    {
+        "id": "XK",
+        "name": "Kosovo",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    20.902977,
+                    42.602636
+                ]
+            },
+            "capital": "Pristina",
+            "population": 1798506,
+            "code": "XK"
+        }
+    },
+    {
+        "id": "KW",
+        "name": "Kuwait",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    47.481766,
+                    29.31166
+                ]
+            },
+            "capital": "Kuwait City",
+            "population": 4226920,
+            "code": "KW"
+        }
+    },
+    {
+        "id": "KG",
+        "name": "Kyrgyzstan",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    74.766098,
+                    41.20438
+                ]
+            },
+            "capital": "Bishkek",
+            "population": 6350500,
+            "code": "KG"
+        }
+    },
+    {
+        "id": "LA",
+        "name": "Laos",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    102.495496,
+                    19.85627
+                ]
+            },
+            "capital": "Vientiane",
+            "population": 7123205,
+            "code": "LA"
+        }
+    },
+    {
+        "id": "LV",
+        "name": "Latvia",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    24.603189,
+                    56.879635
+                ]
+            },
+            "capital": "Riga",
+            "population": 1918500,
+            "code": "LV"
+        }
+    },
+    {
+        "id": "LB",
+        "name": "Lebanon",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    35.862285,
+                    33.854721
+                ]
+            },
+            "capital": "Beirut",
+            "population": 6065922,
+            "code": "LB"
+        }
+    },
+    {
+        "id": "LS",
+        "name": "Lesotho",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    28.233608,
+                    -29.609988
+                ]
+            },
+            "capital": "Maseru",
+            "population": 2007201,
+            "code": "LS"
+        }
+    },
+    {
+        "id": "LR",
+        "name": "Liberia",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -9.429499,
+                    6.428055
+                ]
+            },
+            "capital": "Monrovia",
+            "population": 4475353,
+            "code": "LR"
+        }
+    },
+    {
+        "id": "LY",
+        "name": "Libya",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    17.228331,
+                    26.3351
+                ]
+            },
+            "capital": "Tripoli",
+            "population": 6850229,
+            "code": "LY"
+        }
+    },
+    {
+        "id": "LI",
+        "name": "Liechtenstein",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    9.555373,
+                    47.166
+                ]
+            },
+            "capital": "Vaduz",
+            "population": 38201,
+            "code": "LI"
+        }
+    },
+    {
+        "id": "LT",
+        "name": "Lithuania",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    23.881275,
+                    55.169438
+                ]
+            },
+            "capital": "Vilnius",
+            "population": 2792052,
+            "code": "LT"
+        }
+    },
+    {
+        "id": "LU",
+        "name": "Luxembourg",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    6.129583,
+                    49.815273
+                ]
+            },
+            "capital": "Luxembourg",
+            "population": 602005,
+            "code": "LU"
+        }
+    },
+    {
+        "id": "MK",
+        "name": "Macedonia",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    21.745275,
+                    41.608635
+                ]
+            },
+            "capital": "Skopje",
+            "population": 2074000,
+            "code": "MK"
+        }
+    },
+    {
+        "id": "MG",
+        "name": "Madagascar",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    46.869107,
+                    -18.766947
+                ]
+            },
+            "capital": "Antananarivo",
+            "population": 25263000,
+            "code": "MG"
+        }
+    },
+    {
+        "id": "MW",
+        "name": "Malawi",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    34.301525,
+                    -13.254308
+                ]
+            },
+            "capital": "Lilongwe",
+            "population": 17563749,
+            "code": "MW"
+        }
+    },
+    {
+        "id": "MY",
+        "name": "Malaysia",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    101.975766,
+                    4.210484
+                ]
+            },
+            "capital": "Kuala Lumpur",
+            "population": 32654200,
+            "code": "MY"
+        }
+    },
+    {
+        "id": "MV",
+        "name": "Maldives",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    73.22068,
+                    3.202778
+                ]
+            },
+            "capital": "Male",
+            "population": 378114,
+            "code": "MV"
+        }
+    },
+    {
+        "id": "ML",
+        "name": "Mali",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -3.996166,
+                    17.570692
+                ]
+            },
+            "capital": "Bamako",
+            "population": 19973000,
+            "code": "ML"
+        }
+    },
+    {
+        "id": "MT",
+        "name": "Malta",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    14.375416,
+                    35.937496
+                ]
+            },
+            "capital": "Valletta",
+            "population": 475701,
+            "code": "MT"
+        }
+    },
+    {
+        "id": "MH",
+        "name": "Marshall Islands",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    171.184478,
+                    7.131474
+                ]
+            },
+            "capital": "Majuro",
+            "population": 55500,
+            "code": "MH"
+        }
+    },
+    {
+        "id": "MQ",
+        "name": "Mauritania",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -61.024174,
+                    14.641528
+                ]
+            },
+            "capital": "Nouakchott",
+            "population": 4077347,
+            "code": "MQ"
+        }
+    },
+    {
+        "id": "MR",
+        "name": "Mauritius",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    57.552152,
+                    -20.348404
+                ]
+            },
+            "capital": "Port Louis",
+            "population": 1265577,
+            "code": "MR"
+        }
+    },
+    {
+        "id": "MX",
+        "name": "Mexico",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -102.552784,
+                    23.634501
+                ]
+            },
+            "capital": "Mexico City",
+            "population": 126577691,
+            "code": "MX"
+        }
+    },
+    {
+        "id": "MD",
+        "name": "Moldova",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    28.369885,
+                    47.411631
+                ]
+            },
+            "capital": "Chisinau",
+            "population": 3547539,
+            "code": "MD"
+        }
+    },
+    {
+        "id": "MC",
+        "name": "Monaco",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    7.412841,
+                    43.750298
+                ]
+            },
+            "capital": "Monaco",
+            "population": 3248309,
+            "code": "MC"
+        }
+    },
+    {
+        "id": "MN",
+        "name": "Mongolia",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    103.846656,
+                    46.862496
+                ]
+            },
+            "capital": "Ulaanbaatar",
+            "population": 3248309,
+            "code": "MN"
+        }
+    },
+    {
+        "id": "ME",
+        "name": "Montenegro",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    19.37439,
+                    42.708678
+                ]
+            },
+            "capital": "Podgorica",
+            "population": 622359,
+            "code": "ME"
+        }
+    },
+    {
+        "id": "MA",
+        "name": "Morocco",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -7.09262,
+                    31.791702
+                ]
+            },
+            "capital": "Rabat",
+            "population": 34964500,
+            "code": "MA"
+        }
+    },
+    {
+        "id": "MZ",
+        "name": "Mozambique",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    35.529562,
+                    -18.665695
+                ]
+            },
+            "capital": "Maputo",
+            "population": 28861863,
+            "code": "MZ"
+        }
+    },
+    {
+        "id": "MM",
+        "name": "Myanmar (Burma)",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    95.956223,
+                    21.913965
+                ]
+            },
+            "capital": "Naypyidaw",
+            "population": 54339766,
+            "code": "MM"
+        }
+    },
+    {
+        "id": "NA",
+        "name": "Namibia",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    18.49041,
+                    -22.95764
+                ]
+            },
+            "capital": "Windhoek",
+            "population": 2458936,
+            "code": "NA"
+        }
+    },
+    {
+        "id": "NR",
+        "name": "Nauru",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    166.931503,
+                    -0.522778
+                ]
+            },
+            "capital": "No official capital",
+            "population": 11000,
+            "code": "NR"
+        }
+    },
+    {
+        "id": "NP",
+        "name": "Nepal",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    84.124008,
+                    28.394857
+                ]
+            },
+            "capital": "Kathmandu",
+            "population": 29609623,
+            "code": "NP"
+        }
+    },
+    {
+        "id": "NL",
+        "name": "Netherlands",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    5.291266,
+                    52.132633
+                ]
+            },
+            "capital": "Amsterdam",
+            "population": 17305700,
+            "code": "NL"
+        }
+    },
+    {
+        "id": "NZ",
+        "name": "New Zealand",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    174.885971,
+                    -40.900557
+                ]
+            },
+            "capital": "Wellington",
+            "population": 4947930,
+            "code": "NZ"
+        }
+    },
+    {
+        "id": "NI",
+        "name": "Nicaragua",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -85.207229,
+                    12.865416
+                ]
+            },
+            "capital": "Managua",
+            "population": 6393824,
+            "code": "NI"
+        }
+    },
+    {
+        "id": "NE",
+        "name": "Niger",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    8.081666,
+                    17.607789
+                ]
+            },
+            "capital": "Niamey",
+            "population": 22314743,
+            "code": "NE"
+        }
+    },
+    {
+        "id": "NG",
+        "name": "Nigeria",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    8.675277,
+                    9.081999
+                ]
+            },
+            "capital": "Abuja",
+            "population": 199206000,
+            "code": "NG"
+        }
+    },
+    {
+        "id": "KP",
+        "name": "North Korea",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    127.510093,
+                    40.339852
+                ]
+            },
+            "capital": "Pyongyang",
+            "population": 25450000,
+            "code": "KP"
+        }
+    },
+    {
+        "id": "NO",
+        "name": "Norway",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    8.468946,
+                    60.472024
+                ]
+            },
+            "capital": "Oslo",
+            "population": 5328212,
+            "code": "NO"
+        }
+    },
+    {
+        "id": "OM",
+        "name": "Oman",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    55.923255,
+                    21.512583
+                ]
+            },
+            "capital": "Muscat",
+            "population": 4673555,
+            "code": "OM"
+        }
+    },
+    {
+        "id": "PK",
+        "name": "Pakistan",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    69.345116,
+                    30.375321
+                ]
+            },
+            "capital": "Islamabad",
+            "population": 204039000,
+            "code": "PK"
+        }
+    },
+    {
+        "id": "PW",
+        "name": "Palau",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    134.58252,
+                    7.51498
+                ]
+            },
+            "capital": "Melekeok",
+            "population": 17900,
+            "code": "PW"
+        }
+    },
+    {
+        "id": "PA",
+        "name": "Panama",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -80.782127,
+                    8.537981
+                ]
+            },
+            "capital": "Panama City",
+            "population": 4218808,
+            "code": "PA"
+        }
+    },
+    {
+        "id": "PG",
+        "name": "Papua New Guinea",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    143.95555,
+                    -6.314993
+                ]
+            },
+            "capital": "Port Moresby",
+            "population": 8558800,
+            "code": "PG"
+        }
+    },
+    {
+        "id": "PY",
+        "name": "Paraguay",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -58.443832,
+                    -23.442503
+                ]
+            },
+            "capital": "Asuncion",
+            "population": 7152703,
+            "code": "PY"
+        }
+    },
+    {
+        "id": "PE",
+        "name": "Peru",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -75.015152,
+                    -9.189967
+                ]
+            },
+            "capital": "Lima",
+            "population": 32495510,
+            "code": "PE"
+        }
+    },
+    {
+        "id": "PH",
+        "name": "Philippines",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    121.774017,
+                    12.879721
+                ]
+            },
+            "capital": "Manila",
+            "population": 107363000,
+            "code": "PH"
+        }
+    },
+    {
+        "id": "PL",
+        "name": "Poland",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    19.145136,
+                    51.919438
+                ]
+            },
+            "capital": "Warsaw",
+            "population": 38433600,
+            "code": "PL"
+        }
+    },
+    {
+        "id": "PT",
+        "name": "Portugal",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -8.224454,
+                    39.399872
+                ]
+            },
+            "capital": "Lisbon",
+            "population": 10291027,
+            "code": "PT"
+        }
+    },
+    {
+        "id": "PR",
+        "name": "Puerto Rico",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -66.590149,
+                    18.220833
+                ]
+            },
+            "capital": "San Juan",
+            "population": 3195153,
+            "code": "PR"
+        }
+    },
+    {
+        "id": "QA",
+        "name": "Qatar",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    51.183884,
+                    25.354826
+                ]
+            },
+            "capital": "Doha",
+            "population": 2772947,
+            "code": "QA"
+        }
+    },
+    {
+        "id": "RO",
+        "name": "Romania",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    24.96676,
+                    45.943161
+                ]
+            },
+            "capital": "Bucharest",
+            "population": 19523621,
+            "code": "RO"
+        }
+    },
+    {
+        "id": "RU",
+        "name": "Russia",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    105.318756,
+                    61.52401
+                ]
+            },
+            "capital": "Moscow",
+            "population": 146793744,
+            "code": "RU"
+        }
+    },
+    {
+        "id": "RW",
+        "name": "Rwanda",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    29.873888,
+                    -1.940278
+                ]
+            },
+            "capital": "Kigali",
+            "population": 12374397,
+            "code": "RW"
+        }
+    },
+    {
+        "id": "KN",
+        "name": "Saint Kitts and Nevis",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -62.782998,
+                    17.357822
+                ]
+            },
+            "capital": "Basseterre",
+            "population": 56345,
+            "code": "KN"
+        }
+    },
+    {
+        "id": "LC",
+        "name": "Saint Lucia",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -60.978893,
+                    13.909444
+                ]
+            },
+            "capital": "Castries",
+            "population": 180454,
+            "code": "LC"
+        }
+    },
+    {
+        "id": "VC",
+        "name": "Saint Vincent and the Grenadines",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -61.287228,
+                    12.984305
+                ]
+            },
+            "capital": "Kingstown",
+            "population": 109803,
+            "code": "VC"
+        }
+    },
+    {
+        "id": "WS",
+        "name": "Samoa",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -172.104629,
+                    -13.759029
+                ]
+            },
+            "capital": "Apia",
+            "population": 200874,
+            "code": "WS"
+        }
+    },
+    {
+        "id": "SM",
+        "name": "San Marino",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    12.457777,
+                    43.94236
+                ]
+            },
+            "capital": "San Marino",
+            "population": 33419,
+            "code": "SM"
+        }
+    },
+    {
+        "id": "SA",
+        "name": "Saudi Arabia",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    45.079162,
+                    23.885942
+                ]
+            },
+            "capital": "Riyadh",
+            "population": 33413660,
+            "code": "SA"
+        }
+    },
+    {
+        "id": "SN",
+        "name": "Senegal",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -14.452362,
+                    14.497401
+                ]
+            },
+            "capital": "Dakar",
+            "population": 16209125,
+            "code": "SN"
+        }
+    },
+    {
+        "id": "RS",
+        "name": "Serbia",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    21.005859,
+                    44.016521
+                ]
+            },
+            "capital": "Belgrade",
+            "population": 7001444,
+            "code": "RS"
+        }
+    },
+    {
+        "id": "SC",
+        "name": "Seychelles",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    55.491977,
+                    -4.679574
+                ]
+            },
+            "capital": "Victoria",
+            "population": 96762,
+            "code": "SC"
+        }
+    },
+    {
+        "id": "SL",
+        "name": "Sierra Leone",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -11.779889,
+                    8.460555
+                ]
+            },
+            "capital": "Freetown",
+            "population": 7901454,
+            "code": "SL"
+        }
+    },
+    {
+        "id": "SG",
+        "name": "Singapore",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    103.819836,
+                    1.352083
+                ]
+            },
+            "capital": "Singapore",
+            "population": 5638700,
+            "code": "SG"
+        }
+    },
+    {
+        "id": "SK",
+        "name": "Slovakia",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    19.699024,
+                    48.669026
+                ]
+            },
+            "capital": "Bratislava",
+            "population": 5445087,
+            "code": "SK"
+        }
+    },
+    {
+        "id": "SI",
+        "name": "Slovenia",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    14.995463,
+                    46.151241
+                ]
+            },
+            "capital": "Ljubljana",
+            "population": 2076595,
+            "code": "SI"
+        }
+    },
+    {
+        "id": "SB",
+        "name": "Solomon Islands",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    160.156194,
+                    -9.64571
+                ]
+            },
+            "capital": "Honiara",
+            "population": 680806,
+            "code": "SB"
+        }
+    },
+    {
+        "id": "SO",
+        "name": "Somalia",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    46.199616,
+                    5.152149
+                ]
+            },
+            "capital": "Mogadishu",
+            "population": 15501990,
+            "code": "SO"
+        }
+    },
+    {
+        "id": "ZA",
+        "name": "South Africa",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    22.937506,
+                    -30.559482
+                ]
+            },
+            "capital": "Pretoria",
+            "population": 57725600,
+            "code": "ZA"
+        }
+    },
+    {
+        "id": "KR",
+        "name": "South Korea",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    127.766922,
+                    35.907757
+                ]
+            },
+            "capital": "Seoul",
+            "population": 51811167,
+            "code": "KR"
+        }
+    },
+    {
+        "id": "SS",
+        "name": "South Sudan",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    30.217636,
+                    12.862807
+                ]
+            },
+            "capital": "Juba",
+            "population": 12778250,
+            "code": "SS"
+        }
+    },
+    {
+        "id": "ES",
+        "name": "Spain",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -3.74922,
+                    40.463667
+                ]
+            },
+            "capital": "Madrid",
+            "population": 46733038,
+            "code": "ES"
+        }
+    },
+    {
+        "id": "LK",
+        "name": "Sri Lanka",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    80.771797,
+                    7.873054
+                ]
+            },
+            "capital": "Colombo",
+            "population": 21670000,
+            "code": "LK"
+        }
+    },
+    {
+        "id": "SD",
+        "name": "Sudan",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    30.217636,
+                    12.862807
+                ]
+            },
+            "capital": "Khartoum",
+            "population": 41368334,
+            "code": "SD"
+        }
+    },
+    {
+        "id": "SR",
+        "name": "Suriname",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -56.027783,
+                    3.919305
+                ]
+            },
+            "capital": "Paramaribo",
+            "population": 573085,
+            "code": "SR"
+        }
+    },
+    {
+        "id": "SZ",
+        "name": "Swaziland",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    31.465866,
+                    -26.522503
+                ]
+            },
+            "capital": "Mbabana",
+            "population": 1367000,
+            "code": "SZ"
+        }
+    },
+    {
+        "id": "SE",
+        "name": "Sweden",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    18.643501,
+                    60.128161
+                ]
+            },
+            "capital": "Stockholm",
+            "population": 10238627,
+            "code": "SE"
+        }
+    },
+    {
+        "id": "CH",
+        "name": "Switzerland",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    8.227512,
+                    46.818188
+                ]
+            },
+            "capital": "Bern",
+            "population": 8526932,
+            "code": "CH"
+        }
+    },
+    {
+        "id": "SY",
+        "name": "Syria",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    38.996815,
+                    34.802075
+                ]
+            },
+            "capital": "Damascus",
+            "population": 18499181,
+            "code": "SY"
+        }
+    },
+    {
+        "id": "TW",
+        "name": "Taiwan",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    120.960515,
+                    23.69781
+                ]
+            },
+            "capital": "Taipei",
+            "population": 23590004,
+            "code": "TW"
+        }
+    },
+    {
+        "id": "TJ",
+        "name": "Tajikistan",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    71.276093,
+                    38.861034
+                ]
+            },
+            "capital": "Dushanbe",
+            "population": 8931000,
+            "code": "TJ"
+        }
+    },
+    {
+        "id": "TZ",
+        "name": "Tanzania",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    34.888822,
+                    -6.369028
+                ]
+            },
+            "capital": "Dodoma",
+            "population": 55890747,
+            "code": "TZ"
+        }
+    },
+    {
+        "id": "TH",
+        "name": "Thailand",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    100.992541,
+                    15.870032
+                ]
+            },
+            "capital": "Bangkok",
+            "population": 66341355,
+            "code": "TH"
+        }
+    },
+    {
+        "id": "TG",
+        "name": "Togo",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    0.824782,
+                    8.619543
+                ]
+            },
+            "capital": "Lome",
+            "population": 7538000,
+            "code": "TG"
+        }
+    },
+    {
+        "id": "TO",
+        "name": "Tonga",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -175.198242,
+                    -21.178986
+                ]
+            },
+            "capital": "Nuku'alofa",
+            "population": 100651,
+            "code": "TO"
+        }
+    },
+    {
+        "id": "TT",
+        "name": "Trinidad and Tobago",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -61.222503,
+                    10.691803
+                ]
+            },
+            "capital": "Port of Spain",
+            "population": 1359193,
+            "code": "TT"
+        }
+    },
+    {
+        "id": "TN",
+        "name": "Tunisia",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    9.537499,
+                    33.886917
+                ]
+            },
+            "capital": "Tunis",
+            "population": 11434994,
+            "code": "TN"
+        }
+    },
+    {
+        "id": "TR",
+        "name": "Turkey",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    35.243322,
+                    38.963745
+                ]
+            },
+            "capital": "Ankara",
+            "population": 82003882,
+            "code": "TR"
+        }
+    },
+    {
+        "id": "TM",
+        "name": "Turkmenistan",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    59.556278,
+                    38.969719
+                ]
+            },
+            "capital": "Ashgabat",
+            "population": 5632596,
+            "code": "TM"
+        }
+    },
+    {
+        "id": "TV",
+        "name": "Tuvalu",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    177.64933,
+                    -7.109535
+                ]
+            },
+            "capital": "Funafuti",
+            "population": 10200,
+            "code": "TV"
+        }
+    },
+    {
+        "id": "UG",
+        "name": "Uganda",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    32.290275,
+                    1.373333
+                ]
+            },
+            "capital": "Kampala",
+            "population": 40006700,
+            "code": "UG"
+        }
+    },
+    {
+        "id": "UA",
+        "name": "Ukraine",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    31.16558,
+                    48.379433
+                ]
+            },
+            "capital": "Kiev",
+            "population": 42153201,
+            "code": "UA"
+        }
+    },
+    {
+        "id": "AE",
+        "name": "United Arab Emirates",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    53.847818,
+                    23.424076
+                ]
+            },
+            "capital": "Abu Dhabi",
+            "population": 9682088,
+            "code": "AE"
+        }
+    },
+    {
+        "id": "UY",
+        "name": "Uruguay",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -55.765835,
+                    -32.522779
+                ]
+            },
+            "capital": "Montevideo",
+            "population": 3518552,
+            "code": "UY"
+        }
+    },
+    {
+        "id": "UZ",
+        "name": "Uzbekistan",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    64.585262,
+                    41.377491
+                ]
+            },
+            "capital": "Tashkent",
+            "population": 33394463,
+            "code": "UZ"
+        }
+    },
+    {
+        "id": "VU",
+        "name": "Vanuatu",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    166.959158,
+                    -15.376706
+                ]
+            },
+            "capital": "Port Vila",
+            "population": 304500,
+            "code": "VU"
+        }
+    },
+    {
+        "id": "VA",
+        "name": "Vatican City",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    12.453389,
+                    41.902916
+                ]
+            },
+            "capital": "Vatican City",
+            "population": 800,
+            "code": "VA"
+        }
+    },
+    {
+        "id": "VE",
+        "name": "Venezuela",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -66.58973,
+                    6.42375
+                ]
+            },
+            "capital": "Caracas",
+            "population": 32219521,
+            "code": "VE"
+        }
+    },
+    {
+        "id": "VN",
+        "name": "Vietnam",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    108.277199,
+                    14.058324
+                ]
+            },
+            "capital": "Hanoi",
+            "population": 95354000,
+            "code": "VN"
+        }
+    },
+    {
+        "id": "YE",
+        "name": "Yemen",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    48.516388,
+                    15.552727
+                ]
+            },
+            "capital": "Sanaa",
+            "population": 29579986,
+            "code": "YE"
+        }
+    },
+    {
+        "id": "ZM",
+        "name": "Zambia",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    27.849332,
+                    -13.133897
+                ]
+            },
+            "capital": "Lusaka",
+            "population": 17381168,
+            "code": "ZM"
+        }
+    },
+    {
+        "id": "ZW",
+        "name": "Zimbabwe",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    29.154857,
+                    -19.015438
+                ]
+            },
+            "capital": "Harare",
+            "population": 15159624,
+            "code": "ZW"
+        }
+    },
+    {
+        "id": "FR",
+        "name": "France",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    2.213749,
+                    46.227638
+                ]
+            },
+            "capital": "Paris",
+            "population": 66993000,
+            "code": "FR"
+        }
+    },
+    {
+        "id": "GB",
+        "name": "United Kingdom",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -3.435973,
+                    55.378051
+                ]
+            },
+            "capital": "London",
+            "population": 66040229,
+            "code": "GB"
+        }
+    },
+    {
+        "id": "US",
+        "name": "United States",
+        "entity": {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -95.712891,
+                    37.09024
+                ]
+            },
+            "capital": "Washington D.C.",
+            "population": 328881000,
+            "code": "US"
+        }
+    }
+]

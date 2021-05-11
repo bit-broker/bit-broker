@@ -55,7 +55,7 @@ module.exports = class Contributor extends View {
                 },
                 webhook: item.properties.webhook,
                 cache: item.properties.cache,
-                in_session: item.in_session
+                in_session: item.session_id !== null
             });
         }
 

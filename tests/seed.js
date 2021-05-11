@@ -40,16 +40,6 @@ const fs = require('fs');
 
 describe('Database Seeding', function() {
 
-    // --- development data sizes
-
-    const MIN_ENTITY = 1;
-    const MAX_ENTITY = 8;
-    const MIN_CONNECTOR = 0;
-    const MAX_CONNECTOR = 4;
-    const MIN_RECORD = 0;
-    const MAX_RECORD = 16;
-    const SEED_OUTPUT = 'seeds';
-
     // --- development data
 
     let entities = [];
@@ -70,66 +60,25 @@ describe('Database Seeding', function() {
         return Shared.after_all(false); // false = don't nuke the database
     });
 
-    // --- seed steps
-
-    it('prepare random seed data', () => {
-        let e_count = DATA.integer(MAX_ENTITY, MIN_ENTITY);
-
-        for (let e = 0; e < e_count; e++) {
-            let c_count = DATA.integer(MAX_CONNECTOR, MIN_CONNECTOR);
-            entities.push({ name: DATA.pluck(DATA.SLUG.VALID), connectors: [] });
-
-            for (let c = 0; c < c_count; c++) {
-                let r_count = DATA.integer(MAX_RECORD, MIN_RECORD);
-                entities[e].connectors.push({ name: DATA.pluck(DATA.SLUG.VALID), records: DATA.someof(DATA.RECORDS, r_count) });
-            }
-        }
-
-        return Promise.resolve(true);
-    });
-
     it('create the housing entities', () => {
-        let steps = [];
-
-        for (let e = 0; e < entities.length; e++) {
-            let entity = entities[e].name;
-            steps.push(Entity.add(entity));
-        }
-
-        return Promise.all(steps);
+        return Entity.add('country', {
+            name: 'Countries',
+            description: 'Basic country information',
+            schema: {}
+        });
     });
 
     it('create the housing connectors', () => {
-        let steps = [];
-
-        for (let e = 0; e < entities.length; e++) {
-            for (let c = 0; c < entities[e].connectors.length; c++) {
-                let entity = entities[e].name;
-                let connector = entities[e].connectors[c].name;
-                steps.push(Connector.add(entity, connector));
-            }
-        }
-
-        return Promise.all(steps);
+        return Connector.add('country', 'world-factbook', {
+            name: 'World Factbook',
+            description: 'Country information from the CIA World Factbook',
+            webhook: null,
+            cache: 0
+        });
     });
 
     it('add all the seed data', () => {
-        let steps = [];
-
-        for (let e = 0; e < entities.length; e++) {
-            for (let c = 0; c < entities[e].connectors.length; c++) {
-                let entity = entities[e].name
-                let connector = entities[e].connectors[c].name
-                let records = entities[e].connectors[c].records;
-                steps.push(Session.records(entity, connector, records, 'stream', 'upsert', true));
-            }
-        }
-
-        return Promise.all(steps);
-    });
-
-    it(`write seed data to '${ SEED_OUTPUT }.json'`, () => {
-        fs.writeFileSync(`${ SEED_OUTPUT }.json`, JSON.stringify(entities, null, 2));
-        return Promise.resolve(true);
+        let records = JSON.parse(fs.readFileSync('./data/countries.json'));
+        return Session.records('country', 'world-factbook', records, 'stream', 'upsert', true);
     });
 });

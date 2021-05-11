@@ -55,12 +55,15 @@ module.exports = class Connector {
 
     get COLUMNS() {
         return [
+            'connector.id',
             'connector.slug',
             'connector.properties',
             'entity.slug as entity_slug',
             'connector.contribution_id',
             'connector.contribution_key',
-            this.db.raw('CASE WHEN connector.session_id IS NULL THEN false ELSE true END AS in_session'),
+            'connector.session_id',
+            'connector.session_started',
+            'connector.session_mode',
             'connector.created_at',
             'connector.updated_at'
         ];
@@ -68,14 +71,20 @@ module.exports = class Connector {
 
     // --- table read context
 
+    get read() {
+        return this.db('connector').select(this.COLUMNS).join('entity', 'entity.id', 'connector.entity_id');
+    }
+
+    // --- table rows by entity context
+
     get rows() {
-        return this.db('connector').select(this.COLUMNS).join('entity', 'entity.id', 'connector.entity_id').where({ 'entity.slug': this.entity });
+        return this.read.where({ 'entity.slug': this.entity.slug });
     }
 
     // --- table write context
 
     get write() {
-        return this.db('connector').where('entity_id', this.db('entity').select('id').where({ 'entity.slug': this.entity }));
+        return this.db('connector').where('entity_id', this.db('entity').select('id').where({ 'entity.slug': this.entity.slug }));
     }
 
     // --- all connectors on the instance entity type
@@ -95,7 +104,7 @@ module.exports = class Connector {
     insert(slug, values) {
         values.slug = slug
         values.contribution_id = Permit.CONTRIBUTION_ID;
-        values.entity_id = this.db.from('entity').select('id').where({ slug: this.entity }).first(); // this will *not* execute here, but is compounded into the SQL below
+        values.entity_id = this.db.from('entity').select('id').where({ slug: this.entity.slug }).first(); // this will *not* execute here, but is compounded into the SQL below
         return this.write.insert(values).then(result => result.rowCount > 0);
     }
 
@@ -114,6 +123,6 @@ module.exports = class Connector {
     // --- gets the session sub-model
 
     session(contribution_id) {
-        return this.db('connector').where({ contribution_id }).first().then(item => item ? new Session(this.db, item) : null);
+        return this.read.where({ 'connector.contribution_id': contribution_id }).first().then(item => item ? new Session(this.db, item) : null);
     }
 }

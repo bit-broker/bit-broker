@@ -20,6 +20,7 @@
     "i18n": "^0.13.2",
     "jsonschema": "^1.4.0",
     "knex": "^0.95.4",
+    "mongo-query-to-postgres-jsonb": "^0.2.12",
     "pg": "^8.6.0",
     "validator": "^13.6.0",
     "winston": "^3.3.3",

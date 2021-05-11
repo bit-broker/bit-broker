@@ -49,7 +49,7 @@ module.exports = class Catalog {
             'catalog.id',
             'catalog.public_id',
             'catalog.vendor_id',
-            'catalog.name',
+  //          'catalog.name',
             'entity.slug as entity_slug',
             'catalog.record',
             'catalog.created_at',
@@ -64,6 +64,13 @@ module.exports = class Catalog {
         .select(this.COLUMNS)
         .join('connector', 'connector.id', 'catalog.connector_id')
         .join('entity', 'entity.id', 'connector.entity_id');
+    }
+// { "$or": [ { "name": "France" }, { "entity.capital": "London" }, { "entity.population": { "$gt": 1000000000 }} ]}
+    // --- a catalog query
+
+    query(q) {
+      console.log(q);
+        return this.db('catalog').select('record').whereRaw(q);
     }
 
     // --- list of entity instances for a given entity type
