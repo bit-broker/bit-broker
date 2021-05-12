@@ -27,13 +27,13 @@
 
 // --- dependancies
 
-const Helper = require('../helper.js');
 const HTTP = require('http-status-codes');
+const Helper = require('../helper.js');
+const Status = require('../status.js');
 const failure = require('http-errors');
 const model = require('../model/index.js');
 const view = require('../view/index.js');
 const log = require('../logger.js').Logger;
-const convert = require ('mongo-query-to-postgres-jsonb');
 
 // --- timeseries class (embedded)
 
@@ -69,30 +69,45 @@ module.exports = class Consumer {
         this.timeseries = new Timeseries();
     }
 
+    // --- within the context of an active policy
+
+    static with_policy(slug) {
+        if (slug === null && Status.IS_LIVE === false) return Promise.resolve({});  // TODO - this is a development only catch which we should remove
+
+        return model.policy.find(slug)
+
+        .then(item => {
+            if (!item) throw failure(HTTP.FORBIDDEN);
+            return item.properties.policy.segment_query;
+        })
+    }
+
     // --- performs a catalog query
 
     catalog(req, res, next) {
-        let q = req.query.q || {};
+        let q = req.query.q || '{}';
 
-        if (Helper.is_json(q)) {
-            let w = convert ('record', JSON.parse(q));
-
-            model.catalog.query(w)
-
-            .then(items => {
-                res.json(items);
-            })
-
-            .catch(error => next(error));
-        } else {
+        if (!Helper.is_valid_json(q)) {
             throw failure(HTTP.BAD_REQUEST);
         }
+
+        Consumer.with_policy(null) // TODO - add the policy from the header
+
+        .then(segment => {
+            return model.catalog.query(segment, JSON.parse(q));
+        })
+
+        .then(items => {
+            res.json(view.consumer.instances(items));
+        })
+
+        .catch(error => next(error));
     }
 
     // --- lists all the entity types
 
     types(req, res, next) {
-        model.entity.list()
+        model.entity.list()  // TODO - should this be subject to policy also? probably yes - what about entity hiding...
 
         .then(items => {
             res.json(view.consumer.entities(items));
@@ -106,11 +121,14 @@ module.exports = class Consumer {
     list(req, res, next) {
         let type = req.params.type.toLowerCase();
 
-        model.catalog.list(type)
+        Consumer.with_policy(null) // TODO - add the policy from the header
+
+        .then(segment => {
+            return model.catalog.list(segment, type);
+        })
 
         .then(items => {
-            // TODO only id entity is missing if (!items.length) throw failure(HTTP.NOT_FOUND);
-            res.json(view.consumer.instances(items));
+            res.json(view.consumer.instances(items)); // can be empty
         })
 
         .catch(error => next(error));
@@ -122,7 +140,11 @@ module.exports = class Consumer {
         let type = req.params.type.toLowerCase();
         let id = req.params.id.toLowerCase();
 
-        model.catalog.find(type, id)
+        Consumer.with_policy(null) // TODO - add the policy from the header
+
+        .then(segment => {
+            return model.catalog.find(segment, type, id);
+        })
 
         .then(item => {
             if (!item) throw failure(HTTP.NOT_FOUND);

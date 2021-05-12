@@ -28,7 +28,7 @@ module.exports = class Helper {
 
     // --- is the given string valid json
 
-    static is_json(string) {
+    static is_valid_json(string) {
         try {
             JSON.parse(string);
         } catch (error) {

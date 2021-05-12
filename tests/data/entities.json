@@ -1,0 +1,21 @@
+[
+    {
+        "slug": "country",
+        "properties": {
+            "name": "Countries",
+            "description": "Basic country information",
+            "schema": {}
+        },
+        "connectors": [
+            {
+                "slug": "world-factbook",
+                "properties": {
+                    "name": "World Factbook",
+                    "description": "Country information from the CIA World Factbook",
+                    "webhook": null,
+                    "cache": 0
+                }
+            }
+        ]
+    }
+]

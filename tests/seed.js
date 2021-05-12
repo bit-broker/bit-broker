@@ -29,20 +29,21 @@
 
 // -- dependancies
 
-const DATA = require('./lib/data.js');
 const Shared = require('./lib/shared.js');
 const Entity = require('./lib/entity.js');
 const Connector = require('./lib/connector.js');
 const Session = require('./lib/session.js');
+const Policy = require('./lib/policy.js');
 const fs = require('fs');
 
 // --- the test cases
 
 describe('Database Seeding', function() {
 
-    // --- development data
+    // --- seed data
 
     let entities = [];
+    let policies = [];
 
     // --- test context
 
@@ -60,25 +61,62 @@ describe('Database Seeding', function() {
         return Shared.after_all(false); // false = don't nuke the database
     });
 
+    it('load seed data', () => {
+        entities = JSON.parse(fs.readFileSync('./data/entities.json'));
+        policies = JSON.parse(fs.readFileSync('./data/policies.json'));
+        return Promise.resolve(true);
+    });
+
     it('create the housing entities', () => {
-        return Entity.add('country', {
-            name: 'Countries',
-            description: 'Basic country information',
-            schema: {}
-        });
+        let steps = [];
+
+        for (let i = 0; i < entities.length; i++) {
+            let entity = entities[i];
+            steps.push(Entity.add(entity.slug, entity.properties));
+        }
+
+        return Promise.all(steps);
     });
 
     it('create the housing connectors', () => {
-        return Connector.add('country', 'world-factbook', {
-            name: 'World Factbook',
-            description: 'Country information from the CIA World Factbook',
-            webhook: null,
-            cache: 0
-        });
+        let steps = [];
+
+        for (let i = 0; i < entities.length; i++) {
+            let entity = entities[i];
+
+            for (let j = 0; j < entity.connectors.length; j++) {
+                let connector = entity.connectors[j];
+                steps.push(Connector.add(entity.slug, connector.slug, connector.properties));
+            }
+        }
+
+        return Promise.all(steps);
     });
 
     it('add all the seed data', () => {
-        let records = JSON.parse(fs.readFileSync('./data/countries.json'));
-        return Session.records('country', 'world-factbook', records, 'stream', 'upsert', true);
+        let steps = [];
+
+        for (let i = 0; i < entities.length; i++) {
+            let entity = entities[i];
+
+            for (let j = 0; j < entity.connectors.length; j++) {
+                let connector = entity.connectors[j];
+                let records = JSON.parse(fs.readFileSync(`./data/${ entity.slug }.json`));
+                steps.push(Session.records(entity.slug, connector.slug, records, 'stream', 'upsert', true));
+            }
+        }
+
+        return Promise.all(steps);
+    });
+
+    it('create the policies', () => {
+        let steps = [];
+
+        for (let i = 0; i < policies.length; i++) {
+            let policy = policies[i];
+            steps.push(Policy.add(policy.slug, policy.properties));
+        }
+
+        return Promise.all(steps);
     });
 });

@@ -1,0 +1,44 @@
+[
+    {
+        "slug": "european-union",
+        "properties": {
+            "name": "The European Union",
+            "description": "The 27 countries which are full members as of Jan 2021",
+            "policy": {
+                "access_control": {
+                    "enabled": true,
+                    "quota": {
+                        "max_number": 24000,
+                        "interval_type": "day"
+                    },
+                    "rate": 1000
+                },
+                "segment_query": { "type": "country", "entity.code": { "$in": ["AT", "BE", "BG", "CY", "CZ", "DE", "DK", "EE", "FI", "FR", "GR", "HR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI", "ES", "SE"] }},
+                "hidden_types": [],
+                "field_masks": [],
+                "legal_context": [{ "type": "attribution", "text": "Data is supplied by The European Union", "link": "https://europa.eu/european-union/index_en" }]
+            }
+        }
+    },
+    {
+        "slug": "over-a-billion",
+        "properties": {
+            "name": "The Most Populated Countries",
+            "description": "Countries with a population of over a billion people.",
+            "policy": {
+                "access_control": {
+                    "enabled": true,
+                    "quota": {
+                        "max_number": 24000,
+                        "interval_type": "day"
+                    },
+                    "rate": 1000
+                },
+                "segment_query": { "type": "country", "entity.population": { "$gt": 1000000000 }},
+                "hidden_types": [],
+                "field_masks": [],
+                "legal_context": [{ "type": "attribution", "text": "Data is supplied by The CIA World Factbook", "link": "https://www.cia.gov/the-world-factbook/" }]
+            }
+        }
+    }
+]

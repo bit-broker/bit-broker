@@ -32,6 +32,10 @@
 
 'use strict'; // code assumes ECMAScript 6
 
+// --- dependancies
+
+const convert = require ('mongo-query-to-postgres-jsonb');
+
 // --- catalog class (exported)
 
 module.exports = class Catalog {
@@ -42,6 +46,12 @@ module.exports = class Catalog {
         this.db = db;
     }
 
+    // --- converts a json query string into a postgres where clause
+
+    with(query) {
+        return convert('catalog.record', query);
+    }
+
     // --- select column list
 
     get COLUMNS() {
@@ -49,7 +59,6 @@ module.exports = class Catalog {
             'catalog.id',
             'catalog.public_id',
             'catalog.vendor_id',
-  //          'catalog.name',
             'entity.slug as entity_slug',
             'catalog.record',
             'catalog.created_at',
@@ -57,50 +66,56 @@ module.exports = class Catalog {
         ];
     }
 
-    // --- table read context
+    // --- table read context - ALL read queries MUST go via this to ensure blanket policy enforcement
 
-    get rows() {
+    rows(segment) {
         return this.db('catalog')
         .select(this.COLUMNS)
         .join('connector', 'connector.id', 'catalog.connector_id')
-        .join('entity', 'entity.id', 'connector.entity_id');
+        .join('entity', 'entity.id', 'connector.entity_id')
+        .whereRaw(this.with(segment))
     }
-// { "$or": [ { "name": "France" }, { "entity.capital": "London" }, { "entity.population": { "$gt": 1000000000 }} ]}
+
+    // --- table write context
+
+    get write() {
+        return this.db('catalog');
+    }
+
     // --- a catalog query
 
-    query(q) {
-      console.log(q);
-        return this.db('catalog').select('record').whereRaw(q);
+    query(segment, query) {
+        return this.rows(segment).whereRaw(this.with(query));
     }
 
     // --- list of entity instances for a given entity type
 
-    list(type) {
-        return this.rows.where({ 'entity.slug': type });
+    list(segment, type) {
+        return this.rows(segment).where({ 'entity.slug': type });
     }
 
     // --- find an entity instances by id for a given entity type
 
-    find(type, id) {
-        return this.list(type).where({ 'catalog.public_id': id }).first();
+    find(segment, type, id) {
+        return this.list(segment, type).where({ 'catalog.public_id': id }).first();
     }
 
     // --- upserts a new catalog record
 
     upsert(values) {
         let merge = { name: values.name, record: values.record }; // only these are merged on update
-        return this.rows.insert(values).onConflict(['connector_id', 'vendor_id']).merge(merge).then(result => result.rowCount > 0);
+        return this.write.insert(values).onConflict(['connector_id', 'vendor_id']).merge(merge).then(result => result.rowCount > 0);
     }
 
     // --- deletes an existing catalog record
 
     delete(connector_id, vendor_id) {
-        return this.rows.where({ connector_id, vendor_id }).delete().then(result => result.rowCount > 0);
+        return this.write.where({ connector_id, vendor_id }).delete().then(result => result.rowCount > 0);
     }
 
     // --- deletes all records for the given connector
 
     wipe(connector_id) {
-        return this.rows.where({ connector_id }).delete().then(result => result.rowCount > 0);
+        return this.write.where({ connector_id }).delete().then(result => result.rowCount > 0);
     }
 }
