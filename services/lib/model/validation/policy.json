@@ -1,13 +1,114 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "bbk://policy",
-    "type": "object",
-    "properties": {
-        "name": { "$ref": "bbk://name" },
-        "description": { "$ref": "bbk://description" },
-        "policy": {
-            "type": "object"
+    "definitions": {
+        "policy_obj": {
+            "type": "object",
+            "properties": {
+                "access_control": {
+                    "$ref": "#/definitions/access_control_obj"
+                },
+                "segment_query": {
+                    "type": "object"
+                },
+                "hidden_types": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "field_masks": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "legal_context": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/legal_context_obj"
+                    }
+                }
+            },
+            "required": [
+                "access_control"
+            ]
+        },
+        "access_control_obj": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "quota": {
+                    "type": "object",
+                    "properties": {
+                        "max_number": {
+                            "type": "integer"
+                        },
+                        "interval_type": {
+                            "enum": [
+                                "day",
+                                "month"
+                            ]
+                        }
+                    },
+                    "required": []
+                },
+                "rate": {}
+            },
+            "required": [
+                "enabled"
+            ]
+        },
+        "legal_context_obj": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "enum": [
+                        "attribution",
+                        "contact",
+                        "license",
+                        "note",
+                        "source",
+                        "terms"
+                    ]
+                },
+                "text": {
+                    "$ref": "bbk://description"
+                },
+                "link": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "maxLength": 1024,
+                    "format": "uri",
+                    "pattern": "^https?://.*$"
+                }
+            },
+            "required": [
+                "type",
+                "text",
+                "link"
+            ]
         }
     },
-    "required": ["name", "description"]
+    "type": "object",
+    "properties": {
+        "name": {
+            "$ref": "bbk://name"
+        },
+        "description": {
+            "$ref": "bbk://description"
+        },
+        "policy": {
+            "$ref": "#/definitions/policy_obj"
+        }
+    },
+    "required": [
+        "name",
+        "description",
+        "policy"
+    ]
 }

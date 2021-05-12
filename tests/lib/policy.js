@@ -46,6 +46,31 @@ module.exports = class Policy {
         });
     }
 
+    // --- attempts to add a policy with an invalid slug
+
+    static add_policy_invalid_slug(slug, dsp = null) {
+        return chakram.post(Shared.rest('policy', slug), dsp)
+        .then(response => {
+            expect(response.body).to.be.a('string');
+            expect(response.body.toLowerCase()).to.contain('slug does not match pattern');
+            expect(response).to.have.status(HTTP.BAD_REQUEST);
+            return chakram.wait();
+        });
+    }
+
+
+    // --- attempts to add an invalid policy
+
+    static add_policy_invalid_enum(slug, dsp = null) {
+        return chakram.post(Shared.rest('policy', slug), dsp)
+        .then(response => {
+            expect(response.body).to.be.a('string');
+            expect(response.body.toLowerCase()).to.contain('is not one of enum values:');
+            expect(response).to.have.status(HTTP.BAD_REQUEST);
+            return chakram.wait();
+        });
+    }
+
     // --- updates a policy
 
     static update(slug, dsp) {
@@ -53,6 +78,18 @@ module.exports = class Policy {
         .then(response => {
             expect(response.body).to.be.undefined;
             expect(response).to.have.status(HTTP.NO_CONTENT);
+            return chakram.wait();
+        });
+    }
+
+    // --- attempts to update an invalid policy
+
+    static update_policy_invalid_enum(slug, dsp) {
+        return chakram.put(Shared.rest('policy', slug), dsp)
+        .then(response => {
+            expect(response.body).to.be.a('string');
+            expect(response.body.toLowerCase()).to.contain('is not one of enum values:');
+            expect(response).to.have.status(HTTP.BAD_REQUEST);
             return chakram.wait();
         });
     }

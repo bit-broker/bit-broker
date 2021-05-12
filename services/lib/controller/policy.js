@@ -32,6 +32,63 @@ const failure = require('http-errors');
 const model = require('../model/index.js');
 const view = require('../view/index.js');
 const log = require('../logger.js').Logger;
+const Redis = require("ioredis");
+const redis = new Redis(process.env.POLICY_CACHE, { commandTimeout: 2000 });
+
+redis
+.on('connect', () => {
+    log.info('Redis connect')
+})
+.on('ready', () => {
+    log.info('Redis ready')
+})
+.on('error', (e) => {
+    log.error('Redis ready', e)
+})
+.on('close', () => {
+    log.info('Redis close')
+})
+.on('reconnecting', () => {
+    log.info('Redis reconnecting')
+})
+.on('end', () => {
+    log.info('Redis end')
+})
+
+// update a redis cache entry. Redis errors here are consumed and logged as they are not fatal for the parent promise chain...
+function cacheWrite(pid, policy) {
+    return new Promise((resolve, reject) => {
+        redis.set(process.env.POLICY_CACHE_KEY_PREFIX + pid, JSON.stringify(policy))
+        .then(result => {
+            if (result !== "OK") {
+                log.error('redis cache write error', result)
+            }
+            resolve();
+        })
+        .catch(error => {
+            log.error('redis cache write error', error)
+            resolve();
+        })
+    })
+}
+
+// clear a redis cache entry. Redis errors here are consumed and logged as they are not fatal for the parent promise chain...
+function cacheClear(pid) {
+
+    return new Promise((resolve, reject) => {
+        redis.del(process.env.POLICY_CACHE_KEY_PREFIX + pid)
+        .then(result => {
+            if (result !== 1) {
+                log.error('redis cache del error', result)
+            }
+            resolve();
+        })
+        .catch(error => {
+            log.error('redis cache del error', error)
+            resolve();
+        })
+    })
+}
 
 // --- policy class (exported)
 
@@ -101,6 +158,12 @@ module.exports = class Policy {
             return model.policy.insert(pid, { properties });
         })
 
+        // then update rate limit service
+
+        .then(() => {
+            return cacheWrite(pid, properties);
+        })
+
         .then(() => {
             log.info('policy', pid, 'insert', 'complete');
             let href = `${ req.protocol }://${ req.get('host') }${ req.originalUrl }`;
@@ -131,6 +194,12 @@ module.exports = class Policy {
             return model.policy.update(pid, { properties });
         })
 
+        // then update rate limit service
+
+        .then(() => {
+            return cacheWrite(pid, properties);
+        })
+
         .then(() => {
             log.info('policy', pid, 'update', 'complete');
             res.status(HTTP.NO_CONTENT).send();
@@ -150,6 +219,12 @@ module.exports = class Policy {
         .then(item => {
             if (!item) throw failure(HTTP.NOT_FOUND);
             return model.policy.delete(pid)
+        })
+
+        // then update rate limit service
+
+        .then(() => {
+            return cacheClear(pid)
         })
 
         .then(() => {

@@ -251,6 +251,8 @@ const DATA = {
 
     DSP_ID_1: "access-all-areas",
     DSP_ID_2: "movies-only-no-ratings",
+    DSP_ID_INVALID_POLICY: "invalid-policy",
+    DSP_ID_INVALID_SLUG: "invalid_policy",
     DSP_1: {
         "name": "Access all areas",
         "description": "Access all entities in the catalog, no fields hidden",
@@ -285,6 +287,24 @@ const DATA = {
             "hidden_types": [],
             "field_masks": ["movie.rating"],
             "legal_context": [{ "type": "attribution", "text": "test harness attribution", "link": "https://cto-github.cisco.com/Team6/kalydo/tree/master/policy-distribution/test-harness" }]
+        }
+    },
+    DSP_INVALID_POLICY: {
+        "name": "Invalid Policy",
+        "description": "Invalid Policy",
+        "policy": {
+            "access_control": {
+                "enabled": true,
+                "quota": {
+                    "max_number": 24000,
+                    "interval_type": "day"
+                },
+                "rate": 1000
+            },
+            "segment_query": {},
+            "hidden_types": [],
+            "field_masks": [],
+            "legal_context": [{ "type": "invalid_type", "text": "test harness attribution", "link": "https://cto-github.cisco.com/Team6/kalydo/tree/master/policy-distribution/test-harness" }]
         }
     },
 };

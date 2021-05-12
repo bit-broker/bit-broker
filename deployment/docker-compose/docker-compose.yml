@@ -40,6 +40,18 @@ services:
     ports:
       - 8003:8003
 
+  # Policy server
+  bitbroker-policy:
+    build:
+      context: ../..
+      dockerfile: ./build/policy/Dockerfile
+    container_name: bitbroker-policy
+    image: bitbroker-policy
+    depends_on:
+      - bitbroker-db
+    ports:
+      - 8004:8004
+
   # The Database
   bitbroker-db:
     image: postgres:13.2
@@ -51,6 +63,13 @@ services:
       POSTGRES_PASSWORD: "bitbr0ker"
     ports:
       - "5432:5432"
+
+  # Policy Cache
+  bitbroker-policy-cache:
+    image: redis:6.2.3-alpine
+    container_name: bitbroker-policy-cache
+    ports:
+      - 6379:6379
 
 networks:
   default:

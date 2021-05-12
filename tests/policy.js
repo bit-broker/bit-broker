@@ -86,9 +86,13 @@ describe('Policy Tests', function() {
             return Policy.missing(DATA.DSP_ID_1);
         });
 
-        it('cannot add a policy with an invalid policy id');
+        it('cannot add a policy with an invalid policy id', () => {
+            return Policy.add_policy_invalid_slug(DATA.DSP_ID_INVALID_SLUG, DATA.DSP_1);
+        });
 
-        it('cannot add a policy with an invalid policy object');
+        it('cannot add a policy with an invalid policy object', () => {
+            return Policy.add_policy_invalid_enum(DATA.DSP_ID_INVALID_POLICY, DATA.DSP_INVALID_POLICY);
+        });
 
         it('can add a policy', () => {
             return Policy.add(DATA.DSP_ID_1, DATA.DSP_1);
@@ -106,7 +110,9 @@ describe('Policy Tests', function() {
             return Policy.duplicate(DATA.DSP_ID_1, DATA.DSP_1);
         });
 
-        it('cannot update a policy with an invalid policy object');
+        it('cannot update a policy with an invalid policy object', () => {
+            return Policy.update_policy_invalid_enum(DATA.DSP_ID_1, DATA.DSP_INVALID_POLICY);
+        });
 
         it('can update an policy', () => {
             return Policy.update(DATA.DSP_ID_1, DATA.DSP_2);
