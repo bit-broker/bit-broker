@@ -51,6 +51,6 @@ USER bitbroker
 WORKDIR /home/node/app/services/policy
 RUN npm install
 
-EXPOSE 8003
+EXPOSE 8004
 ENTRYPOINT [ "/home/node/app/services/docker-entrypoint.sh" ]
 CMD ["npm","start"]
