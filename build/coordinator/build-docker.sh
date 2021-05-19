@@ -1,7 +1,7 @@
 #!/bin/bash -e
 # Syntax build-docker.sh [-i|--image imagename]
 
-PROJECT=bitbroker- coordinator
+PROJECT=coordinator
 DOCKER_IMAGE=${PROJECT}:latest
 BASE_DOCKER_IMAGE=${PROJECT}:base
 
