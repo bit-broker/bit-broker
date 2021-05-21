@@ -32,8 +32,11 @@ const failure = require('http-errors');
 const model = require('../model/index.js');
 const view = require('../view/index.js');
 const log = require('../logger.js').Logger;
+const cloneDeep = require('clone-deep');
 const Redis = require("ioredis");
 const redis = new Redis(process.env.POLICY_CACHE, { commandTimeout: 2000 });
+
+// --- redis event logging
 
 redis
 .on('connect', () => {
@@ -132,6 +135,21 @@ module.exports = class Policy {
         .catch(error => next(error));
     }
 
+    // --- get access_control only for a named policy
+
+    get_access_control(req, res, next) {
+        let pid = req.params.pid.toLowerCase();
+
+        model.policy.find(pid)
+
+        .then(item => {
+            if (!item) throw failure(HTTP.NOT_FOUND);
+            res.json(view.policy.policy_access_control(item));
+        })
+
+        .catch(error => next(error));
+    }
+
     // --- adds a new policy
 
     insert(req, res, next) {
@@ -158,10 +176,12 @@ module.exports = class Policy {
             return model.policy.insert(pid, { properties });
         })
 
-        // then update rate limit service
-
         .then(() => {
-            return cacheWrite(pid, properties);
+            let cachedPolicy = cloneDeep(properties.policy);
+            if (cachedPolicy.hasOwnProperty("access_control")) {
+                delete cachedPolicy.access_control;
+            }
+            return cacheWrite(pid, cachedPolicy);
         })
 
         .then(() => {
@@ -194,10 +214,12 @@ module.exports = class Policy {
             return model.policy.update(pid, { properties });
         })
 
-        // then update rate limit service
-
         .then(() => {
-            return cacheWrite(pid, properties);
+            let cachedPolicy = cloneDeep(properties.policy);
+            if (cachedPolicy.hasOwnProperty("access_control")) {
+                delete cachedPolicy.access_control;
+            }
+            return cacheWrite(pid, cachedPolicy);
         })
 
         .then(() => {
@@ -220,8 +242,6 @@ module.exports = class Policy {
             if (!item) throw failure(HTTP.NOT_FOUND);
             return model.policy.delete(pid)
         })
-
-        // then update rate limit service
 
         .then(() => {
             return cacheClear(pid)

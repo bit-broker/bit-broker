@@ -29,6 +29,19 @@
 
 'use strict'; // code assumes ECMAScript 6
 
+// --- dependancies
+
+const fetch = require('node-fetch');
+
+// --- fetch headers
+
+const FETCH_TIMEOUT = 2000;
+
+const FETCH_HEADERS = {
+    'Accept': 'application/json, text/plain, */*',
+    'Content-Type': 'application/json'
+};
+
 // --- policy class (exported)
 
 module.exports = class Policy {
@@ -72,18 +85,55 @@ module.exports = class Policy {
 
     insert(slug, values) {
         values.slug = slug
-        return this.rows.insert(values).then(result => result.rowCount > 0);
+
+        return this.db.transaction(function(trx) {
+            return trx
+            .insert(values)
+            .into('policy')
+            .then(() => fetch(process.env.RATE_LIMIT_BASE + '/api/v1/' + slug + '/config', {
+                method: 'put',
+                headers: FETCH_HEADERS,
+                body: JSON.stringify(values.properties.policy.access_control),
+                timeout: FETCH_TIMEOUT
+            }))
+            .then(result => result.rowCount > 0);
+        });
     }
 
     // --- updates an existing policy
 
     update(slug, values) {
-        return this.find(slug).update(values).then(result => result.rowCount > 0);
+        return this.db.transaction(function(trx) {
+            return trx
+            .select('*')
+            .from('policy')
+            .where({ slug }).first()
+            .update(values)
+            .then(() => fetch(process.env.RATE_LIMIT_BASE + '/api/v1/' + slug + '/config', {
+                method: 'put',
+                headers: FETCH_HEADERS,
+                body: JSON.stringify(values.properties.policy.access_control),
+                timeout: FETCH_TIMEOUT
+            }))
+            .then(result => result.rowCount > 0);
+        });
     }
 
     // --- deletes an existing policy
 
     delete(slug) {
-        return this.find(slug).delete().then(result => result.rowCount > 0);
+        return this.db.transaction(function(trx) {
+            return trx
+            .select('*')
+            .from('policy')
+            .where({ slug }).first()
+            .delete()
+            .then(() => fetch(process.env.RATE_LIMIT_BASE + '/api/v1/' + slug + '/config', {
+                method: 'delete',
+                headers: FETCH_HEADERS,
+                timeout: FETCH_TIMEOUT
+            }))
+            .then(result => result.rowCount > 0);
+        });
     }
 }

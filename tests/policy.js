@@ -106,6 +106,10 @@ describe('Policy Tests', function() {
             return Policy.verify(DATA.DSP_ID_1, DATA.DSP_1);
         });
 
+        it('can access the policy access_control directly', () => {
+            return Policy.verify_access_control(DATA.DSP_ID_1, DATA.DSP_1.policy.access_control);
+        });
+
         it('cannot add a duplicate policy', () => {
             return Policy.duplicate(DATA.DSP_ID_1, DATA.DSP_1);
         });

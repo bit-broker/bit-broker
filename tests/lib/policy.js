@@ -143,6 +143,17 @@ module.exports = class Policy {
         });
     }
 
+    // --- verifies policy access_control
+    static verify_access_control(slug, dsp_access_control) {
+        return chakram.get(Shared.rest('policy', slug, 'access_control'))
+        .then(response => {
+            expect(response.body).to.be.an('object');
+            expect(response.body).to.deep.equals(dsp_access_control);
+            expect(response).to.have.status(HTTP.OK);
+            return chakram.wait();
+        });
+    }
+
     // --- verify a policy list
 
     static verify_all(policies) {

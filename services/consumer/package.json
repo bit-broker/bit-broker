@@ -11,6 +11,7 @@
   "license": "UNLICENSED",
   "dependencies": {
     "body-parser": "^1.19.0",
+    "clone-deep": "^4.0.1",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
@@ -22,6 +23,7 @@
     "jsonschema": "^1.4.0",
     "knex": "^0.95.4",
     "mongo-query-to-postgres-jsonb": "^0.2.12",
+    "node-fetch": "^2.6.1",
     "pg": "^8.6.0",
     "validator": "^13.6.0",
     "winston": "^3.3.3",

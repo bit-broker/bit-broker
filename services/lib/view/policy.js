@@ -52,6 +52,12 @@ module.exports = class Policy extends View {
         return doc;
     }
 
+    // --- policy access_control only
+
+    static policy_access_control(item) {
+        return item.properties.policy.access_control;
+    }
+
     // --- a list of policy ids
 
     static policies(items) {
