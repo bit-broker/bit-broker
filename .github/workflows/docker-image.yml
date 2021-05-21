@@ -30,7 +30,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         push: true
-        dockerfile: ./build/coordinator/Dockerfile
+        context: ./build/coordinator
         tags: ${{ secrets.AWS_ECR_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/coordinator:latest,${{ secrets.AWS_ECR_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/coordinator:${{ env.TAG_NAME }}
     - name: Push consumer image to AWS ECR
       uses: docker/build-push-action@v2
