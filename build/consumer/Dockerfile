@@ -18,24 +18,24 @@ RUN mkdir /home/node/app/services && \
 WORKDIR /home/node/app/services
 
 # Copy docker entry point script (Placeholder for now)
-COPY ./build/consumer/docker-entrypoint.sh ./docker-entrypoint.sh
+COPY ./docker-entrypoint.sh ./docker-entrypoint.sh
 RUN chown bitbroker:bitbroker ./docker-entrypoint.sh
 RUN ["chmod", "+x", "./docker-entrypoint.sh"]
 
 # Copy bitbroker consumer code, env config, lib/ locales directory and test directory and set ownership
-COPY ./services/consumer consumer/
+COPY ../../services/consumer consumer/
 RUN chown -R bitbroker:bitbroker /home/node/app/services/consumer
 
-COPY ./services/lib lib/
+COPY ../../services/lib lib/
 RUN chown -R bitbroker:bitbroker /home/node/app/services/lib
 
-COPY ./services/locales locales/
+COPY ../../services/locales locales/
 RUN chown -R bitbroker:bitbroker /home/node/app/services/locales
 
-#COPY ./tests tests/
-#RUN chown -R bitbroker:bitbroker /home/node/app/services/tests
+COPY ../../tests tests/
+RUN chown -R bitbroker:bitbroker /home/node/app/services/tests
 
-COPY .env.example /home/node/app/.env
+COPY ./../.env.example /home/node/app/.env
 RUN chown bitbroker:bitbroker /home/node/app/.env
 
 
