@@ -32,6 +32,8 @@
 // --- dependancies
 
 const fetch = require('node-fetch');
+const cloneDeep = require('clone-deep');
+const log = require('../logger.js').Logger;
 
 // --- fetch headers
 
@@ -48,8 +50,9 @@ module.exports = class Policy {
 
     // --- class constructor
 
-    constructor(db) {
+    constructor(db, cache) {
         this.db = db;
+        this.cache = cache;
     }
 
     // --- select column list
@@ -136,4 +139,80 @@ module.exports = class Policy {
             .then(result => result.rowCount > 0);
         });
     }
+
+    // --- read a cache entry (if not found fall back to db query)
+
+    cacheRead(slug) {
+        return new Promise((resolve, reject) => {
+            let key = process.env.POLICY_CACHE_KEY_PREFIX + slug;
+            this.cache.get(key)
+            .then(response => {
+                if (response === null) {
+                    log.error('cache miss; fall back to db query for slug: ' + slug)
+                    this.find(slug)
+                    .then(item => {
+                        // re-populate cache...
+                        this.cacheWrite(slug, item.properties.policy)
+                        .then(() => resolve(item.properties.policy))
+                    })
+                    .catch(error => {
+                        reject(error)
+                    })
+                } else {
+                    resolve(JSON.parse(response));
+                }
+            })
+            .catch(error => {
+                log.error('cache read error; fall back db query for slug: ' + slug, error)
+                this.find(slug)
+                .then(item => resolve(item.properties.policy))
+                .catch(error => {
+                    reject(error)
+                })
+            })
+        })
+    }
+
+    // --- update a cache entry. Errors here are consumed and logged as they are not fatal for the parent promise chain...
+
+    cacheWrite(slug, policy) {
+
+        // strip out access_control info prior to caching...
+        let cachedPolicy = cloneDeep(policy);
+        if (cachedPolicy.hasOwnProperty("access_control")) {
+            delete cachedPolicy.access_control;
+        }
+        return new Promise((resolve, reject) => {
+            this.cache.set(process.env.POLICY_CACHE_KEY_PREFIX + slug, JSON.stringify(cachedPolicy))
+            .then(result => {
+                if (result !== "OK") {
+                    log.error('cache write error', result)
+                }
+                resolve();
+            })
+            .catch(error => {
+                log.error('cache write error', error)
+                resolve();
+            })
+        })
+    }
+
+    // --- clear a cache entry. Errors here are consumed and logged as they are not fatal for the parent promise chain...
+
+    cacheClear(slug) {
+        return new Promise((resolve, reject) => {
+            this.cache.del(process.env.POLICY_CACHE_KEY_PREFIX + slug)
+            .then(result => {
+                if (result !== 1) {
+                    log.error('cache del error', result)
+                }
+                resolve();
+            })
+            .catch(error => {
+                log.error('cache del error', error)
+                resolve();
+            })
+        })
+    }
+
 }

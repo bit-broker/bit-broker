@@ -72,13 +72,13 @@ module.exports = class Consumer {
     // --- within the context of an active policy
 
     static with_policy(slug) {
-        if (slug === null && Status.IS_LIVE === false) return Promise.resolve({});  // TODO - this is a development only catch which we should remove
+        if ((slug === undefined || slug === null) && Status.IS_LIVE === false) return Promise.resolve({}); // TODO - this is a development only catch which we should remove
 
-        return model.policy.find(slug)
+        return model.policy.cacheRead(slug)
 
         .then(item => {
             if (!item) throw failure(HTTP.FORBIDDEN);
-            return item.properties.policy.segment_query;
+            return item.segment_query;
         })
     }
 
@@ -91,7 +91,7 @@ module.exports = class Consumer {
             throw failure(HTTP.BAD_REQUEST);
         }
 
-        Consumer.with_policy(null) // TODO - add the policy from the header
+        Consumer.with_policy(req.header('x-bb-policy'))
 
         .then(segment => {
             return model.catalog.query(segment, JSON.parse(q));
@@ -107,7 +107,7 @@ module.exports = class Consumer {
     // --- lists all the entity types
 
     types(req, res, next) {
-        model.entity.list()  // TODO - should this be subject to policy also? probably yes - what about entity hiding...
+        model.entity.list() // TODO - should this be subject to policy also? probably yes - what about entity hiding...
 
         .then(items => {
             res.json(view.consumer.entities(items));
@@ -121,7 +121,7 @@ module.exports = class Consumer {
     list(req, res, next) {
         let type = req.params.type.toLowerCase();
 
-        Consumer.with_policy(null) // TODO - add the policy from the header
+        Consumer.with_policy(req.header('x-bb-policy'))
 
         .then(segment => {
             return model.catalog.list(segment, type);
@@ -140,7 +140,7 @@ module.exports = class Consumer {
         let type = req.params.type.toLowerCase();
         let id = req.params.id.toLowerCase();
 
-        Consumer.with_policy(null) // TODO - add the policy from the header
+        Consumer.with_policy(req.header('x-bb-policy'))
 
         .then(segment => {
             return model.catalog.find(segment, type, id);

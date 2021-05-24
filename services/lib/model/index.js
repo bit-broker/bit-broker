@@ -32,6 +32,32 @@ const Catalog = require('./catalog.js');
 const Policy = require('./policy.js');
 const Validate = require('./validate.js');
 
+const Redis = require("ioredis");
+const redis = new Redis(process.env.POLICY_CACHE, { commandTimeout: 2000 });
+const log = require('../logger.js').Logger;
+
+// --- redis event logging
+
+redis
+.on('connect', () => {
+    log.info('Redis connect')
+})
+.on('ready', () => {
+    log.info('Redis ready')
+})
+.on('error', (e) => {
+    log.error('Redis ready', e)
+})
+.on('close', () => {
+    log.info('Redis close')
+})
+.on('reconnecting', () => {
+    log.info('Redis reconnecting')
+})
+.on('end', () => {
+    log.info('Redis end')
+})
+
 // --- running contexts
 
 var db = new Knex({ client: 'pg', connection: process.env.DATABASE }); // TODO: should we fix the client version here?
@@ -42,6 +68,6 @@ module.exports = {
     entity: new Entity(db),
     connector: new Connector(db),
     catalog: new Catalog(db),
-    policy: new Policy(db),
+    policy: new Policy(db, redis),
     validate: new Validate()
 };

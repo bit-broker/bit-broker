@@ -71,6 +71,23 @@ services:
     ports:
       - 6379:6379
 
+  # Rate Service
+  rate-service:
+    image: rate-service
+    container_name: rate-service
+    ports:
+      - 4000:4000
+      - 7000:7000
+    depends_on:
+      - rate-service-redis
+
+  # Rate Service Redis
+  rate-service-redis:
+    image: redis:6.2.3-alpine
+    container_name: rate-service-redis
+    ports:
+      - 6380:6379
+
 networks:
   default:
     name: bitbroker-net
