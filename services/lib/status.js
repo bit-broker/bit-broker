@@ -26,5 +26,6 @@
 // --- exports
 
 module.exports = {
-    IS_LIVE: (process.env.NODE_ENV === 'production')
+    IS_LIVE: (process.env.NODE_ENV === 'production'),
+    USE_POLICY: (process.env.APP_MODE !== 'open')
 };
