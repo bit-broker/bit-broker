@@ -109,6 +109,7 @@ describe('Database Seeding', function() {
         return Promise.all(steps);
     });
 
+/*
     it('create the policies', () => {
         let steps = [];
 
@@ -119,4 +120,6 @@ describe('Database Seeding', function() {
 
         return Promise.all(steps);
     });
+
+*/    
 });

@@ -8,10 +8,29 @@
         },
         "connectors": [
             {
-                "slug": "world-factbook",
+                "slug": "wikipedia",
                 "properties": {
-                    "name": "World Factbook",
-                    "description": "Country information from the CIA World Factbook",
+                    "name": "Wikipedia",
+                    "description": "Country information from Wikipedia",
+                    "webhook": null,
+                    "cache": 0
+                }
+            }
+        ]
+    },
+    {
+        "slug": "heritage-site",
+        "properties": {
+            "name": "World Heritage Sites",
+            "description": "A landmark or area with legal protection by an international convention administered by UNESCO",
+            "schema": {}
+        },
+        "connectors": [
+            {
+                "slug": "unesco",
+                "properties": {
+                    "name": "UNESCO",
+                    "description": "World Heritage Sites information from UNESCO",
                     "webhook": null,
                     "cache": 0
                 }
