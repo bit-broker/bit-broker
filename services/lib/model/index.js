@@ -31,36 +31,51 @@ const Connector = require('./connector.js');
 const Catalog = require('./catalog.js');
 const Policy = require('./policy.js');
 const Validate = require('./validate.js');
-
 const Redis = require("ioredis");
-const redis = new Redis(process.env.POLICY_CACHE, { commandTimeout: 2000 });
 const log = require('../logger.js').Logger;
+
+// --- constants - not .env configurable
+
+const REDIS_TIMEOUT = 2000;
+
+// --- running contexts
+
+var db = new Knex({ client: 'pg', connection: process.env.DATABASE }); // TODO: should we fix the client version here?
+var redis = new Redis(process.env.POLICY_CACHE, { commandTimeout: REDIS_TIMEOUT });
 
 // --- redis event logging
 
 redis
 .on('connect', () => {
-    log.info('Redis connect')
+    log.info('redis', 'connected')
 })
 .on('ready', () => {
-    log.info('Redis ready')
+    log.info('redis', 'ready')
 })
-.on('error', (e) => {
-    log.error('Redis ready', e)
+.on('error', (err) => {
+    log.error('redis', 'error', err)
 })
 .on('close', () => {
-    log.info('Redis close')
+    log.info('redis', 'close')
 })
 .on('reconnecting', () => {
-    log.info('Redis reconnecting')
+    log.info('redis', 'reconnecting')
 })
 .on('end', () => {
-    log.info('Redis end')
+    log.info('redis', 'end')
+});
+
+// --- postgres test and report
+
+db.raw('SELECT 1+1 AS result')
+
+.then(() => {
+    log.info('postgres', 'connected');
 })
 
-// --- running contexts
-
-var db = new Knex({ client: 'pg', connection: process.env.DATABASE }); // TODO: should we fix the client version here?
+.catch(err => {
+    log.error('postgres', 'error', err);
+});
 
 // --- exports
 
