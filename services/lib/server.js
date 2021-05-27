@@ -126,10 +126,11 @@ module.exports = class Server {
 
     // --- starts the server
 
-    listen() {
+    listen(cb = null) {
         log.info(this.name, 'started');
         this.app.listen(this.port, () => {
             log.info('name', this.name, 'base', this.base, 'version', this.version, 'port', this.port);
+            if (cb) cb();
         });
     }
 }

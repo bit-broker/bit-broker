@@ -37,6 +37,7 @@ process.env.DATABASE = process.env.DATABASE.replace('CREDENTIALS', process.env.C
 
 const Server = require(`${ PATH_LIB }/server.js`);
 const controller = require(`${ PATH_LIB }/controller/index.js`);
+const log = require(`${ PATH_LIB }/logger.js`).Logger;
 
 // --- running contexts
 
@@ -50,4 +51,6 @@ api.router.get('/connector/:cid/session/:sid/close/:commit', controller.session.
 
 // --- start the server
 
-api.listen();
+api.listen(() => {
+    log.info('app mode', process.env.APP_MODE);
+});
