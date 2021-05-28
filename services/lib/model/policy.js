@@ -35,6 +35,8 @@ const fetch = require('node-fetch');
 const cloneDeep = require('clone-deep');
 const log = require('../logger.js').Logger;
 
+const POLICY_CACHE_KEY_PREFIX = "BBK_DSP_ID_" ;
+
 // --- fetch headers
 
 const FETCH_TIMEOUT = 2000;
