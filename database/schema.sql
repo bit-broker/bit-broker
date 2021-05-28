@@ -55,8 +55,11 @@ GRANT bbk_writer TO bbk_admin, bbk_tests, bbk_coordinator, bbk_contributor, bbk_
 -- create the database
 
 CREATE DATABASE bit_broker WITH ENCODING = 'UTF8' OWNER = bbk_admin;
-
 \connect bit_broker
+
+-- extensions
+
+CREATE EXTENSION postgis;
 
 -- entity table
 
