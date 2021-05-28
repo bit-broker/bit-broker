@@ -37,7 +37,7 @@ module.exports = class Session {
 
     // --- opens a new sesson on the given connector
 
-    static open(entity, connector, mode, cb = null) {
+    static open(entity, connector, mode, cb = null) { // TODO: review use of callback here - if the cb contains other promises then nasty sequencing issues will occur
         return Connector.with(entity, connector, (item) => {
             return chakram.get(Shared.rest('connector', item.contribution.id, 'session', 'open', mode))
             .then(response => {
@@ -207,11 +207,16 @@ module.exports = class Session {
     // --- an end-to-end open -> action -> close step
 
     static records(entity, connector, records, mode, action, commit) {
-        return Session.open(entity, connector, mode, (sid => {
+        let sid = null;
+
+        return Session.open(entity, connector, mode, (session => sid = session))
+
+        .then (() => {
             return Session.action(entity, connector, sid, action, records)
-            .then(() => {
-                return Session.close(entity, connector, sid, commit);
-            });
-        }));
+        })
+
+        .then(() => {
+            return Session.close(entity, connector, sid, commit);
+        });
     }
 }
