@@ -146,7 +146,7 @@ module.exports = class Policy {
 
     cacheRead(slug) {
         return new Promise((resolve, reject) => {
-            let key = process.env.POLICY_CACHE_KEY_PREFIX + slug;
+            let key = POLICY_CACHE_KEY_PREFIX + slug;
             this.cache.get(key)
             .then(response => {
                 if (response === null) {
@@ -190,7 +190,7 @@ module.exports = class Policy {
             delete cachedPolicy.access_control;
         }
         return new Promise((resolve, reject) => {
-            this.cache.set(process.env.POLICY_CACHE_KEY_PREFIX + slug, JSON.stringify(cachedPolicy))
+            this.cache.set(POLICY_CACHE_KEY_PREFIX + slug, JSON.stringify(cachedPolicy))
             .then(result => {
                 if (result !== "OK") {
                     log.error('cache write error', result)
@@ -208,7 +208,7 @@ module.exports = class Policy {
 
     cacheClear(slug) {
         return new Promise((resolve, reject) => {
-            this.cache.del(process.env.POLICY_CACHE_KEY_PREFIX + slug)
+            this.cache.del(POLICY_CACHE_KEY_PREFIX + slug)
             .then(result => {
                 if (result !== 1) {
                     log.error('cache del error', result)
