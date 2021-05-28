@@ -3,8 +3,8 @@ FROM node:15.13.0-alpine3.10
 
 # Create bitbroker group and user
 #RUN addgroup bitbroker && adduser bitbroker
-RUN addgroup -S bitbroker -g 1392\
-    && adduser -S -D -s /sbin/nologin -h /home/node/app -u 1392 -G bitbroker bitbroker
+RUN addgroup -S bitbroker \
+    && adduser -S -G bitbroker bitbroker
 
 # Add some development tools (To be removed)
 RUN apk --no-cache add curl && apk --no-cache add busybox-extras
