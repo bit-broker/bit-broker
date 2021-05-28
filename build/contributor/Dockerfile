@@ -1,5 +1,5 @@
 # Use latest stable node alpine image
-FROM node:15.13.0-alpine3.10
+FROM node:16-alpine3.12
 
 # Add some development tools (To be removed)
 RUN apk --no-cache add curl && apk --no-cache add busybox-extras
@@ -7,10 +7,10 @@ RUN apk --no-cache add curl && apk --no-cache add busybox-extras
 
 # Create bitbroker group and user
 #RUN addgroup bitbroker && adduser bitbroker
-RUN addgroup -S bitbroker -g 1392\
-    && adduser -S -D -s /sbin/nologin -h /home/node/app -u 1392 -G bitbroker bitbroker
+RUN addgroup -S bitbroker -g 1999\
+    && adduser -S -D -s /sbin/nologin -h /home/node/app -u 1999 -G bitbroker bitbroker
 
-# Create services services root folder and change permissions
+# Create services root folder and change permissions
 RUN mkdir /home/node/app/services && \
     chown -R bitbroker:bitbroker /home/node/app/services
 

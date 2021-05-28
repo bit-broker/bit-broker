@@ -36,9 +36,10 @@ module.exports = class Script {
 
     // --- class constructor
 
-    constructor(entity, connector) {
+    constructor(entity, connector, policy) {
         this.entity = entity;
         this.connector = connector;
+        this.policy = { headers: { 'x-bb-policy': policy }};
         this.sid = null;
     }
 
@@ -63,7 +64,7 @@ module.exports = class Script {
     // --- check records are present or absent
 
     _op_check(given, present) {
-        return chakram.get(`http://localhost:8003/v1/entity/${ this.entity }`) // TODO - fix embedded URL
+        return chakram.get(`${ process.env.CONSUMER_BASE }/entity/${ this.entity }`, this.policy)
         .then(response => {
             expect(response.body).to.be.an('array');
 

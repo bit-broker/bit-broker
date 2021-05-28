@@ -18,6 +18,7 @@ const DATA = require('./lib/data.js');
 const Shared = require('./lib/shared.js');
 const Entity = require('./lib/entity.js');
 const Connector = require('./lib/connector.js');
+const Policy = require('./lib/policy.js');
 const Script = require('./lib/script.js');
 const chakram = require('chakram');
 const expect = chakram.expect;
@@ -44,7 +45,7 @@ describe('Connector Session Tests', function() {
 
     let entity = DATA.ENTITY;
     let connector = DATA.pluck(DATA.CONNECTOR);
-    let script = new Script(entity, connector);
+    let script = new Script(entity, connector, DATA.DSP_ID_1);
 
     it('can create the housing entity', () => {
         return Entity.add(entity);
@@ -52,6 +53,10 @@ describe('Connector Session Tests', function() {
 
     it('can create the housing connector', () => {
         return Connector.add(entity, connector);
+    });
+
+    it('can create the policy', () => {
+        return Policy.add(DATA.DSP_ID_1, DATA.DSP_1);  // DSP_1 is access all areas
     });
 
     it('- STREAM TESTS -----------------------------------', () => { return true; });
