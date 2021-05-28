@@ -35,12 +35,10 @@ const fetch = require('node-fetch');
 const cloneDeep = require('clone-deep');
 const log = require('../logger.js').Logger;
 
-const POLICY_CACHE_KEY_PREFIX = "BBK_DSP_ID_" ;
+// --- constants
 
-// --- fetch headers
-
+const POLICY_CACHE_KEY_PREFIX = 'BBK_DSP_ID_' ;
 const FETCH_TIMEOUT = 2000;
-
 const FETCH_HEADERS = {
     'Accept': 'application/json, text/plain, */*',
     'Content-Type': 'application/json'
@@ -55,6 +53,12 @@ module.exports = class Policy {
     constructor(db, cache) {
         this.db = db;
         this.cache = cache;
+    }
+
+    // --- returns the rate limit url for a given slug
+
+    static rate_limiter(slug) {
+        return `${ process.env.RATE_LIMIT_BASE }/${ slug }/config`;
     }
 
     // --- select column list
@@ -95,7 +99,7 @@ module.exports = class Policy {
             return trx
             .insert(values)
             .into('policy')
-            .then(() => fetch(process.env.RATE_LIMIT_BASE + '/api/v1/' + slug + '/config', {
+            .then(() => fetch(Policy.rate_limiter(slug), {
                 method: 'put',
                 headers: FETCH_HEADERS,
                 body: JSON.stringify(values.properties.policy.access_control),
@@ -114,7 +118,7 @@ module.exports = class Policy {
             .from('policy')
             .where({ slug }).first()
             .update(values)
-            .then(() => fetch(process.env.RATE_LIMIT_BASE + '/api/v1/' + slug + '/config', {
+            .then(() => fetch(Policy.rate_limiter(slug), {
                 method: 'put',
                 headers: FETCH_HEADERS,
                 body: JSON.stringify(values.properties.policy.access_control),
@@ -133,7 +137,7 @@ module.exports = class Policy {
             .from('policy')
             .where({ slug }).first()
             .delete()
-            .then(() => fetch(process.env.RATE_LIMIT_BASE + '/api/v1/' + slug + '/config', {
+            .then(() => fetch(Policy.rate_limiter(slug), {
                 method: 'delete',
                 headers: FETCH_HEADERS,
                 timeout: FETCH_TIMEOUT
@@ -186,13 +190,13 @@ module.exports = class Policy {
 
         // strip out access_control info prior to caching...
         let cachedPolicy = cloneDeep(policy);
-        if (cachedPolicy.hasOwnProperty("access_control")) {
+        if (cachedPolicy.hasOwnProperty('access_control')) {
             delete cachedPolicy.access_control;
         }
         return new Promise((resolve, reject) => {
             this.cache.set(POLICY_CACHE_KEY_PREFIX + slug, JSON.stringify(cachedPolicy))
             .then(result => {
-                if (result !== "OK") {
+                if (result !== 'OK') {
                     log.error('cache write error', result)
                 }
                 resolve();
