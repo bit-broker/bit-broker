@@ -35,7 +35,7 @@ const fetch = require('node-fetch');
 const cloneDeep = require('clone-deep');
 const log = require('../logger.js').Logger;
 
-// --- constants
+// --- constants - not .env configurable
 
 const POLICY_CACHE_KEY_PREFIX = 'BBK_DSP_ID_' ;
 const FETCH_TIMEOUT = 2000;
