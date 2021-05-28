@@ -103,7 +103,7 @@ module.exports = class Seeder {
         return Promise.all(steps);
     }
 
-    // --- adds the policies\
+    // --- adds the policies
 
     static add_policies() {
         let steps = [];
