@@ -34,7 +34,7 @@
 
 // --- dependancies
 
-const convert = require ('mongo-query-to-postgres-jsonb');
+const Query = require('./query.js');
 
 // --- catalog class (exported)
 
@@ -46,34 +46,38 @@ module.exports = class Catalog {
         this.db = db;
     }
 
-    // --- converts a json query string into a postgres where clause
+    // --- select catalog column list
 
-    with(query) {
-        return convert('catalog.record', query);
-    }
-
-    // --- select column list
-
-    get COLUMNS() {
+    get COLUMNS_CATALOG() {
         return [
             'catalog.id',
             'catalog.public_id',
             'catalog.vendor_id',
             'entity.slug as entity_slug',
+            'entity.properties as entity_properties',
             'catalog.record',
             'catalog.created_at',
             'catalog.updated_at'
         ];
     }
 
+    // --- select type column list
+
+    get COLUMNS_TYPE() {
+        return [
+            'entity.slug as entity_slug',
+            'entity.properties as entity_properties'
+        ];
+    }
+
     // --- table read context - ALL read queries MUST go via this to ensure blanket policy enforcement
 
-    rows(segment) {
+    rows(segment, full = true) {
         return this.db('catalog')
-        .select(this.COLUMNS)
+        .select(full ? this.COLUMNS_CATALOG : this.COLUMNS_TYPE)
         .join('connector', 'connector.id', 'catalog.connector_id')
         .join('entity', 'entity.id', 'connector.entity_id')
-        .whereRaw(this.with(segment))
+        .whereRaw(Query.process(segment).where);
     }
 
     // --- table write context
@@ -85,7 +89,15 @@ module.exports = class Catalog {
     // --- a catalog query
 
     query(segment, query) {
-        return this.rows(segment).whereRaw(this.with(query));
+        let subset = Query.process(query).where;
+        if (subset === 'TRUE') subset = 'FALSE';  // by convention, no query == no records on bare catalog calls
+        return this.rows(segment).whereRaw(subset);
+    }
+
+    // --- list of entity types
+
+    types(segment) {
+        return this.rows(segment, false).distinct('entity.slug').orderBy('entity.slug');
     }
 
     // --- list of entity instances for a given entity type

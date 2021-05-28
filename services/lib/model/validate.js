@@ -25,10 +25,11 @@
 // --- dependancies
 
 const Validator = require('jsonschema').Validator; // specifically NOT json-schema
+const Query = require('./query.js');
 const locales = require('../locales.js');
 const fs = require('fs');
 
-// --- scheme listß
+// --- scheme list
 
 const SCHEMES = [ 'id', 'slug', 'name', 'description', 'entity', 'connector', 'session', 'policy' ]; // we name them here, rather than just iterate the directory
 
@@ -44,6 +45,21 @@ module.exports = class Validate {
         for (let i = 0 ; i < SCHEMES.length ; i++) {
             this.schema.addSchema(JSON.parse(fs.readFileSync(`${ __dirname }/validation/${ SCHEMES[i] }.json`)), `bbk://${ SCHEMES[i] }`);
         }
+    }
+
+    // --- is the given string valid json
+
+    is_valid_json(string) {
+        let valid = false;  // assume the worst
+
+        try {
+            JSON.parse(string);
+            valid = true;
+        } catch (err) {
+            valid = false;
+        }
+
+        return valid;
     }
 
     // --- checks a document against a schema and gathers human readable error messages
@@ -105,5 +121,27 @@ module.exports = class Validate {
 
     commit(item) {
         return this.scheme(item, 'session#/commit', 'commit');
+    }
+
+    // --- validates a data segment query
+
+    query(item) {
+        let error = null;  // assume the worst
+
+        if (this.is_valid_json(item)) {
+            if (Query.scoped(item)) {
+                let q = Query.process(JSON.parse(item));
+
+                if (q.valid === false || q.where.match(/"\$\w+"/) !== null) { // valid queries should no longer contain any "$xxx" style keys
+                    error = 'cannot-be-parsed';
+                }
+            } else {
+                error = 'has-unrecognised-operations';
+            }
+        } else {
+            error = 'is-not-valid-json';
+        }
+
+        return error ? [locales.__(`error.query-${ error }`, item)] : [];
     }
 }

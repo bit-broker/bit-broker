@@ -37,10 +37,10 @@ module.exports = class Consumer extends View {
 
     static entity(item) {
         return {
-            id: item.slug,
-            url: this.rest(process.env.CONSUMER_BASE, 'entity', item.slug),
-            name: item.properties.name,
-            description: item.properties.description
+            id: item.entity_slug,
+            url: this.rest(process.env.CONSUMER_BASE, 'entity', item.entity_slug),
+            name: item.entity_properties.name,
+            description: item.entity_properties.description
         };
     }
 

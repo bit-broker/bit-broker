@@ -28,12 +28,16 @@
 // --- dependancies
 
 const HTTP = require('http-status-codes');
-const Helper = require('../helper.js');
 const Status = require('../status.js');
 const failure = require('http-errors');
 const model = require('../model/index.js');
 const view = require('../view/index.js');
 const log = require('../logger.js').Logger;
+
+// --- constants - not .env configurable
+
+const POLICY_HEADER = 'x-bb-policy';
+const NO_POLICY_SEGMENT = {}; // the segment to use when USE_POLICY is false in .env - normally just {}
 
 // --- timeseries class (embedded)
 
@@ -72,26 +76,31 @@ module.exports = class Consumer {
     // --- within the context of an active policy
 
     static with_policy(slug) {
-        if ((slug === undefined || slug === null) && Status.IS_LIVE === false) return Promise.resolve({}); // TODO - this is a development only catch which we should remove
+        if (Status.USE_POLICY) {
+            return model.policy.cacheRead(slug || '') // empty string is not a valid policy slug
 
-        return model.policy.cacheRead(slug)
-
-        .then(item => {
-            if (!item) throw failure(HTTP.FORBIDDEN);
-            return item.segment_query;
-        })
+            .then(item => {
+                if (!item) throw failure(HTTP.FORBIDDEN);
+                return item.segment_query;
+            })
+        } else {
+            return Promise.resolve(NO_POLICY_SEGMENT);
+        }
     }
 
     // --- performs a catalog query
 
     catalog(req, res, next) {
         let q = req.query.q || '{}';
+        let errors = [];
 
-        if (!Helper.is_valid_json(q)) {
-            throw failure(HTTP.BAD_REQUEST);
+        errors = errors.concat(model.validate.query(q));
+
+        if (errors.length) {
+            throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
         }
 
-        Consumer.with_policy(req.header('x-bb-policy'))
+        Consumer.with_policy(req.header(POLICY_HEADER))
 
         .then(segment => {
             return model.catalog.query(segment, JSON.parse(q));
@@ -107,10 +116,15 @@ module.exports = class Consumer {
     // --- lists all the entity types
 
     types(req, res, next) {
-        model.entity.list() // TODO - should this be subject to policy also? probably yes - what about entity hiding...
+
+        Consumer.with_policy(req.header(POLICY_HEADER))
+
+        .then(segment => {
+            return model.catalog.types(segment);
+        })
 
         .then(items => {
-            res.json(view.consumer.entities(items));
+            res.json(view.consumer.entities(items)); // can be empty
         })
 
         .catch(error => next(error));
@@ -121,14 +135,21 @@ module.exports = class Consumer {
     list(req, res, next) {
         let type = req.params.type.toLowerCase();
 
-        Consumer.with_policy(req.header('x-bb-policy'))
+        Consumer.with_policy(req.header(POLICY_HEADER))
 
         .then(segment => {
-            return model.catalog.list(segment, type);
-        })
+            return model.catalog.types(segment) // TODO: Calling this first is a heavy price to pay for returning HTTP/404 vs []
 
-        .then(items => {
-            res.json(view.consumer.instances(items)); // can be empty
+            .then(types => {
+                let slugs = types.map(t => t.entity_slug);
+          //      if (!slugs.includes(type)) throw failure(HTTP.NOT_FOUND);  // the entity type is either not present or not in policy
+
+                return model.catalog.list(segment, type);
+            })
+
+            .then(items => {
+                res.json(view.consumer.instances(items)); // can be empty
+            })
         })
 
         .catch(error => next(error));
@@ -140,7 +161,7 @@ module.exports = class Consumer {
         let type = req.params.type.toLowerCase();
         let id = req.params.id.toLowerCase();
 
-        Consumer.with_policy(req.header('x-bb-policy'))
+        Consumer.with_policy(req.header(POLICY_HEADER))
 
         .then(segment => {
             return model.catalog.find(segment, type, id);
