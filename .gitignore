@@ -1,6 +1,21 @@
-.DS_Store
+# Env
 .env
-.idea/
-node_modules/
-logs/
+
+# Tests
 tests/*.json
+
+# Logs
+logs/
+
+# Dependencies
+node_modules/
+
+# Misc
+.DS_Store
+.idea/
+
+# Linting
+.eslintcache
+
+# VIM Locked
+.swp

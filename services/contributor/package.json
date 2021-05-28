@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo 'tests are only available in development builds'",
+    "lint": "eslint --fix . && prettier \"../**/*.{js,jsx}\" --write",
     "start": "NODE_PATH=./node_modules node index.js"
   },
   "author": "Cisco",
@@ -29,5 +30,22 @@
     "validator": "^13.6.0",
     "winston": "^3.3.3",
     "winston-daily-rotate-file": "^4.5.2"
+  },
+  "devDependencies": {
+    "eslint": "^7.23.0",
+    "husky": "^3.1.0",
+    "lint-staged": "^10.5.4",
+    "prettier": "^2.2.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "../**/*.{js, jsx}": [
+      "eslint --cache --fix",
+      "prettier --write"
+    ]
   }
 }
