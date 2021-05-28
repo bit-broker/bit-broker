@@ -153,9 +153,14 @@ module.exports = class Policy {
                     log.error('cache miss; fall back to db query for slug: ' + slug)
                     this.find(slug)
                     .then(item => {
-                        // re-populate cache...
-                        this.cacheWrite(slug, item.properties.policy)
-                        .then(() => resolve(item.properties.policy))
+                        if (item === undefined) { // slug not found in database
+                            log.error('slug not found in db: ' + slug)
+                            resolve(null)
+                        } else {
+                            // re-populate cache...
+                            this.cacheWrite(slug, item.properties.policy)
+                            .then(() => resolve(item.properties.policy))
+                        }
                     })
                     .catch(error => {
                         reject(error)
