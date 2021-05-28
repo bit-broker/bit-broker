@@ -37,6 +37,7 @@ var mocha = new Mocha();
 
 mocha.addFile('./coordinator.js');
 mocha.addFile('./contributor.js');
+mocha.addFile('./consumer.js');
 mocha.addFile('./sessions.js');
 mocha.addFile('./policy.js');
 

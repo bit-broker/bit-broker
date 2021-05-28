@@ -1,5 +1,26 @@
 [
     {
+        "slug": "access-all-areas",
+        "properties": {
+            "name": "Access All Areas",
+            "description": "Global access to every record",
+            "policy": {
+                "access_control": {
+                    "enabled": true,
+                    "quota": {
+                        "max_number": 24000,
+                        "interval_type": "day"
+                    },
+                    "rate": 1000
+                },
+                "segment_query": {},
+                "hidden_types": [],
+                "field_masks": [],
+                "legal_context": []
+            }
+        }
+    },
+    {
         "slug": "european-union",
         "properties": {
             "name": "The European Union",
