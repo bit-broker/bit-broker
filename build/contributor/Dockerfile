@@ -7,7 +7,7 @@ RUN apk --no-cache add curl && apk --no-cache add busybox-extras
 
 # Create bitbroker group and user
 #RUN addgroup bitbroker && adduser bitbroker
-RUN addgroup -S bitbroker && adduser -S -G bitbroker bitbroker
+RUN addgroup -S bitbroker && adduser -S -h /home/node/app -G bitbroker bitbroker
 
 # Create services root folder and change permissions
 RUN mkdir /home/node/app/services && \
