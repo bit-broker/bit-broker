@@ -37,7 +37,28 @@
                 "segment_query": { "type": "country", "entity.population": { "$gt": 1000000000 }},
                 "hidden_types": [],
                 "field_masks": [],
-                "legal_context": [{ "type": "attribution", "text": "Data is supplied by The CIA World Factbook", "link": "https://www.cia.gov/the-world-factbook/" }]
+                "legal_context": [{ "type": "attribution", "text": "Data is supplied by Wikipedia", "link": "https://en.wikipedia.org/" }]
+            }
+        }
+    },
+    {
+        "slug": "north-america",
+        "properties": {
+            "name": "North American Countries Only",
+            "description": "Countries within the continent of North America.",
+            "policy": {
+                "access_control": {
+                    "enabled": true,
+                    "quota": {
+                        "max_number": 24000,
+                        "interval_type": "day"
+                    },
+                    "rate": 1000
+                },
+                "segment_query": { "type": "country", "entity.continent": "North America" },
+                "hidden_types": [],
+                "field_masks": [],
+                "legal_context": [{ "type": "attribution", "text": "Data is supplied by Wikipedia", "link": "https://en.wikipedia.org/" }]
             }
         }
     }
