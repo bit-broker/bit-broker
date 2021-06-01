@@ -28,6 +28,7 @@
 const HTTP = require('http-status-codes');
 const failure = require('http-errors');
 const express = require('express');
+const promBundle = require('express-prom-bundle')
 const parser = require('body-parser');
 const cors = require('cors');
 const logger = require('./logger.js');
@@ -89,6 +90,10 @@ module.exports = class Server {
         this.app.use(parser.json({ limit: MAX_POST_SIZE }));
         this.app.use(cors()); // TODO review CORS settings
         this.app.use(locales.init); // defaults to EN
+
+        // --- setup metrics
+        const metricsMiddleware = promBundle({ includeMethod: true })
+        this.app.use(metricsMiddleware)
 
         if (this.version.length) {
             this.app.use(`/${ this.version }/`, this.router);
