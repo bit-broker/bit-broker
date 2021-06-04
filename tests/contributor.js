@@ -58,15 +58,11 @@ describe('Contributor Tests', function() {
     describe('start up tests', () => {
 
         it('the server is up', () => {
-            return Shared.up(Shared.contributor);
+            return Shared.up(process.env.CONTRIBUTOR_BASE);
         });
 
         it('it responds to an announce request', () => {
-            return Shared.announce(Shared.contributor, process.env.CONTRIBUTOR_NAME, process.env.CONTRIBUTOR_BASE);
-        });
-
-        it('it responds to unknown restful resources', () => {
-            return Shared.bad_route(Shared.rest('catalog', DATA.slug()));
+            return Shared.announce(process.env.CONTRIBUTOR_BASE, process.env.CONTRIBUTOR_NAME);
         });
 
         it('the database is empty', () => {

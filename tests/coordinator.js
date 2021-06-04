@@ -57,15 +57,11 @@ describe('Coordinator Tests', function() {
     describe('start up tests', () => {
 
         it('the server is up', () => {
-            return Shared.up(Shared.coordinator);
+            return Shared.up(process.env.COORDINATOR_BASE);
         });
 
         it('it responds to an announce request', () => {
-            return Shared.announce(Shared.coordinator, process.env.COORDINATOR_NAME, process.env.COORDINATOR_BASE);
-        });
-
-        it('it responds to unknown restful resources', () => {
-            return Shared.bad_route(Shared.rest('entity', DATA.slug()));
+            return Shared.announce(process.env.COORDINATOR_BASE, process.env.COORDINATOR_NAME);
         });
 
         it('the database is empty', () => {
@@ -79,8 +75,8 @@ describe('Coordinator Tests', function() {
 
         let slug1 = DATA.pluck(DATA.SLUG.VALID); // pluck - so as to never get duplicate
         let slug2 = DATA.pick(DATA.SLUG.VALID);
-        let values1 = { name: "foo", description: DATA.text(DATA.DESCRIPTION.REASONABLE) };
-        let values2 = { name: "foo", description: DATA.text(DATA.DESCRIPTION.REASONABLE + 1) }; // +1 - so as to be different from first
+        let values1 = { name: DATA.slug(), description: DATA.text(DATA.DESCRIPTION.REASONABLE) };
+        let values2 = { name: DATA.slug(), description: DATA.text(DATA.DESCRIPTION.REASONABLE + 1) }; // +1 - so as to be different from first
 
         before(() => {
             return Shared.empty();
@@ -195,26 +191,26 @@ describe('Coordinator Tests', function() {
 
         it('disallows various invalid descriptions', () => {
             let tests = [];
-            tests.push(Entity.bad(chakram.post, DATA.slug(DATA.SLUG.REASONABLE), 'description', 'not meet minimum length', { name: "foo" }));
-            tests.push(Entity.bad(chakram.post, DATA.slug(DATA.SLUG.REASONABLE), 'description', 'not meet minimum length', { name: "foo", description: '' }));
-            tests.push(Entity.bad(chakram.post, DATA.slug(DATA.SLUG.REASONABLE), 'description', 'not meet minimum length', { name: "foo", description: null }));
-            tests.push(Entity.bad(chakram.post, DATA.slug(DATA.SLUG.REASONABLE), 'description', 'not meet maximum length', { name: "foo", description: DATA.text(DATA.DESCRIPTION.LONGEST + 1) }));
+            tests.push(Entity.bad(chakram.post, DATA.slug(DATA.SLUG.REASONABLE), 'description', 'not meet minimum length', { name: DATA.slug() }));
+            tests.push(Entity.bad(chakram.post, DATA.slug(DATA.SLUG.REASONABLE), 'description', 'not meet minimum length', { name: DATA.slug(), description: '' }));
+            tests.push(Entity.bad(chakram.post, DATA.slug(DATA.SLUG.REASONABLE), 'description', 'not meet minimum length', { name: DATA.slug(), description: null }));
+            tests.push(Entity.bad(chakram.post, DATA.slug(DATA.SLUG.REASONABLE), 'description', 'not meet maximum length', { name: DATA.slug(), description: DATA.text(DATA.DESCRIPTION.LONGEST + 1) }));
             return Promise.all(tests);
         });
 
         it('allows various valid descriptions', () => {
             let tests = [];
-            tests.push(Entity.good(chakram.post, DATA.slug(DATA.SLUG.REASONABLE + 1), { name: "foo", description: DATA.text(DATA.DESCRIPTION.SHORTEST) }));
-            tests.push(Entity.good(chakram.post, DATA.slug(DATA.SLUG.REASONABLE + 2), { name: "foo", description: DATA.text(DATA.DESCRIPTION.LONGEST) }));
+            tests.push(Entity.good(chakram.post, DATA.slug(DATA.SLUG.REASONABLE + 1), { name: DATA.slug(), description: DATA.text(DATA.DESCRIPTION.SHORTEST) }));
+            tests.push(Entity.good(chakram.post, DATA.slug(DATA.SLUG.REASONABLE + 2), { name: DATA.slug(), description: DATA.text(DATA.DESCRIPTION.LONGEST) }));
             return Promise.all(tests);
         });
 
         it('disallows update of various invalid descriptions', () => {
             let tests = [];
-            tests.push(Entity.bad(chakram.put, DATA.slug(DATA.SLUG.REASONABLE + 1), 'description', 'not meet minimum length', { name: "foo" }));
-            tests.push(Entity.bad(chakram.put, DATA.slug(DATA.SLUG.REASONABLE + 1), 'description', 'not meet minimum length', { name: "foo", description: '' }));
-            tests.push(Entity.bad(chakram.put, DATA.slug(DATA.SLUG.REASONABLE + 1), 'description', 'not meet minimum length', { name: "foo", description: null }));
-            tests.push(Entity.bad(chakram.put, DATA.slug(DATA.SLUG.REASONABLE + 1), 'description', 'not meet maximum length', { name: "foo", description: DATA.text(DATA.DESCRIPTION.LONGEST + 1) }));
+            tests.push(Entity.bad(chakram.put, DATA.slug(DATA.SLUG.REASONABLE + 1), 'description', 'not meet minimum length', { name: DATA.slug() }));
+            tests.push(Entity.bad(chakram.put, DATA.slug(DATA.SLUG.REASONABLE + 1), 'description', 'not meet minimum length', { name: DATA.slug(), description: '' }));
+            tests.push(Entity.bad(chakram.put, DATA.slug(DATA.SLUG.REASONABLE + 1), 'description', 'not meet minimum length', { name: DATA.slug(), description: null }));
+            tests.push(Entity.bad(chakram.put, DATA.slug(DATA.SLUG.REASONABLE + 1), 'description', 'not meet maximum length', { name: DATA.slug(), description: DATA.text(DATA.DESCRIPTION.LONGEST + 1) }));
             return Promise.all(tests);
         });
 
@@ -239,13 +235,13 @@ describe('Coordinator Tests', function() {
         let connector1 = DATA.pluck(DATA.SLUG.VALID); // pluck - so as to never get duplicate
         let connector2 = DATA.pick(DATA.SLUG.VALID);
         let values1 = {
-            name: "foo",
+            name: DATA.slug(),
             description: DATA.text(DATA.DESCRIPTION.REASONABLE),
             webhook: DATA.pluck(DATA.WEBHOOK.VALID), // pluck - so as to never get duplicate
             cache: DATA.integer(DATA.CACHE.REASONABLE),
         };
         let values2 = {
-            name: "foo",
+            name: DATA.slug(),
             description: DATA.text(DATA.DESCRIPTION.REASONABLE + 1), // +1 - so as to be different from first
             webhook: DATA.pick(DATA.WEBHOOK.VALID),
             cache: DATA.integer(DATA.CACHE.REASONABLE),
@@ -356,15 +352,15 @@ describe('Coordinator Tests', function() {
         });
 
         it('can add connector with a missing cache and webhook', () => {
-            return Connector.check_defaults(entity1, connector1, { name: 'foo', description: 'abc' });
+            return Connector.check_defaults(entity1, connector1, { name: DATA.slug(), description: DATA.text(DATA.DESCRIPTION.REASONABLE) });
         });
 
         it('can add connector with an empty webhook', () => {
-            return Connector.check_defaults(entity1, connector1, { name: 'foo', description: 'abc', webhook: '' });
+            return Connector.check_defaults(entity1, connector1, { name: DATA.slug(), description: DATA.text(DATA.DESCRIPTION.REASONABLE), webhook: '' });
         });
 
         it('can add connector with a null cache and webhook', () => {
-            return Connector.check_defaults(entity1, connector1, { name: 'foo', description: 'abc', webhook: null, cache: null });
+            return Connector.check_defaults(entity1, connector1, { name: DATA.slug(), description: DATA.text(DATA.DESCRIPTION.REASONABLE), webhook: null, cache: null });
         });
 
         it('can delete the entity type and all hence its connectors', () => {
@@ -378,7 +374,7 @@ describe('Coordinator Tests', function() {
         let entity = DATA.pick(DATA.SLUG.VALID);
         let connector = DATA.pick(DATA.SLUG.VALID);
         let values = {
-            name: 'foo',
+            name: DATA.slug(),
             description: DATA.text(DATA.DESCRIPTION.REASONABLE),
             webhook: DATA.pick(DATA.WEBHOOK.VALID),
             cache: DATA.integer(DATA.CACHE.REASONABLE),

@@ -56,15 +56,11 @@ describe('Policy Tests', function() {
     describe('start up tests', () => {
 
         it('the server is up', () => {
-            return Shared.up(Shared.policy);
+            return Shared.up(process.env.POLICY_BASE);
         });
 
         it('it responds to an announce request', () => {
-            return Shared.announce(Shared.policy, process.env.POLICY_NAME, process.env.POLICY_BASE);
-        });
-
-        it('it responds to unknown restful resources', () => {
-            return Shared.bad_route(Shared.rest('policy', DATA.slug()));
+            return Shared.announce(process.env.POLICY_BASE, process.env.POLICY_NAME);
         });
 
         it('the database is empty', () => {

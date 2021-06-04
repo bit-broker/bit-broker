@@ -96,8 +96,6 @@ const DATA = {
     },
 
     STATUS: 'development', // tests are only for development deployments
-    ENTITY: 'movie',
-    CONNECTOR: ['imdb', 'bfi', 'wikipedia', 'afi', 'netflix', 'amazon'],
 
     CACHE: {
         SHORTEST: 0,
@@ -129,7 +127,7 @@ const DATA = {
         REASONABLE: 16,
         LONGEST: 32,
         CHARS: 'abcdefghijklmnopqrstuvwxyz0123456789_',
-        VALID: ['astaire', 'bacall', 'bergman', 'bogart', 'brando', 'cagney', 'chaplin', 'cooper', 'crawford', 'davis', 'dietrich', 'douglas', 'fonda', 'fontaine', 'gable', 'garbo', 'garland', 'grant', 'hardy', 'hayworth', 'hepburn', 'kelly', 'laurel', 'monroe', 'olivier', 'rogers', 'stewart', 'taylor', 'tracy', 'wayne'],
+        VALID: ['lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing', 'elit', 'eiusmod', 'tempor', 'incididunt', 'labore', 'dolore', 'magna', 'aliqua', 'enim', 'minim', 'veniam', 'quis', 'nostrud', 'exercitation', 'ullamco', 'laboris', 'nisi', 'aliquip', 'commodo', 'consequat', 'duis', 'aute', 'irure', 'dolor', 'reprehenderit'],
         INVALID: ['0_number_at_start', '_starts_with_undescore', 'has spaces', 'has_invalid_chars!'],
     },
 

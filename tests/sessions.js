@@ -43,8 +43,8 @@ describe('Connector Session Tests', function() {
 
     // --- test context
 
-    let entity = DATA.ENTITY;
-    let connector = DATA.pluck(DATA.CONNECTOR);
+    let entity = DATA.slug();
+    let connector = DATA.slug();
     let script = new Script(entity, connector, DATA.DSP_ID_1);
 
     it('can create the housing entity', () => {

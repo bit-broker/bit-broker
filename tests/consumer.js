@@ -57,15 +57,11 @@ describe('Consumer Tests', function() {
     describe('start up tests', () => {
 
         it('the server is up', () => {
-            return Shared.up(Shared.consumer);
+            return Shared.up(process.env.CONSUMER_BASE);
         });
 
         it('it responds to an announce request', () => {
-            return Shared.announce(Shared.consumer, process.env.CONSUMER_NAME, process.env.CONSUMER_BASE);
-        });
-
-        it('it responds to unknown restful resources', () => {
-            return Shared.bad_route(Shared.rest('entity', DATA.slug()));
+            return Shared.announce(process.env.CONSUMER_BASE, process.env.CONSUMER_NAME);
         });
 
         it('the database is empty', () => {

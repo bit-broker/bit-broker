@@ -38,7 +38,7 @@ module.exports = class Entity {
 
     static get example() {
         return {
-            name: "foo",
+            name: DATA.slug(),
             description: DATA.text(DATA.DESCRIPTION.REASONABLE)
         };
     }
@@ -146,7 +146,7 @@ module.exports = class Entity {
         });
     }
 
-    // --- adds and then deleted an entity with a good slug
+    // --- adds and then deletes an entity with a good slug
 
     static good(action, slug, values = null) {
         return action(Shared.rest('entity', slug), values || this.example)
