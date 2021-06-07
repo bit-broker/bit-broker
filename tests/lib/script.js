@@ -40,25 +40,25 @@ module.exports = class Script {
         this.entity = entity;
         this.connector = connector;
         this.policy = { headers: { 'x-bb-policy': policy }};
-        this.sid = null;
+        this.session = {};
     }
 
     // --- open a session
 
     _op_open(mode) {
-        return Session.open(this.entity, this.connector, mode, (session_id => this.sid = session_id));
+        return Session.open(this.entity, this.connector, mode, (info => this.session = info));
     }
 
     // --- submit records into a session
 
     _op_submit(action, records) {
-        return Session.action(this.entity, this.connector, this.sid, action, records);
+        return Session.action(this.session.cid, this.session.sid, action, records);
     }
 
     // --- close a session
 
     _op_close(commit) {
-        return Session.close(this.entity, this.connector, this.sid, commit == 'true')
+        return Session.close(this.session.cid, this.session.sid, commit == 'true')
     }
 
     // --- check records are present or absent

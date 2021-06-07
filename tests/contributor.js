@@ -69,12 +69,12 @@ describe('Contributor Tests', function() {
         });
     });
 
-    // --- session open and close tests
+    // --- session manipulation tests
 
-    describe('session open and close tests', () => {
+    describe('session manipulation tests', () => {
         let entity = DATA.pick(DATA.SLUG.VALID);
         let connector = DATA.pick(DATA.SLUG.VALID);
-        let sid = null;
+        let session = {};
 
         before(() => {
             return Shared.empty();
@@ -93,38 +93,39 @@ describe('Contributor Tests', function() {
         });
 
         it('can open a session', () => {
-            return Session.open(entity, connector, 'stream', (session_id => sid = session_id));
+            return Session.open(entity, connector, 'stream', (info => session = info));
         });
 
         it('can post data to a session', () => {
-            return Session.action(entity, connector, sid, 'upsert', []);
+            return Session.action(session.cid, session.sid, 'upsert', []);
         });
 
         it('can close a session', () => {
-            return Session.close(entity, connector, sid, true);
+            return Session.close(session.cid, session.sid, true);
         });
 
         it('can open a new session', () => {
-            return Session.open(entity, connector, 'stream', (session_id => sid = session_id));
+            return Session.open(entity, connector, 'stream', (info => session = info));
         });
 
         it('can post data to a session', () => {
-            return Session.action(entity, connector, sid, 'upsert', []);
+            return Session.action(session.cid, session.sid, 'upsert', []);
         });
 
-        it('can open a new session, overwriting previous', () => {
-            return Session.open(entity, connector, 'stream', (session_id => {
-                expect(session_id).to.not.be.eq(sid); // different session id as overwritten
-                sid = session_id;
+        it('can open a new session and overwriting previous', () => {
+            return Session.open(entity, connector, 'stream', (info => {
+                expect(info.cid).to.be.eq(session.cid);
+                expect(info.sid).to.not.be.eq(session.sid); // different session id as overwritten
+                session = info;
             }));
         });
 
         it('can post data to a session', () => {
-            return Session.action(entity, connector, sid, 'upsert', []);
+            return Session.action(session.cid, session.sid, 'upsert', []);
         });
 
         it('can close the current session', () => {
-            return Session.close(entity, connector, sid, true);
+            return Session.close(session.cid, session.sid, true);
         });
 
         it('can delete the housing entity', () => {
@@ -138,7 +139,11 @@ describe('Contributor Tests', function() {
 
         let entity = DATA.pick(DATA.SLUG.VALID);
         let connector = DATA.pick(DATA.SLUG.VALID);
-        let sid = null;
+        let session = {};
+
+        function url_open(cid, mode = 'stream') { return Shared.rest('connector', cid, 'session', 'open', mode); }
+        function url_action(cid, sid, action = 'upsert') { return Shared.rest('connector', cid, 'session', sid, action); }
+        function url_close(cid, sid, commit = true) { return Shared.rest('connector', cid, 'session', sid, 'close', commit); }
 
         before(() => {
             return Shared.empty();
@@ -156,71 +161,56 @@ describe('Contributor Tests', function() {
             return Crud.add(Shared.rest('entity', entity, 'connector', connector), DATA.some_info());
         });
 
-        it('can now open a session', () => {
-            return Session.open(entity, connector, 'stream', (session_id => sid = session_id));
-        });
-
         it('cannot open a session with an unknown contribution id', () => {
-            return Session.open_missing(entity, connector, DATA.ID.UNKNOWN);
+            return Crud.not_found(url_open(DATA.ID.UNKNOWN));
         });
 
-        it('cannot open a session with an invalid contribution id', () => {
-            return Session.open_bad(entity, connector, DATA.ID.UNKNOWN + 'x', 'stream', [{ id: 'not meet maximum length' }]);
-        });
-
-        it('cannot open a session with an unknown mode', () => {
-            let mode = DATA.slug();
-            return Session.open_bad(entity, connector, null, mode, [{ mode: 'not one of enum' }]);
+        it('cannot open a session with various invalid ids and modes', () => {
+            return Promise.resolve()
+            .then (() => Crud.bad_request(url_open('x'), [{ id: DATA.ERRORS.MIN }]))
+            .then (() => Crud.bad_request(url_open(DATA.ID.UNKNOWN + 'x'), [{ id: DATA.ERRORS.MAX }]))
+            .then (() => Crud.bad_request(url_open(DATA.ID.UNKNOWN + 'X'), [{ id: DATA.ERRORS.FORMAT }]))
+            .then (() => Crud.bad_request(url_open(DATA.ID.UNKNOWN, DATA.slug()), [{ mode: DATA.ERRORS.ENUM }]));
         });
 
         it('can now open a session', () => {
-            return Session.open(entity, connector, 'stream', (session_id => sid = session_id));
+            return Session.open(entity, connector, 'stream', (info => session = info));
         });
 
         it('cannot post data with an unknown contribution id', () => {
-            return Session.action_missing(entity, connector, DATA.ID.UNKNOWN, sid, 'upsert', []);
+            return Crud.not_found(url_action(DATA.ID.UNKNOWN, session.sid), [], chakram.post);
         });
 
         it('cannot post data with an unknown session id', () => {
-            return Session.action_not_auth(entity, connector, DATA.ID.UNKNOWN, 'upsert', []);
+            return Crud.unauthorized(url_action(session.cid, DATA.ID.UNKNOWN), [], chakram.post);
         });
 
-        it('cannot post data an invalid contribution id', () => {  // TODO - also add invalid char test
-            return Session.action_bad(entity, connector, DATA.ID.UNKNOWN + 'x', sid, 'upsert', [], [{ id: 'not meet maximum length' }]);
-        });
-
-        it('cannot post data an invalid session id', () => {
-            return Session.action_bad(entity, connector, null, DATA.ID.UNKNOWN + 'x', 'upsert', [], [{ id: 'not meet maximum length' }]);
-        });
-
-        it('cannot post data with an unknown action', () => {
-            let action = DATA.slug();
-            return Session.action_bad(entity, connector, null, sid, action, [], [{ action: 'not one of enum' }]);
+        it('cannot post data with various invalid id and actions', () => {
+            return Promise.resolve()
+            .then (() => Crud.bad_request(url_action(DATA.ID.UNKNOWN + 'x', session.sid), [{ id: DATA.ERRORS.MAX }], [], chakram.post))
+            .then (() => Crud.bad_request(url_action(session.cid, DATA.ID.UNKNOWN + 'x'), [{ id: DATA.ERRORS.MAX }], [], chakram.post))
+            .then (() => Crud.bad_request(url_action(session.cid, session.sid, DATA.slug()), [{ action: DATA.ERRORS.ENUM }], [], chakram.post));
         });
 
         it('cannot close a session with an unknown contribution id', () => {
-            return Session.close_missing(entity, connector, DATA.ID.UNKNOWN, sid);
+            return Crud.not_found(url_close(DATA.ID.UNKNOWN, session.sid));
         });
 
         it('cannot close a session with an unknown session id', () => {
-            return Session.close_not_auth(entity, connector, DATA.ID.UNKNOWN);
+            return Crud.unauthorized(url_close(session.cid, DATA.ID.UNKNOWN));
         });
 
-        it('cannot close a session with an invalid contribution id', () => {
-            return Session.close_bad(entity, connector, DATA.ID.UNKNOWN + 'x', sid, 'true', [{ id: 'not meet maximum length' }]);
+        it('cannot close a session with various invalid ids and commits', () => {
+            return Promise.resolve()
+            .then (() => Crud.bad_request(url_close(DATA.ID.UNKNOWN + 'x', session.sid, 'true'), [{ id: DATA.ERRORS.MAX }]))
+            .then (() => Crud.bad_request(url_close(DATA.ID.UNKNOWN + 'X', session.sid, 'true'), [{ id: DATA.ERRORS.FORMAT }]))
+            .then (() => Crud.bad_request(url_close(session.cid, DATA.ID.UNKNOWN + 'x', 'true'), [{ id: DATA.ERRORS.MAX }]))
+            .then (() => Crud.bad_request(url_close(session.cid, DATA.ID.UNKNOWN + 'X', 'true'), [{ id: DATA.ERRORS.FORMAT }]))
+            .then (() => Crud.bad_request(url_close(session.cid, session.sid, DATA.slug()), [{ commit: DATA.ERRORS.ENUM }]));
         });
 
-        it('cannot close a session with an invalid session id', () => {
-            return Session.close_bad(entity, connector, null, DATA.ID.UNKNOWN + 'x', 'true', [{ id: 'not meet maximum length' }]);
-        });
-
-        it('cannot close a session with an invalid commit mode', () => {
-            let commit = DATA.slug();
-            return Session.close_bad(entity, connector, null, sid, commit, [{ commit: 'not one of enum' }]);
-        });
-
-        it('can close the original session', () => {
-            return Session.close(entity, connector, sid, true);
+        it('can close the session', () => {
+            return Session.close(session.cid, session.sid, true);
         });
 
         it('can delete the housing entity', () => {
@@ -228,13 +218,13 @@ describe('Contributor Tests', function() {
         });
     });
 
-    // --- session basic record tests
+    // --- session basic record tests - see session.js for more extensive testing
 
     describe('session basic record tests', () => {
 
         let entity = DATA.pick(DATA.SLUG.VALID);
         let connector = DATA.pick(DATA.SLUG.VALID);
-        let sid = null;
+        let session = {};
 
         before(() => {
             return Shared.empty();
@@ -253,23 +243,23 @@ describe('Contributor Tests', function() {
         });
 
         it('can now open a session', () => {
-            return Session.open(entity, connector, 'stream', (session_id => sid = session_id));
+            return Session.open(entity, connector, 'stream', (info => session = info));
         });
 
         it('can post data to a session', () => {
-            return Session.action(entity, connector, sid, 'upsert', [{ id: "123", name: "foo" }, { id: "456", name: "bar" }]);
+            return Session.action(session.cid, session.sid, 'upsert', [{ id: '123', name: 'alice' }, { id: '456', name: 'bob' }]);
         });
 
         it('can post new and updated data to a session', () => {
-            return Session.action(entity, connector, sid, 'upsert', [{ id: "123", name: "bob" }, { id: "456", name: "sue" }, { id: "789", name: "alice" }]);
+            return Session.action(session.cid, session.sid, 'upsert', [{ id: '123', name: 'carol' }, { id: '456', name: 'dave' }, { id: '789', name: 'eve' }]);
         });
 
         it('can post new and updated data to a session', () => {
-            return Session.action(entity, connector, sid, 'delete', [{ id: "789", name: "alice" }]);
+            return Session.action(session.cid, session.sid, 'delete', [{ id: '789' }]);
         });
 
         it('can close the original session', () => {
-            return Session.close(entity, connector, sid, true);
+            return Session.close(session.cid, session.sid, true);
         });
 
         it('can delete the housing entity', () => {

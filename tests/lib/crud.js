@@ -107,6 +107,18 @@ module.exports = class Crud {
         });
     }
 
+    // --- attempts a unauthorized request on a resource
+
+    static unauthorized(url, body = undefined, action = chakram.get) {
+        return action(url, body)
+        .then(response => {
+            expect(response.body).to.be.a('string');
+            expect(response.body.toLowerCase()).to.contain('unauthorized');
+            expect(response).to.have.status(HTTP.UNAUTHORIZED);
+            return chakram.wait();
+        });
+    }
+
     // --- verifies a resource
 
     static verify(url, resource) {

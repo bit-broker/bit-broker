@@ -112,7 +112,8 @@ const DATA = {
         MIN: 'not meet minimum length',
         CONFORM: 'does not conform to the',
         FORMAT: 'not match pattern',
-        TYPE: 'is not of a type'
+        TYPE: 'is not of a type',
+        ENUM: 'is not one of enum values'
     },
 
     CACHE: {
