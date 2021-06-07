@@ -162,7 +162,7 @@ describe('Coordinator Service Tests', function() {
 
     describe('entity validation tests', () => {
         let entity = DATA.pick(DATA.SLUG.VALID);
-        let values = { name: DATA.name(), description: DATA.text() };
+        let values = DATA.some_info();
 
         function url(slug = null) { return Shared.rest('entity', slug ? slug : DATA.slug(DATA.SLUG.REASONABLE)); }
 
@@ -434,7 +434,7 @@ describe('Coordinator Service Tests', function() {
         });
 
         it('add the housing entity', () => {
-            return Crud.add(Shared.rest('entity', entity), { name: DATA.name(), description: DATA.text() });
+            return Crud.add(Shared.rest('entity', entity), DATA.some_info());
         });
 
         it('disallows invalid connector slug', () => {

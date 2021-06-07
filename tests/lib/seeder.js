@@ -24,8 +24,8 @@
 
 // -- dependancies
 
-const Entity = require('./entity.js');
-const Connector = require('./connector.js');
+const Shared = require('./shared.js');
+const Crud = require('./crud.js');
 const Session = require('./session.js');
 const Policy = require('./policy.js');
 const fs = require('fs');
@@ -60,7 +60,7 @@ module.exports = class Seeder {
 
         for (let i = 0; i < entities.length; i++) {
             let entity = entities[i];
-            steps.push(Entity.add(entity.slug, entity.properties));
+            steps.push(Crud.add(Shared.rest('entity', entity.slug), entity.properties));
         }
 
         return Promise.all(steps);
@@ -77,7 +77,7 @@ module.exports = class Seeder {
 
             for (let j = 0; j < entity.connectors.length; j++) {
                 let connector = entity.connectors[j];
-                steps.push(Connector.add(entity.slug, connector.slug, connector.properties));
+                steps.push(Crud.add(Shared.rest('entity', entity.slug, 'connector', connector.slug), connector.properties));
             }
         }
 

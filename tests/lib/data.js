@@ -79,6 +79,10 @@ const DATA = {
         return slug.substring(0, size);
     },
 
+    some_info: function() {
+        return { name: DATA.name(), description: DATA.text() };
+    },
+
     record: function(index) {
         return DATA.RECORDS[index];
     },

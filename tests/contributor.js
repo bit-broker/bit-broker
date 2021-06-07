@@ -29,8 +29,7 @@
 const HTTP = require('http-status-codes');
 const DATA = require('./lib/data.js');
 const Shared = require('./lib/shared.js');
-const Entity = require('./lib/entity.js');
-const Connector = require('./lib/connector.js');
+const Crud = require('./lib/crud.js');
 const Session = require('./lib/session.js');
 const chakram = require('chakram');
 const expect = chakram.expect;
@@ -73,7 +72,6 @@ describe('Contributor Tests', function() {
     // --- session open and close tests
 
     describe('session open and close tests', () => {
-
         let entity = DATA.pick(DATA.SLUG.VALID);
         let connector = DATA.pick(DATA.SLUG.VALID);
         let sid = null;
@@ -87,11 +85,11 @@ describe('Contributor Tests', function() {
         });
 
         it('can create the housing entity', () => {
-            return Entity.add(entity);
+            return Crud.add(Shared.rest('entity', entity), DATA.some_info());
         });
 
         it('can create the housing connector', () => {
-            return Connector.add(entity, connector);
+            return Crud.add(Shared.rest('entity', entity, 'connector', connector), DATA.some_info());
         });
 
         it('can open a session', () => {
@@ -130,7 +128,7 @@ describe('Contributor Tests', function() {
         });
 
         it('can delete the housing entity', () => {
-            return Entity.delete(entity);
+            return Crud.delete(Shared.rest('entity', entity))
         });
     });
 
@@ -151,11 +149,11 @@ describe('Contributor Tests', function() {
         });
 
         it('can create the housing entity', () => {
-            return Entity.add(entity);
+            return Crud.add(Shared.rest('entity', entity), { name: DATA.name(), description: DATA.text() });
         });
 
         it('can create the housing connector', () => {
-            return Connector.add(entity, connector);
+            return Crud.add(Shared.rest('entity', entity, 'connector', connector), { name: DATA.name(), description: DATA.text() });
         });
 
         it('can now open a session', () => {
@@ -226,7 +224,7 @@ describe('Contributor Tests', function() {
         });
 
         it('can delete the housing entity', () => {
-            return Entity.delete(entity);
+            return Crud.delete(Shared.rest('entity', entity))
         });
     });
 
@@ -247,11 +245,11 @@ describe('Contributor Tests', function() {
         });
 
         it('can create the housing entity', () => {
-            return Entity.add(entity);
+            return Crud.add(Shared.rest('entity', entity), { name: DATA.name(), description: DATA.text() });
         });
 
         it('can create the housing connector', () => {
-            return Connector.add(entity, connector);
+            return Crud.add(Shared.rest('entity', entity, 'connector', connector), { name: DATA.name(), description: DATA.text() });
         });
 
         it('can now open a session', () => {
@@ -275,7 +273,7 @@ describe('Contributor Tests', function() {
         });
 
         it('can delete the housing entity', () => {
-            return Entity.delete(entity);
+            return Crud.delete(Shared.rest('entity', entity))
         });
     });
 });

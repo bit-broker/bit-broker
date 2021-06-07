@@ -27,7 +27,6 @@
 const HTTP = require('http-status-codes');
 const DATA = require('./data.js');
 const Shared = require('./shared.js');
-const Connector = require('./connector.js');
 const chakram = require('chakram');
 const expect = chakram.expect;
 
@@ -35,10 +34,20 @@ const expect = chakram.expect;
 
 module.exports = class Session {
 
+    // --- perform tests with a given connector on an entity type
+
+    static with(entity, connector, cb) {
+        return chakram.get(Shared.rest('entity', entity, 'connector', connector))
+        .then(response => {
+            expect(response.body).to.be.an('object');
+            return chakram.wait().then(() => cb(response.body));
+        });
+    }
+
     // --- opens a new sesson on the given connector
 
     static open(entity, connector, mode, cb = null) { // TODO: review use of callback here - if the cb contains other promises then nasty sequencing issues will occur
-        return Connector.with(entity, connector, (item) => {
+        return Session.with(entity, connector, (item) => {
             return chakram.get(Shared.rest('connector', item.contribution.id, 'session', 'open', mode))
             .then(response => {
                 expect(response.body).to.be.a('string');
@@ -54,7 +63,7 @@ module.exports = class Session {
     // --- attempts to open a not known session
 
     static open_missing(entity, connector, cid) {
-        return Connector.with(entity, connector, (item) => {
+        return Session.with(entity, connector, (item) => {
             return chakram.get(Shared.rest('connector', cid, 'session', 'open', 'stream'))
             .then(response => {
                 expect(response.body).to.be.a('string');
@@ -68,7 +77,7 @@ module.exports = class Session {
     // --- attempts to open a session with validation errors
 
     static open_bad(entity, connector, cid, mode, errors) {
-        return Connector.with(entity, connector, (item) => {
+        return Session.with(entity, connector, (item) => {
             return chakram.get(Shared.rest('connector', cid || item.contribution.id, 'session', 'open', mode))
             .then(response => {
                 expect(response.body).to.be.a('string');
@@ -87,7 +96,7 @@ module.exports = class Session {
     // --- actions an data operation within an open session
 
     static action(entity, connector, sid, action, data) {
-        return Connector.with(entity, connector, (item) => {
+        return Session.with(entity, connector, (item) => {
             return chakram.post(Shared.rest('connector', item.contribution.id, 'session', sid, action), data)
             .then(response => {
                 expect(response.body).to.be.undefined;
@@ -100,7 +109,7 @@ module.exports = class Session {
     // --- attempts to action a data operation with an invalid contribution id
 
     static action_missing(entity, connector, cid, sid, action, data) {
-        return Connector.with(entity, connector, (item) => {
+        return Session.with(entity, connector, (item) => {
             return chakram.post(Shared.rest('connector', cid, 'session', sid, action), data)
             .then(response => {
                 expect(response.body).to.be.a('string');
@@ -114,7 +123,7 @@ module.exports = class Session {
     // --- attempts to action a data operation with an invalid session id
 
     static action_not_auth(entity, connector, sid, action, data) {
-        return Connector.with(entity, connector, (item) => {
+        return Session.with(entity, connector, (item) => {
             return chakram.post(Shared.rest('connector', item.contribution.id, 'session', sid, action), data)
             .then(response => {
                 expect(response.body).to.be.a('string');
@@ -128,7 +137,7 @@ module.exports = class Session {
     // --- attempts to action a data operation with validation errors
 
     static action_bad(entity, connector, cid, sid, action, data, errors) {
-        return Connector.with(entity, connector, (item) => {
+        return Session.with(entity, connector, (item) => {
             return chakram.post(Shared.rest('connector', cid || item.contribution.id, 'session', sid, action), data)
             .then(response => {
                 expect(response.body).to.be.a('string');
@@ -147,7 +156,7 @@ module.exports = class Session {
     // --- closes an existing sesson on the given connector
 
     static close(entity, connector, sid, commit) {
-        return Connector.with(entity, connector, (item) => {
+        return Session.with(entity, connector, (item) => {
             return chakram.get(Shared.rest('connector', item.contribution.id, 'session', sid, 'close', commit ? 'true' : 'false'))
             .then(response => {
                 expect(response.body).to.be.undefined;
@@ -160,7 +169,7 @@ module.exports = class Session {
     // --- attempts to close not known session
 
     static close_missing(entity, connector, cid, sid) {
-        return Connector.with(entity, connector, (item) => {
+        return Session.with(entity, connector, (item) => {
             return chakram.get(Shared.rest('connector', cid, 'session', sid, 'close', 'true'))
             .then(response => {
                 expect(response.body).to.be.a('string');
@@ -174,7 +183,7 @@ module.exports = class Session {
     // --- attempts to close not known session
 
     static close_not_auth(entity, connector, sid) {
-        return Connector.with(entity, connector, (item) => {
+        return Session.with(entity, connector, (item) => {
             return chakram.get(Shared.rest('connector', item.contribution.id, 'session', sid, 'close', 'true'))
             .then(response => {
                 expect(response.body).to.be.a('string');
@@ -188,7 +197,7 @@ module.exports = class Session {
     // --- attempts to close a session with validation errors
 
     static close_bad(entity, connector, cid, sid, commit, errors) {
-        return Connector.with(entity, connector, (item) => {
+        return Session.with(entity, connector, (item) => {
             return chakram.get(Shared.rest('connector', cid || item.contribution.id, 'session', sid, 'close', commit))
             .then(response => {
                 expect(response.body).to.be.a('string');

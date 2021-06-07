@@ -16,8 +16,7 @@
 
 const DATA = require('./lib/data.js');
 const Shared = require('./lib/shared.js');
-const Entity = require('./lib/entity.js');
-const Connector = require('./lib/connector.js');
+const Crud = require('./lib/crud.js');
 const Policy = require('./lib/policy.js');
 const Script = require('./lib/script.js');
 const chakram = require('chakram');
@@ -48,11 +47,11 @@ describe('Connector Session Tests', function() {
     let script = new Script(entity, connector, DATA.DSP_ID_1);
 
     it('can create the housing entity', () => {
-        return Entity.add(entity);
+        return Crud.add(Shared.rest('entity', entity), DATA.some_info());
     });
 
     it('can create the housing connector', () => {
-        return Connector.add(entity, connector);
+        return Crud.add(Shared.rest('entity', entity, 'connector', connector), DATA.some_info());
     });
 
     it('can create the policy', () => {
@@ -820,6 +819,6 @@ describe('Connector Session Tests', function() {
     });
 
     it('can delete the housing entity', () => {
-        return Entity.delete(entity);
+        return Crud.delete(Shared.rest('entity', entity));
     });
 });
