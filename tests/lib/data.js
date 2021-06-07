@@ -65,6 +65,10 @@ const DATA = {
         return text.substring(0, size).replace(/\s$/, 'x'); // changes trailing spaces to 'x' in order to preserve desired size
     },
 
+    name: function(size = 32) {
+        return this.text(size);
+    },
+
     slug: function(size = 16) {
         let slug = '';
 
@@ -96,6 +100,16 @@ const DATA = {
     },
 
     STATUS: 'development', // tests are only for development deployments
+
+    ERRORS: {
+        BIG: 'must be less than or equal',
+        SMALL: 'must be greater than or equal',
+        MAX: 'not meet maximum length',
+        MIN: 'not meet minimum length',
+        CONFORM: 'does not conform to the',
+        FORMAT: 'not match pattern',
+        TYPE: 'is not of a type'
+    },
 
     CACHE: {
         SHORTEST: 0,
@@ -131,6 +145,12 @@ const DATA = {
         INVALID: ['0_number_at_start', '_starts_with_undescore', 'has spaces', 'has_invalid_chars!'],
     },
 
+    NAME: {
+        SHORTEST: 1,
+        REASONABLE: 32,
+        LONGEST: 64
+    },
+
     DESCRIPTION: {
         SHORTEST: 1,
         REASONABLE: 64,
@@ -139,7 +159,10 @@ const DATA = {
 
     WEBHOOK: {
         VALID: ['http://www.foo.com/', 'http://www.example.com/foo/bar', 'http://foo.com/bar', 'https://foo.com/bar1/bar2', 'https://www.foo.org/?bar=catflap', 'https://www.foo.org:8000', 'https://www.foo.org:8000/?bar=catflap', 'http://localhost:8000'],
-        INVALID: ['foo', 'www.', '.com', 'http:www.foo.com', 'http/:foo.com', 'http:/', 'http:// www.foo.com'],
+        INVALID: [
+          ['foo', 'www.', '.com', 'http/:foo.com', 'http:// www.foo.com'],  // uri non conform
+          ['ftp://foo.org', 'www.foo.org', 'foo.org', 'http:www.foo.com', 'http:/'] // regex non match
+        ]
     },
 
     PROSE: 'lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum',
