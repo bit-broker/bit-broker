@@ -149,11 +149,11 @@ describe('Contributor Tests', function() {
         });
 
         it('can create the housing entity', () => {
-            return Crud.add(Shared.rest('entity', entity), { name: DATA.name(), description: DATA.text() });
+            return Crud.add(Shared.rest('entity', entity), DATA.some_info());
         });
 
         it('can create the housing connector', () => {
-            return Crud.add(Shared.rest('entity', entity, 'connector', connector), { name: DATA.name(), description: DATA.text() });
+            return Crud.add(Shared.rest('entity', entity, 'connector', connector), DATA.some_info());
         });
 
         it('can now open a session', () => {
@@ -245,11 +245,11 @@ describe('Contributor Tests', function() {
         });
 
         it('can create the housing entity', () => {
-            return Crud.add(Shared.rest('entity', entity), { name: DATA.name(), description: DATA.text() });
+            return Crud.add(Shared.rest('entity', entity), DATA.some_info());
         });
 
         it('can create the housing connector', () => {
-            return Crud.add(Shared.rest('entity', entity, 'connector', connector), { name: DATA.name(), description: DATA.text() });
+            return Crud.add(Shared.rest('entity', entity, 'connector', connector), DATA.some_info());
         });
 
         it('can now open a session', () => {
