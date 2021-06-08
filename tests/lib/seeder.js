@@ -27,7 +27,6 @@
 const Shared = require('./shared.js');
 const Crud = require('./crud.js');
 const Session = require('./session.js');
-const Policy = require('./policy.js');
 const fs = require('fs');
 
 // --- seeder class (exported)
@@ -111,7 +110,7 @@ module.exports = class Seeder {
 
         for (let i = 0; i < policies.length; i++) {
             let policy = policies[i];
-            steps.push(Policy.add(policy.slug, policy.properties));
+            steps.push(Crud.add(Shared.rest('policy', policy.slug), policy.properties));
         }
 
         return Promise.all(steps);

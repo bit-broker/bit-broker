@@ -17,7 +17,6 @@
 const DATA = require('./lib/data.js');
 const Shared = require('./lib/shared.js');
 const Crud = require('./lib/crud.js');
-const Policy = require('./lib/policy.js');
 const Script = require('./lib/script.js');
 const chakram = require('chakram');
 const expect = chakram.expect;
@@ -44,7 +43,7 @@ describe('Connector Session Tests', function() {
 
     let entity = DATA.slug();
     let connector = DATA.slug();
-    let script = new Script(entity, connector, DATA.DSP_ID_1);
+    let script = new Script(entity, connector, DATA.POLICY.ALLAREA.ID);
 
     it('can create the housing entity', () => {
         return Crud.add(Shared.rest('entity', entity), DATA.some_info());
@@ -55,7 +54,7 @@ describe('Connector Session Tests', function() {
     });
 
     it('can create the policy', () => {
-        return Policy.add(DATA.DSP_ID_1, DATA.DSP_1);  // DSP_1 is access all areas
+        return Crud.add(Shared.rest('policy', DATA.POLICY.ALLAREA.ID), DATA.POLICY.ALLAREA.DETAIL);
     });
 
     it('- STREAM TESTS -----------------------------------', () => { return true; });
