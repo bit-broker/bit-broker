@@ -101,7 +101,7 @@ describe('Policy Tests', function() {
         });
 
         it('can access the policy access_control directly', () => {
-//            return Crud.verify(url(DATA.POLICY.ALLAREA.ID, 'access_control'), DATA.POLICY.ALLAREA.DETAIL.policy.access_control);
+            return Crud.verify(url(DATA.POLICY.ALLAREA.ID, 'access_control'), DATA.POLICY.ALLAREA.DETAIL.policy.access_control, false);
         });
 
         it('cannot add a duplicate policy', () => {
