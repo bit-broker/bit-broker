@@ -121,11 +121,11 @@ module.exports = class Crud {
 
     // --- verifies a resource
 
-    static verify(url, resource) {
+    static verify(url, resource, include = true) {
         return chakram.get(url)
         .then(response => {
             expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.include(resource);  // resource is a subset of what the restful call returns
+            include ? expect(response.body).to.deep.include(resource) : expect(response.body).to.deep.equal(resource);
             expect(response).to.have.status(HTTP.OK);
             return chakram.wait();
         });
@@ -133,14 +133,14 @@ module.exports = class Crud {
 
     // --- verifies the entire resource list
 
-    static verify_all(url, resources) {
+    static verify_all(url, resources, include = true) {
         resources.sort((a, b) => a.id.localeCompare(b.id)); // in id order
         return chakram.get(url)
         .then(response => {
             expect(response.body).to.be.an('array');
             expect(response.body.length).to.be.eq(resources.length);
             for (let i = 0; i < resources.length; i++) {
-                expect(response.body[i]).to.deep.include(resources[i]);  // assumes resources are in the same order as the restful call returns
+                include ? expect(response.body[i]).to.deep.include(resources[i]) : expect(response.body[i]).to.deep.equal(resources[i]);
             }
             expect(response).to.have.status(HTTP.OK);
             return chakram.wait();
