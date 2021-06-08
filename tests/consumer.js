@@ -68,6 +68,8 @@ describe('Consumer Tests', function() {
         });
     });
 
+    // --- seed the database
+
     describe('seed the database', function() {
 
         it('create the housing entities', () => {
