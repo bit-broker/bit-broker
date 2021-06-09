@@ -29,7 +29,7 @@
 const HTTP = require('http-status-codes');
 const DATA = require('./lib/data.js');
 const Shared = require('./lib/shared.js');
-const Policy = require('./lib/policy.js');
+const Crud = require('./lib/crud.js');
 const chakram = require('chakram');
 const expect = chakram.expect;
 
@@ -56,15 +56,11 @@ describe('Policy Tests', function() {
     describe('start up tests', () => {
 
         it('the server is up', () => {
-            return Shared.up(Shared.policy);
+            return Shared.up(process.env.POLICY_BASE);
         });
 
         it('it responds to an announce request', () => {
-            return Shared.announce(Shared.policy, process.env.POLICY_NAME, process.env.POLICY_BASE);
-        });
-
-        it('it responds to unknown restful resources', () => {
-            return Shared.bad_route(Shared.rest('policy', DATA.slug()));
+            return Shared.announce(process.env.POLICY_BASE, process.env.POLICY_NAME);
         });
 
         it('the database is empty', () => {
@@ -72,7 +68,9 @@ describe('Policy Tests', function() {
         });
     });
 
-    describe('policy management tests', () => {
+    // --- policy manipulation tests
+
+    describe('policy manipulation tests', () => {
 
         before(() => {
             return Shared.empty();
@@ -82,84 +80,126 @@ describe('Policy Tests', function() {
             return Shared.empty();
         });
 
+        function url(slug = '', resource = undefined) { return resource ? Shared.rest('policy', slug, resource) : Shared.rest('policy', slug); }
+
         it('the policy is not there to start with', () => {
-            return Policy.missing(DATA.DSP_ID_1);
-        });
-
-        it('cannot add a policy with an invalid policy id', () => {
-            return Policy.add_policy_invalid_slug(DATA.DSP_ID_INVALID_SLUG, DATA.DSP_1);
-        });
-
-        it('cannot add a policy with an invalid policy object', () => {
-            return Policy.add_policy_invalid_enum(DATA.DSP_ID_INVALID_POLICY, DATA.DSP_INVALID_POLICY);
+            return Crud.not_found(url(DATA.POLICY.ALLAREA.ID));
         });
 
         it('can add a policy', () => {
-            return Policy.add(DATA.DSP_ID_1, DATA.DSP_1);
+            return Crud.add(url(DATA.POLICY.ALLAREA.ID), DATA.POLICY.ALLAREA.DETAIL);
         });
 
         it('it is present in the policy list', () => {
-            return Policy.verify_all([{ slug: DATA.DSP_ID_1, dsp: DATA.DSP_1 }]);
+            return Crud.verify_all(url(), [
+                { id: DATA.POLICY.ALLAREA.ID, url: url(DATA.POLICY.ALLAREA.ID), name: DATA.POLICY.ALLAREA.DETAIL.name, description: DATA.POLICY.ALLAREA.DETAIL.description }
+            ]);
         });
 
         it('it is present when addressed directly', () => {
-            return Policy.verify(DATA.DSP_ID_1, DATA.DSP_1);
+            return Crud.verify(url(DATA.POLICY.ALLAREA.ID), { id: DATA.POLICY.ALLAREA.ID, url: url(DATA.POLICY.ALLAREA.ID), name: DATA.POLICY.ALLAREA.DETAIL.name, description: DATA.POLICY.ALLAREA.DETAIL.description });
         });
 
         it('can access the policy access_control directly', () => {
-            return Policy.verify_access_control(DATA.DSP_ID_1, DATA.DSP_1.policy.access_control);
+            return Crud.verify(url(DATA.POLICY.ALLAREA.ID, 'access_control'), DATA.POLICY.ALLAREA.DETAIL.policy.access_control, false);
         });
 
         it('cannot add a duplicate policy', () => {
-            return Policy.duplicate(DATA.DSP_ID_1, DATA.DSP_1);
-        });
-
-        it('cannot update a policy with an invalid policy object', () => {
-            return Policy.update_policy_invalid_enum(DATA.DSP_ID_1, DATA.DSP_INVALID_POLICY);
+            return Crud.duplicate(url(DATA.POLICY.ALLAREA.ID), DATA.POLICY.ALLAREA.DETAIL);
         });
 
         it('can update an policy', () => {
-            return Policy.update(DATA.DSP_ID_1, DATA.DSP_2);
+            return Crud.update(url(DATA.POLICY.ALLAREA.ID), DATA.POLICY.EXAMPLE.DETAIL);
         });
 
         it('new values are present in the policy list', () => {
-            return Policy.verify_all([{ slug: DATA.DSP_ID_1, dsp: DATA.DSP_2 }]);
+            return Crud.verify_all(url(), [
+                { id: DATA.POLICY.ALLAREA.ID, url: url(DATA.POLICY.ALLAREA.ID), name: DATA.POLICY.EXAMPLE.DETAIL.name, description: DATA.POLICY.EXAMPLE.DETAIL.description }
+            ]);
         });
 
         it('new values are present when addressed directly', () => {
-            return Policy.verify(DATA.DSP_ID_1, DATA.DSP_2);
+            return Crud.verify(url(DATA.POLICY.ALLAREA.ID), { id: DATA.POLICY.ALLAREA.ID, url: url(DATA.POLICY.ALLAREA.ID), name: DATA.POLICY.EXAMPLE.DETAIL.name, description: DATA.POLICY.EXAMPLE.DETAIL.description });
         });
 
         it('the second policy is not there to start with', () => {
-            return Policy.missing(DATA.DSP_ID_2);
+            return Crud.not_found(url(DATA.POLICY.EXAMPLE.ID));
         });
 
         it('can add a second policy', () => {
-            return Policy.add(DATA.DSP_ID_2, DATA.DSP_2);
+            return Crud.add(url(DATA.POLICY.EXAMPLE.ID), DATA.POLICY.EXAMPLE.DETAIL);
         });
 
         it('both are present in the policy list', () => {
-            return Policy.verify_all([
-                { slug: DATA.DSP_ID_1, dsp: DATA.DSP_2 },
-                { slug: DATA.DSP_ID_2, dsp: DATA.DSP_2 }
+            return Crud.verify_all(url(), [
+                { id: DATA.POLICY.ALLAREA.ID, url: url(DATA.POLICY.ALLAREA.ID), name: DATA.POLICY.EXAMPLE.DETAIL.name, description: DATA.POLICY.EXAMPLE.DETAIL.description },
+                { id: DATA.POLICY.EXAMPLE.ID, url: url(DATA.POLICY.EXAMPLE.ID), name: DATA.POLICY.EXAMPLE.DETAIL.name, description: DATA.POLICY.EXAMPLE.DETAIL.description }
             ]);
         });
 
         it('can delete the first policy', () => {
-            return Policy.delete(DATA.DSP_ID_1);
+            return Crud.delete(url(DATA.POLICY.ALLAREA.ID));
         });
 
         it('it is gone from the policy list', () => {
-            return Policy.verify_all([{ slug: DATA.DSP_ID_2, dsp: DATA.DSP_2 }]);
+            return Crud.verify_all(url(), [
+                { id: DATA.POLICY.EXAMPLE.ID, url: url(DATA.POLICY.EXAMPLE.ID), name: DATA.POLICY.EXAMPLE.DETAIL.name, description: DATA.POLICY.EXAMPLE.DETAIL.description }
+            ]);
         });
 
         it('the policy is gone when addressed directly', () => {
-            return Policy.missing(DATA.DSP_ID_1);
+            return Crud.not_found(url(DATA.POLICY.ALLAREA.ID));
         });
 
         it('can delete the second policy', () => {
-            return Policy.delete(DATA.DSP_ID_2);
+            return Crud.delete(url(DATA.POLICY.EXAMPLE.ID));
+        });
+
+        it('the policy list is empty', () => {
+            return Crud.verify_all(url(), []);
         });
     });
 
+    // --- policy validation tests - here we test invalid entries only, on add and update
+
+    describe('policy validation tests', () => {
+
+        before(() => {
+            return Shared.empty();
+        });
+
+        after(() => {
+            return Shared.empty();
+        });
+
+        function url(slug) { return Shared.rest('policy', slug); }
+
+        it('cannot open a policy with various invalid ids', () => {
+            let test = Promise.resolve()
+            .then(() => Crud.bad_request(url(DATA.slug(DATA.SLUG.SHORTEST - 1)), [{ slug: DATA.ERRORS.MIN }], DATA.POLICY.ALLAREA.DETAIL, chakram.post))
+            .then(() => Crud.bad_request(url(DATA.slug(DATA.SLUG.LONGEST + 1)), [{ slug: DATA.ERRORS.MAX }], DATA.POLICY.ALLAREA.DETAIL, chakram.post));
+
+            for (let i = 0; i < DATA.SLUG.INVALID.length; i++) {
+                test = test.then(() => Crud.bad_request(url(DATA.SLUG.INVALID[i]), [{ slug: DATA.ERRORS.FORMAT }], DATA.POLICY.ALLAREA.DETAIL, chakram.post));
+            }
+
+            return test;
+        });
+
+        it('cannot add a policy with an invalid policy object', () => {
+            return Crud.bad_request(url(DATA.POLICY.INVALID.ID), [{ legal_context: DATA.ERRORS.ENUM }], DATA.POLICY.INVALID.DETAIL, chakram.post);
+        });
+
+        it('can add a policy', () => {
+            return Crud.add(url(DATA.POLICY.ALLAREA.ID), DATA.POLICY.ALLAREA.DETAIL);
+        });
+
+        it('cannot update a policy with an invalid policy object', () => {
+            return Crud.bad_request(url(DATA.POLICY.INVALID.ID), [{ legal_context: DATA.ERRORS.ENUM }], DATA.POLICY.INVALID.DETAIL, chakram.put);
+        });
+
+        it('can delete the first policy', () => {
+            return Crud.delete(url(DATA.POLICY.ALLAREA.ID), DATA.POLICY.ALLAREA.DETAIL);
+        });
+    });
 });

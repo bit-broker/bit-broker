@@ -27,7 +27,6 @@
 const HTTP = require('http-status-codes');
 const DATA = require('./data.js');
 const Shared = require('./shared.js');
-const Connector = require('./connector.js');
 const chakram = require('chakram');
 const expect = chakram.expect;
 
@@ -37,48 +36,30 @@ module.exports = class Session {
 
     // --- opens a new sesson on the given connector
 
-    static open(entity, connector, mode, cb = null) { // TODO: review use of callback here - if the cb contains other promises then nasty sequencing issues will occur
-        return Connector.with(entity, connector, (item) => {
-            return chakram.get(Shared.rest('connector', item.contribution.id, 'session', 'open', mode))
+    static open(entity, connector, mode, cb = null) { // this cb should never by async - just stash the info
+        return chakram.get(Shared.rest('entity', entity, 'connector', connector))
+
+        .then(response => {
+            expect(response.body).to.be.an('object');
+            expect(response.body.contribution.id).to.be.a('string');
+            expect(response.body.contribution.id).to.match(new RegExp(DATA.ID.REGEX));
+            expect(response.body.contribution.id.length).to.be.eq(DATA.ID.SIZE);
+            return response.body.contribution.id;
+        })
+
+        .then(cid => {
+            return chakram.get(Shared.rest('connector', cid, 'session', 'open', mode))
+
             .then(response => {
                 expect(response.body).to.be.a('string');
                 expect(response.body).to.match(new RegExp(DATA.ID.REGEX));
                 expect(response.body.length).to.be.eq(DATA.ID.SIZE);
                 expect(response).to.have.status(HTTP.OK);
-                if (cb) cb(response.body);
-                return chakram.wait();
-            });
-        });
-    }
+                return response.body;
+            })
 
-    // --- attempts to open a not known session
-
-    static open_missing(entity, connector, cid) {
-        return Connector.with(entity, connector, (item) => {
-            return chakram.get(Shared.rest('connector', cid, 'session', 'open', 'stream'))
-            .then(response => {
-                expect(response.body).to.be.a('string');
-                expect(response.body.toLowerCase()).to.contain('not found');
-                expect(response).to.have.status(HTTP.NOT_FOUND);
-                return chakram.wait();
-            });
-        });
-    }
-
-    // --- attempts to open a session with validation errors
-
-    static open_bad(entity, connector, cid, mode, errors) {
-        return Connector.with(entity, connector, (item) => {
-            return chakram.get(Shared.rest('connector', cid || item.contribution.id, 'session', 'open', mode))
-            .then(response => {
-                expect(response.body).to.be.a('string');
-                for (let i = 0; i < errors.length; i++) {
-                    for (let j in errors[i]) {
-                        expect(response.body).to.contain(j);
-                        expect(response.body).to.contain(errors[i][j]);
-                    }
-                }
-                expect(response).to.have.status(HTTP.BAD_REQUEST);
+            .then(sid => {
+                if (cb) cb({ cid: cid, sid: sid });
                 return chakram.wait();
             });
         });
@@ -86,137 +67,32 @@ module.exports = class Session {
 
     // --- actions an data operation within an open session
 
-    static action(entity, connector, sid, action, data) {
-        return Connector.with(entity, connector, (item) => {
-            return chakram.post(Shared.rest('connector', item.contribution.id, 'session', sid, action), data)
-            .then(response => {
-                expect(response.body).to.be.undefined;
-                expect(response).to.have.status(HTTP.NO_CONTENT);
-                return chakram.wait();
-            });
-        });
-    }
-
-    // --- attempts to action a data operation with an invalid contribution id
-
-    static action_missing(entity, connector, cid, sid, action, data) {
-        return Connector.with(entity, connector, (item) => {
-            return chakram.post(Shared.rest('connector', cid, 'session', sid, action), data)
-            .then(response => {
-                expect(response.body).to.be.a('string');
-                expect(response.body.toLowerCase()).to.contain('not found');
-                expect(response).to.have.status(HTTP.NOT_FOUND);
-                return chakram.wait();
-            });
-        });
-    }
-
-    // --- attempts to action a data operation with an invalid session id
-
-    static action_not_auth(entity, connector, sid, action, data) {
-        return Connector.with(entity, connector, (item) => {
-            return chakram.post(Shared.rest('connector', item.contribution.id, 'session', sid, action), data)
-            .then(response => {
-                expect(response.body).to.be.a('string');
-                expect(response.body.toLowerCase()).to.contain('unauthorized');
-                expect(response).to.have.status(HTTP.UNAUTHORIZED);
-                return chakram.wait();
-            });
-        });
-    }
-
-    // --- attempts to action a data operation with validation errors
-
-    static action_bad(entity, connector, cid, sid, action, data, errors) {
-        return Connector.with(entity, connector, (item) => {
-            return chakram.post(Shared.rest('connector', cid || item.contribution.id, 'session', sid, action), data)
-            .then(response => {
-                expect(response.body).to.be.a('string');
-                for (let i = 0; i < errors.length; i++) {
-                    for (let j in errors[i]) {
-                        expect(response.body).to.contain(j);
-                        expect(response.body).to.contain(errors[i][j]);
-                    }
-                }
-                expect(response).to.have.status(HTTP.BAD_REQUEST);
-                return chakram.wait();
-            });
+    static action(cid, sid, action, data) {
+        return chakram.post(Shared.rest('connector', cid, 'session', sid, action), data)
+        .then(response => {
+            expect(response.body).to.be.undefined;
+            expect(response).to.have.status(HTTP.NO_CONTENT);
+            return chakram.wait();
         });
     }
 
     // --- closes an existing sesson on the given connector
 
-    static close(entity, connector, sid, commit) {
-        return Connector.with(entity, connector, (item) => {
-            return chakram.get(Shared.rest('connector', item.contribution.id, 'session', sid, 'close', commit ? 'true' : 'false'))
-            .then(response => {
-                expect(response.body).to.be.undefined;
-                expect(response).to.have.status(HTTP.OK);
-                return chakram.wait();
-            });
-        });
-    }
-
-    // --- attempts to close not known session
-
-    static close_missing(entity, connector, cid, sid) {
-        return Connector.with(entity, connector, (item) => {
-            return chakram.get(Shared.rest('connector', cid, 'session', sid, 'close', 'true'))
-            .then(response => {
-                expect(response.body).to.be.a('string');
-                expect(response.body.toLowerCase()).to.contain('not found');
-                expect(response).to.have.status(HTTP.NOT_FOUND);
-                return chakram.wait();
-            });
-        });
-    }
-
-    // --- attempts to close not known session
-
-    static close_not_auth(entity, connector, sid) {
-        return Connector.with(entity, connector, (item) => {
-            return chakram.get(Shared.rest('connector', item.contribution.id, 'session', sid, 'close', 'true'))
-            .then(response => {
-                expect(response.body).to.be.a('string');
-                expect(response.body.toLowerCase()).to.contain('unauthorized');
-                expect(response).to.have.status(HTTP.UNAUTHORIZED);
-                return chakram.wait();
-            });
-        });
-    }
-
-    // --- attempts to close a session with validation errors
-
-    static close_bad(entity, connector, cid, sid, commit, errors) {
-        return Connector.with(entity, connector, (item) => {
-            return chakram.get(Shared.rest('connector', cid || item.contribution.id, 'session', sid, 'close', commit))
-            .then(response => {
-                expect(response.body).to.be.a('string');
-                for (let i = 0; i < errors.length; i++) {
-                    for (let j in errors[i]) {
-                        expect(response.body).to.contain(j);
-                        expect(response.body).to.contain(errors[i][j]);
-                    }
-                }
-                expect(response).to.have.status(HTTP.BAD_REQUEST);
-                return chakram.wait();
-            });
+    static close(cid, sid, commit) {
+        return chakram.get(Shared.rest('connector', cid, 'session', sid, 'close', commit ? 'true' : 'false'))
+        .then(response => {
+            expect(response.body).to.be.undefined;
+            expect(response).to.have.status(HTTP.OK);
+            return chakram.wait();
         });
     }
 
     // --- an end-to-end open -> action -> close step
 
     static records(entity, connector, records, mode, action, commit) {
-        let sid = null;
-
-        return Session.open(entity, connector, mode, (session => sid = session))
-
-        .then (() => {
-            return Session.action(entity, connector, sid, action, records)
-        })
-
-        .then(() => {
-            return Session.close(entity, connector, sid, commit);
-        });
+        let session = {};
+        return Session.open(entity, connector, mode, (info => session = info))
+        .then(() => { return Session.action(session.cid, session.sid, action, records) })
+        .then(() => { return Session.close(session.cid, session.sid, commit); });
     }
 }

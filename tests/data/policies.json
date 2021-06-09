@@ -82,5 +82,26 @@
                 "legal_context": [{ "type": "attribution", "text": "Data is supplied by Wikipedia", "link": "https://en.wikipedia.org/" }]
             }
         }
+    },
+    {
+        "slug": "british-isles",
+        "properties": {
+            "name": "The British Isles",
+            "description": "Everything within the geography of the British Isles.",
+            "policy": {
+                "access_control": {
+                    "enabled": true,
+                    "quota": {
+                        "max_number": 24000,
+                        "interval_type": "day"
+                    },
+                    "rate": 1000
+                },
+                "segment_query": { "entity.location": { "$within": { "$geometry": { "type": "Polygon","coordinates": [[[-12.386341,59.062341],[-12.386341,49.952269],[2.500282,49.952269],[2.500282,59.062341],[-12.386341,59.062341]]]}}}},
+                "hidden_types": [],
+                "field_masks": [],
+                "legal_context": [{ "type": "attribution", "text": "Data is supplied by Wikipedia", "link": "https://en.wikipedia.org/" }]
+            }
+        }
     }
 ]

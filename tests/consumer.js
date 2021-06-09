@@ -30,7 +30,6 @@ const HTTP = require('http-status-codes');
 const DATA = require('./lib/data.js');
 const Shared = require('./lib/shared.js');
 const Seeder = require('./lib/seeder.js');
-const Consumer = require('./lib/consumer.js');
 const chakram = require('chakram');
 const expect = chakram.expect;
 
@@ -57,21 +56,19 @@ describe('Consumer Tests', function() {
     describe('start up tests', () => {
 
         it('the server is up', () => {
-            return Shared.up(Shared.consumer);
+            return Shared.up(process.env.CONSUMER_BASE);
         });
 
         it('it responds to an announce request', () => {
-            return Shared.announce(Shared.consumer, process.env.CONSUMER_NAME, process.env.CONSUMER_BASE);
-        });
-
-        it('it responds to unknown restful resources', () => {
-            return Shared.bad_route(Shared.rest('entity', DATA.slug()));
+            return Shared.announce(process.env.CONSUMER_BASE, process.env.CONSUMER_NAME);
         });
 
         it('the database is empty', () => {
             return Shared.empty();
         });
     });
+
+    // --- seed the database
 
     describe('seed the database', function() {
 
@@ -102,24 +99,53 @@ describe('Consumer Tests', function() {
         const GEOGRAPHY = Seeder.records('geography');
         const POPULATION = Seeder.records('country').reduce((m, i) => { m[i.id] = i.entity.population; return m; }, {});
 
+        // --- checks a catalog query
+
+        function catalog(test) {
+
+            test.except = test.except || [];
+            test.policy = test.policy || 'access-all-areas'; // TODO: Change this to be better handled in the revised testing suite
+
+            return chakram.get(`${ process.env.CONSUMER_BASE }/catalog?q=${ JSON.stringify(test.query) }`, { headers: { 'x-bb-policy': test.policy }})
+
+            .then(response => {
+                expect(response.body).to.be.an('array');
+                let items = response.body.map(i => i.name);
+
+                for (let i = 0; i < test.yields.length; i++) {
+                    if (!test.except.includes(test.yields[i])) {
+                        expect(items).to.include(test.yields[i]);
+                    }
+                }
+
+                for (let i = 0; i < test.except.length; i++) {
+                    expect(items).to.not.include(test.except[i]);
+                }
+
+                expect(items.length).to.be.eq(test.yields.length - test.except.length);
+
+                return chakram.wait();
+            });
+        }
+
         // -- the query tests start here
 
         it('0 » nul » empty query', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: {},
                 yields: []
             });
         });
 
         it('1 » str » implicit equal', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: { 'type': 'country', 'name': 'United Kingdom' },
                 yields: ['United Kingdom']
             });
         });
 
         it('0 » str » implicit equal', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: { 'type': 'country', 'name': 'Atlantis' },
                 yields: []
             });
@@ -128,14 +154,14 @@ describe('Consumer Tests', function() {
         it('M » str » implicit equal'); // TODO
 
         it('1 » num » implicit equal', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: { 'type': 'country', 'entity.population': POPULATION.GB },
                 yields: ['United Kingdom']
             });
         });
 
         it('0 » num » implicit equal', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: { 'entity.population': 0 },
                 yields: []
             });
@@ -144,14 +170,14 @@ describe('Consumer Tests', function() {
         it('M » num » implicit equal'); // TODO
 
         it('1 » str » $eq', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: { 'type': 'country', 'entity.capital': { '$eq': 'London' } },
                 yields: ['United Kingdom']
             });
         });
 
         it('0 » str » $eq', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: { 'type': 'country', 'entity.capital': { '$eq': 'Babylon' } },
                 yields: []
             });
@@ -160,14 +186,14 @@ describe('Consumer Tests', function() {
         it('M » str » $eq'); // TODO
 
         it('1 » num » $eq', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: { 'type': 'country', 'entity.population': { '$eq': POPULATION.GB } },
                 yields: ['United Kingdom']
             });
         });
 
         it('M » str » $ne', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: { 'type': 'country', 'entity.capital': { '$ne': 'London' } },
                 yields: THE_WORLD,
                 except: ['United Kingdom']
@@ -175,7 +201,7 @@ describe('Consumer Tests', function() {
         });
 
         it('M » num » $ne', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: { 'type': 'country', 'entity.population': { '$ne': POPULATION.GB } },
                 yields: THE_WORLD,
                 except: ['United Kingdom']
@@ -183,63 +209,63 @@ describe('Consumer Tests', function() {
         });
 
         it('M » num » $lt', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: { 'type': 'country', 'entity.population': { '$lt': POPULATION.LI } },
                 yields: ['Nauru', 'Palau', 'San Marino', 'Tuvalu', 'Vatican City']
             });
         });
 
         it('M » num » $lte', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: { 'type': 'country', 'entity.population': { '$lte': POPULATION.LI } },
                 yields: ['Liechtenstein', 'Nauru', 'Palau', 'San Marino', 'Tuvalu', 'Vatican City']
             });
         });
 
         it('M » num » $gt', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: { 'type': 'country', 'entity.population': { '$gt': POPULATION.IN } },
                 yields: ['China']
             });
         });
 
         it('M » num » $gte', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: { 'entity.population': { '$gte': POPULATION.IN } },
                 yields: ['China', 'India']
             });
         });
 
         it('M » str » $lt', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: { 'type': 'country', 'name': { '$lt': 'Argentina' } },
                 yields: ['Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda']
             });
         });
 
         it('M » str » $lt', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: { 'type': 'country', 'name': { '$lte': 'Argentina' } },
                 yields: ['Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda', 'Argentina']
             });
         });
 
         it('0 » str » $in', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: { 'type': 'country', 'name': { '$in': ['Atlantis', 'Sparta'] } },
                 yields: []
             });
         });
 
         it('M » str » $in', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: { 'type': 'country', 'name': { '$in': ['United Kingdom', 'Atlantis', 'India', 'France'] } },
                 yields: ['United Kingdom', 'India', 'France']
             });
         });
 
         it('M » str » $nin', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: { 'type': 'country', 'name': { '$nin': ['United Kingdom', 'Atlantis', 'India', 'France'] } },
                 yields: THE_WORLD,
                 except: ['United Kingdom', 'India', 'France']
@@ -247,21 +273,21 @@ describe('Consumer Tests', function() {
         });
 
         it('M » str » $and', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: { 'type': 'country', '$and': [{ 'name': 'United Kingdom' }, { 'entity.population': POPULATION.GB }] },
                 yields: ['United Kingdom']
             });
         });
 
         it('M » str » $or', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: { 'type': 'country', '$or': [{ 'name': 'United Kingdom' }, { 'entity.population': POPULATION.IN }] },
                 yields: ['United Kingdom', 'India']
             });
         });
 
         it('M » str » $not', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: { 'type': 'country', '$not': { 'name': 'United Kingdom' } },
                 yields: THE_WORLD,
                 except: ['United Kingdom']
@@ -269,7 +295,7 @@ describe('Consumer Tests', function() {
         });
 
         it('M » str » $not', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: { 'type': 'country', '$nor': [{ 'name': 'United Kingdom' }, { 'entity.population': POPULATION.IN }] },
                 yields: THE_WORLD,
                 except: ['United Kingdom', 'India']
@@ -277,49 +303,49 @@ describe('Consumer Tests', function() {
         });
 
         it('M » str » regex', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: { 'type': 'country', 'name': { '$regex': 'United .*', '$options': 'i' } },
                 yields: ['United Kingdom', 'United States', 'United Arab Emirates']
             });
         });
 
         it('1 » obj » implicit match', () => {
-        /*    return Consumer.catalog({  TODO
+        /*    return catalog({  TODO
                 query: { 'enity.location': GEOGRAPHY.GB },
                 yields: ['United Kingdom']
             });*/
         });
 
         it('M » geo » $near', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: { 'type': 'country', 'entity.location': { '$near': { '$geometry': GEOGRAPHY.BIG_BEN, '$min': 0, '$max': 750000 } } },
                 yields: ['United Kingdom', 'Ireland', 'Netherlands']
             });
         });
 
         it('M » geo » $within', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: { 'type': 'country', 'entity.location': { '$within': { '$geometry': GEOGRAPHY.BRITISH_ISLES } } },
                 yields: ['United Kingdom', 'Ireland']
             });
         });
 
 /*        it('M » geo » error type', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: 'FOO',
                 yields: []
             });
         });
 
         it('M » geo » error type', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: [],
                 yields: []
             });
         });
 
         it('M » geo » error invalid', () => {
-            return Consumer.catalog({
+            return catalog({
                 query: { 'type': 'country', '$or': 'FOO' },
                 yields: []
             });

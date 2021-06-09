@@ -43,25 +43,25 @@ class Shared {
     // --- class constructor
 
     constructor() {
-        this.coordinator = process.env.COORDINATOR_BASE.replace(/\/$/g, ''); // all urls without trailing slash
-        this.contributor = process.env.CONTRIBUTOR_BASE.replace(/\/$/g, '');
-        this.consumer = process.env.CONSUMER_BASE.replace(/\/$/g, '');
-        this.policy = process.env.POLICY_BASE.replace(/\/$/g, '');
         this.db = null;
+        this.api = {  // apis listed by restful prefix
+            entity: process.env.COORDINATOR_BASE,
+            connector: process.env.CONTRIBUTOR_BASE,
+            policy: process.env.POLICY_BASE
+        };
     }
 
-    // --- returns a restful url to either the catalog or register service
+    // --- returns a restful url to an known API service
 
-    rest(...resources) {  // TODO - line below is ugly - do it another way
-        resources.unshift(resources.length && (resources[0] === 'entity' ? this.coordinator : (resources[0] === 'policy' ? this.policy : this.contributor)));
+    rest(...resources) {
+        resources.unshift(resources.length ? this.api[resources[0]] : '');
         return resources.join('/');
     }
 
     // --- resets the underlying database
 
     nuke() {
-        return this.db('entity').delete()
-
+        return this.db('entity').delete()  // will auto cascade to connectors, catalog, etc
         .then(() => {
             return this.db('policy').delete();
         });
@@ -101,7 +101,7 @@ class Shared {
 
     // --- tests a server announce message
 
-    announce(server, name, base) {
+    announce(server, name) {
         return chakram.get(server)
         .then(response => {
             expect(response.body).to.be.an('object');
@@ -109,18 +109,6 @@ class Shared {
             expect(response.body.name).to.be.equal(name);
             expect(response.body.version).to.match(new RegExp(DATA.VERSION.REGEX));
             expect(response.body.status).to.be.equal(DATA.STATUS);
-            return chakram.wait();
-        });
-    }
-
-    // --- tests for an expected bad route
-
-    bad_route(url, verb = chakram.get) {
-        return verb(url)
-        .then(response => {
-            expect(response.body).to.be.a('string');
-            expect(response.body.toLowerCase()).to.contain('not found');
-            expect(response).to.have.status(HTTP.NOT_FOUND);
             return chakram.wait();
         });
     }
