@@ -35,6 +35,7 @@ const logger = require('./logger.js');
 const status = require('./status.js')
 const locales = require('./locales.js');
 const url = require('url');
+const os = require('os');
 
 // --- constants - not deployment configurable
 
@@ -67,6 +68,15 @@ module.exports = class Server {
             log.error(text);
             log.error(error.stack || 'no stack trace');
         }
+    }
+
+    // --- returns the ip address of the host machince
+
+    ip_address(family = 'IPv4', missing = '<not found>') {
+        let nets = os.networkInterfaces();
+        let eth0 = (nets.eth0 || nets.en0) || [];
+        let ip = eth0.find(i => i.family === family);
+        return ip && ip.address ? ip.address : missing;
     }
 
     // --- constructor
@@ -137,7 +147,7 @@ module.exports = class Server {
     listen(cb = null) {
         log.info(this.name, 'started');
         this.app.listen(this.port, () => {
-            log.info('name', this.name, 'base', this.base, 'version', this.version, 'port', this.port);
+            log.info('name', this.name, 'base', this.base, 'version', this.version, 'port', this.port, 'ip address', this.ip_address());
             if (cb) cb();
         });
     }
