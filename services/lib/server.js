@@ -92,6 +92,7 @@ module.exports = class Server {
         this.app.use(locales.init); // defaults to EN
 
         // --- setup metrics if enabled
+
         if (process.env.METRICS_ENABLED === "true") {
             const metricsMiddleware = promBundle({ includeMethod: true })
             this.app.use(metricsMiddleware)
