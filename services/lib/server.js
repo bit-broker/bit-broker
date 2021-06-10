@@ -91,9 +91,11 @@ module.exports = class Server {
         this.app.use(cors()); // TODO review CORS settings
         this.app.use(locales.init); // defaults to EN
 
-        // --- setup metrics
-        const metricsMiddleware = promBundle({ includeMethod: true })
-        this.app.use(metricsMiddleware)
+        // --- setup metrics if enabled
+        if (process.env.METRICS_ENABLED === "true") {
+            const metricsMiddleware = promBundle({ includeMethod: true })
+            this.app.use(metricsMiddleware)
+        }
 
         if (this.version.length) {
             this.app.use(`/${ this.version }/`, this.router);
