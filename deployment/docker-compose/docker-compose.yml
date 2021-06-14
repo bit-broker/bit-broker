@@ -1,96 +1,122 @@
 ##################################################################################
-# Name:        docker-compose.yml
+# BitBroker docker compose
 ##################################################################################
 
 version: "3"
+
+networks:
+  default:
+    name: bbk-net
+
+volumes:
+  dbdata:
+
 services:
-  # Bitbroker Coordinator
-  bitbroker-coordinator:
+
+  # --- coordinator service
+  bbk-coordinator:
     build:
       context: ../..
       dockerfile: ./build/coordinator/Dockerfile
-    container_name: bitbroker-coordinator
-    image: bitbroker-coordinator
+    container_name: bbk-coordinator
+    image: bbk-coordinator
     depends_on:
-      - bitbroker-db
+      bbk-database:
+        condition: service_healthy
     ports:
       - 8001:8001
 
-  # Bitbroker Contributor
-  bitbroker-contributor:
+  # --- contributor service
+  bbk-contributor:
     build:
       context: ../..
       dockerfile: ./build/contributor/Dockerfile
-    container_name: bitbroker-contributor
-    image: bitbroker-contributor
+    container_name: bbk-contributor
+    image: bbk-contributor
     depends_on:
-      - bitbroker-db
+      bbk-database:
+        condition: service_healthy
     ports:
       - 8002:8002
 
-  # Bitbroker Consumer
-  bitbroker-consumer:
+  # --- consumer service
+  bbk-consumer:
     build:
       context: ../..
       dockerfile: ./build/consumer/Dockerfile
-    container_name: bitbroker-consumer
-    image: bitbroker-consumer
+    container_name: bbk-consumer
+    image: bbk-consumer
     depends_on:
-      - bitbroker-db
+      bbk-database:
+        condition: service_healthy
     ports:
       - 8003:8003
 
-  # Policy server
-  bitbroker-policy:
+  # --- policy service
+  bbk-policy:
     build:
       context: ../..
       dockerfile: ./build/policy/Dockerfile
-    container_name: bitbroker-policy
-    image: bitbroker-policy
+    container_name: bbk-policy
+    image: bbk-policy
     depends_on:
-      - bitbroker-db
+      bbk-database:
+        condition: service_healthy
+      bbk-policy-cache:
+        condition: service_healthy
     ports:
       - 8004:8004
 
-  # The Database
-  bitbroker-db:
-    image: postgres:13.2
-    container_name: bitbroker-db
+  # --- rate limit service
+  bbk-rate-limit:
+    build:
+      context: ../../..
+      dockerfile: ./bit-broker/build/rate-limit/Dockerfile
+    container_name: bbk-rate-limit
+    image: bbk-rate-limit
+    depends_on:
+      - bbk-rate-limit-cache
+    ports:
+      - 4000:4000
+      - 7000:7000
+
+  # --- main database
+  bbk-database:
+    image: postgis/postgis:13-3.1-alpine
+    container_name: bbk-database
     volumes:
       - dbdata:/var/lib/postgresql/data
       - ../../database/schema.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       POSTGRES_PASSWORD: "bitbr0ker"
     ports:
-      - "5432:5432"
+      - 5432:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 4s
+      timeout: 4s
+      retries: 16
 
-  # Policy Cache
-  bitbroker-policy-cache:
+  # --- policy cache
+  bbk-policy-cache:
     image: redis:6.2.3-alpine
-    container_name: bitbroker-policy-cache
+    container_name: bbk-policy-cache
     ports:
       - 6379:6379
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping"]
+      interval: 4s
+      timeout: 4s
+      retries: 16
 
-  # Rate Service
-  rate-service:
-    image: rate-service
-    container_name: rate-service
-    ports:
-      - 4000:4000
-      - 7000:7000
-    depends_on:
-      - rate-service-redis
-
-  # Rate Service Redis
-  rate-service-redis:
+  # --- rate limit cache
+  bbk-rate-limit-cache:
     image: redis:6.2.3-alpine
-    container_name: rate-service-redis
+    container_name: bbk-rate-limit-cache
     ports:
       - 6380:6379
-
-networks:
-  default:
-    name: bitbroker-net
-
-volumes:
-  dbdata:
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping"]
+      interval: 4s
+      timeout: 4s
+      retries: 16

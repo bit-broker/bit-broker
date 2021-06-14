@@ -1,7 +1,7 @@
 #!/bin/bash -e
 # Syntax build-docker.sh [-i|--image imagename]
 
-PROJECT=bbk-contributor
+PROJECT=bbk-rate-limit
 DOCKER_IMAGE=${PROJECT}:latest
 BASE_DOCKER_IMAGE=${PROJECT}:base
 
@@ -37,5 +37,5 @@ echo BUILDING DOCKER ${DOCKER_IMAGE}
 
 docker build --no-cache \
     -t ${DOCKER_IMAGE} \
-    -f build/contributor/Dockerfile \
+    -f bit-broker/build/rate-limit/Dockerfile \
     .
