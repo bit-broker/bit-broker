@@ -60,7 +60,7 @@ module.exports = class Session {
                 log.warn('connector', cid, 'session', 'open', mode, 'overwrite', session.id);
             }
 
-            return session.open(mode)
+            session.open(mode)
 
             .then(() => {
                 res.json(session.id);
@@ -95,11 +95,11 @@ module.exports = class Session {
             if (!session) throw failure(HTTP.NOT_FOUND);
             if (session.id != sid) throw failure(HTTP.UNAUTHORIZED);
 
-            return session.process(action, records)
+            return session.process(action, records);
+        })
 
-            .then(() => {
-                res.status(HTTP.NO_CONTENT).send(); // TODO: Some return doc here?
-            });
+        .then(() => {
+            res.status(HTTP.NO_CONTENT).send(); // TODO: Some return doc here?
         })
 
         .catch(error => next(error));
@@ -128,11 +128,11 @@ module.exports = class Session {
             if (!session) throw failure(HTTP.NOT_FOUND);
             if (session.id != sid) throw failure(HTTP.UNAUTHORIZED);
 
-            return session.close(commit === 'true') // converts to a boolean
+            return session.close(commit === 'true'); // converts to a boolean
+        })
 
-            .then(() => {
-                res.status(HTTP.OK).send();
-            });
+        .then(() => {
+            res.status(HTTP.OK).send();  // TODO: Some report here
         })
 
         .catch(error => next(error));
