@@ -30,6 +30,10 @@ const Shared = require('./shared.js');
 const chakram = require('chakram');
 const expect = chakram.expect;
 
+// --- constants
+
+const DATA_PAGE_SIZE  = 50; // number of records in a singel data upsert
+
 // --- session test class (exported)
 
 module.exports = class Session {
@@ -68,12 +72,20 @@ module.exports = class Session {
     // --- actions an data operation within an open session
 
     static action(cid, sid, action, data) {
-        return chakram.post(Shared.rest('connector', cid, 'session', sid, action), data)
-        .then(response => {
-            expect(response.body).to.be.undefined;
-            expect(response).to.have.status(HTTP.NO_CONTENT);
-            return chakram.wait();
-        });
+        let actions = Promise.resolve();
+
+        for (let i = 0 ; i < data.length ; i += DATA_PAGE_SIZE) {
+            actions = actions.then(() => {
+                return chakram.post(Shared.rest('connector', cid, 'session', sid, action), data.slice(i, i + DATA_PAGE_SIZE))
+                .then(response => {
+                    expect(response.body).to.be.undefined;
+                    expect(response).to.have.status(HTTP.NO_CONTENT);
+                    return chakram.wait();
+                });
+            });
+        };
+
+        return actions;
     }
 
     // --- closes an existing sesson on the given connector
