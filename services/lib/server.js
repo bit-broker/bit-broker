@@ -103,7 +103,7 @@ module.exports = class Server {
 
         // --- setup metrics if enabled
 
-        if (process.env.METRICS_ENABLED === "true") {
+        if (status.USE_METRICS) {
             const metricsMiddleware = promBundle({ includeMethod: true })
             this.app.use(metricsMiddleware)
         }
@@ -147,7 +147,7 @@ module.exports = class Server {
     listen(cb = null) {
         log.info(this.name, 'started');
         this.app.listen(this.port, () => {
-            log.info('name', this.name, 'base', this.base, 'version', this.version, 'port', this.port, 'ip address', this.ip_address());
+            log.info('name', this.name, 'base', this.base, 'version', this.version, 'port', this.port, 'ip address', this.ip_address(), 'metrics', status.USE_METRICS ? 'on' : 'off');
             if (cb) cb();
         });
     }

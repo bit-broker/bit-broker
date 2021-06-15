@@ -27,5 +27,6 @@
 
 module.exports = {
     IS_LIVE: (process.env.NODE_ENV === 'production'),
-    USE_POLICY: (process.env.APP_MODE !== 'open')
+    USE_POLICY: (process.env.APP_MODE !== 'open'),
+    USE_METRICS: (process.env.APP_SERVER_METRICS === 'true')
 };
