@@ -27,7 +27,7 @@
 // --- dependancies
 
 const winston = require('winston');
-const rotate = require('winston-daily-rotate-file');
+const rotate = require('winston-daily-rotate-file'); // see winston-daily-rotate-file documentation for default settings like max files and max file sizes
 const winexp = require('express-winston');
 const status = require('./status.js')
 
@@ -53,38 +53,35 @@ const formatter = {
     }
 };
 
-// --- setup formatters
+// --- make the standard logger
 
-const fmtout = winston.format.combine(winston.format.timestamp(), formatter);
-const fmtweb = winston.format.combine(winston.format.timestamp(), winston.format.json());
+let translog = [new winston.transports.Console()];
 
-// --- setup transports - see winston-daily-rotate-file documentation for default settings like max files and max file sizes
-
-const stdout = new winston.transports.DailyRotateFile({ filename: `${ LOG_DIR }/out-%DATE%.log`, level: 'info' });
-const stderr = new winston.transports.DailyRotateFile({ filename: `${ LOG_DIR }/err-%DATE%.log`, level: 'error' });
-const stdweb = new winston.transports.DailyRotateFile({ filename: `${ LOG_DIR }/web-%DATE%.log` });
-
-// --- make the loggers
+if (status.USE_FILE_LOGS) {
+    translog.push (new winston.transports.DailyRotateFile({ filename: `${ LOG_DIR }/out-%DATE%.log`, level: 'info' })); // stdout
+    translog.push (new winston.transports.DailyRotateFile({ filename: `${ LOG_DIR }/err-%DATE%.log`, level: 'error' })); // stderr
+}
 
 const logger = winston.createLogger({
-    level: 'info',
-    transports: [stdout, stderr],
-    format: fmtout
+    level: status.IS_LIVE ? 'info' : 'debug',
+    transports: translog,
+    format: winston.format.combine(winston.format.timestamp(), formatter)
 });
+
+// --- make the web loggers
+
+let transweb = [new winston.transports.Console()];
+
+if (status.USE_FILE_LOGS) {
+    transweb.push (new winston.transports.DailyRotateFile({ filename: `${ LOG_DIR }/web-%DATE%.log` }));
+}
 
 const weblog = winexp.logger({
     meta: true,
-    transports: [stdweb],
-    format: fmtweb,
+    transports: transweb,
+    format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
     msg: 'HTTP {{req.method}} {{req.url}}'
 });
-
-// --- development only - add logging to the console too
-
-if (status.IS_LIVE != true) {
-    logger.add(new winston.transports.Console());
-    logger.level = 'debug';
-}
 
 // --- exports
 

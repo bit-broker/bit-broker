@@ -94,16 +94,21 @@ module.exports = class Server {
         this.port = parts.port || DEFAULT_PORT;
         this.version = parts.path.replace(/^\/|\/$/g, ''); // strips all slashes
 
+        // --- server logging
+
+        if (status.USE_SERVER_LOGGING) {
+            this.app.use(weblog); // sets up std web logging - do this first
+        }
+
         // --- server context
 
-        this.app.use(weblog); // sets up std web logging - do this first
         this.app.use(parser.json({ limit: MAX_POST_SIZE }));
         this.app.use(cors()); // TODO review CORS settings
         this.app.use(locales.init); // defaults to EN
 
         // --- setup metrics if enabled
 
-        if (status.USE_METRICS) {
+        if (status.USE_SERVER_METRICS) {
             const metricsMiddleware = promBundle({ includeMethod: true })
             this.app.use(metricsMiddleware)
         }
@@ -147,7 +152,7 @@ module.exports = class Server {
     listen(cb = null) {
         log.info(this.name, 'started');
         this.app.listen(this.port, () => {
-            log.info('name', this.name, 'base', this.base, 'version', this.version, 'port', this.port, 'ip address', this.ip_address(), 'metrics', status.USE_METRICS ? 'on' : 'off');
+            log.info('name', this.name, 'base', this.base, 'version', this.version, 'port', this.port, 'ip address', this.ip_address(), 'metrics', status.USE_SERVER_METRICS ? 'on' : 'off');
             if (cb) cb();
         });
     }
