@@ -32,26 +32,26 @@ jobs:
         push: true
         context: ./
         file: ./build/coordinator/Dockerfile
-        tags: ${{ secrets.AWS_ECR_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/coordinator:latest,${{ secrets.AWS_ECR_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/coordinator:${{ env.TAG_NAME }}
+        tags: ${{ secrets.AWS_ECR_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/bbk-coordinator:latest,${{ secrets.AWS_ECR_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/bbk-coordinator:${{ env.TAG_NAME }}
     - name: Push consumer image to AWS ECR
       uses: docker/build-push-action@v2
       with:
         push: true
         context: ./
         file: ./build/consumer/Dockerfile
-        tags: ${{ secrets.AWS_ECR_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/consumer:latest,${{ secrets.AWS_ECR_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/consumer:${{ env.TAG_NAME }}
+        tags: ${{ secrets.AWS_ECR_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/bbk-consumer:latest,${{ secrets.AWS_ECR_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/bbk-consumer:${{ env.TAG_NAME }}
     - name: Push contributor image to AWS ECR
       uses: docker/build-push-action@v2
       with:
         push: true
         context: ./
         file: ./build/contributor/Dockerfile
-        tags: ${{ secrets.AWS_ECR_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/contributor:latest,${{ secrets.AWS_ECR_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/contributor:${{ env.TAG_NAME }}
+        tags: ${{ secrets.AWS_ECR_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/bbk-contributor:latest,${{ secrets.AWS_ECR_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/bbk-contributor:${{ env.TAG_NAME }}
     - name: Push policy image to AWS ECR
       uses: docker/build-push-action@v2
       with:
         push: true
         context: ./
         file: ./build/policy/Dockerfile
-        tags: ${{ secrets.AWS_ECR_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/policy:latest,${{ secrets.AWS_ECR_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/policy:${{ env.TAG_NAME }}
+        tags: ${{ secrets.AWS_ECR_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/bbk-policy:latest,${{ secrets.AWS_ECR_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/bbk-policy:${{ env.TAG_NAME }}
 
