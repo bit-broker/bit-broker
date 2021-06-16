@@ -32,7 +32,6 @@ DROP USER IF EXISTS bbk_tests;
 DROP USER IF EXISTS bbk_coordinator;
 DROP USER IF EXISTS bbk_contributor;
 DROP USER IF EXISTS bbk_consumer;
-DROP USER IF EXISTS bbk_policy;
 
 DROP ROLE IF EXISTS bbk_reader;
 DROP ROLE IF EXISTS bbk_writer;
@@ -47,10 +46,9 @@ CREATE USER bbk_tests WITH ENCRYPTED PASSWORD 'bbk_tests_pwd';
 CREATE USER bbk_coordinator WITH ENCRYPTED PASSWORD 'bbk_coordinator_pwd';
 CREATE USER bbk_contributor WITH ENCRYPTED PASSWORD 'bbk_contributor_pwd';
 CREATE USER bbk_consumer WITH ENCRYPTED PASSWORD 'bbk_consumer_pwd';
-CREATE USER bbk_policy WITH ENCRYPTED PASSWORD 'bbk_policy_pwd';
 
 GRANT bbk_reader TO bbk_consumer;
-GRANT bbk_writer TO bbk_admin, bbk_tests, bbk_coordinator, bbk_contributor, bbk_policy;
+GRANT bbk_writer TO bbk_admin, bbk_tests, bbk_coordinator, bbk_contributor;
 
 -- create the database
 
