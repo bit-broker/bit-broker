@@ -63,4 +63,41 @@ module.exports = class Coordinator extends View {
 
         return doc;
     }
+
+    // --- a policy
+
+    static policy(item, full = true) {
+        let doc = {
+            id: item.slug,
+            url: this.rest(process.env.COORDINATOR_BASE, 'policy', item.slug),
+            name: item.properties.name,
+            description: item.properties.description
+        };
+
+        if (full) {
+            doc = Object.assign(doc, {
+                policy: item.properties.policy
+            });
+        }
+
+        return doc;
+    }
+
+    // --- policy access_control only
+
+    static policy_access_control(item) {
+        return item.properties.policy.access_control;
+    }
+
+    // --- a list of policy ids
+
+    static policies(items) {
+        let doc = [];
+
+        for (let i = 0; i < items.length; i++) {
+            doc.push(this.policy(items[i], false));
+        }
+
+        return doc;
+    }
 }

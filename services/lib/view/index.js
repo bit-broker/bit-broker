@@ -28,13 +28,11 @@
 const Coordinator = require('./coordinator.js');
 const Contributor = require('./contributor.js');
 const Consumer = require('./consumer.js');
-const Policy = require('./policy.js');
 
 // --- exports
 
 module.exports = {
     coordinator: Coordinator,
     contributor: Contributor,
-    consumer: Consumer,
-    policy: Policy
+    consumer: Consumer
 };

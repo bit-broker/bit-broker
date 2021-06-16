@@ -54,7 +54,7 @@ module.exports = class Policy {
         model.policy.list()
 
         .then(items => {
-            res.json(view.policy.policies(items));
+            res.json(view.coordinator.policies(items));
         })
 
         .catch(error => next(error));
@@ -69,7 +69,7 @@ module.exports = class Policy {
 
         .then(item => {
             if (!item) throw failure(HTTP.NOT_FOUND);
-            res.json(view.policy.policy(item));
+            res.json(view.coordinator.policy(item));
         })
 
         .catch(error => next(error));
@@ -84,7 +84,7 @@ module.exports = class Policy {
 
         .then(item => {
             if (!item) throw failure(HTTP.NOT_FOUND);
-            res.json(view.policy.policy_access_control(item));
+            res.json(view.coordinator.policy_access_control(item));
         })
 
         .catch(error => next(error));
