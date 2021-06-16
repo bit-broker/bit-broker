@@ -79,7 +79,7 @@ module.exports = class Entity {
     // --- inserts a new entity type
 
     insert(slug, values) {
-        values.slug = slug
+        values.slug = slug;
         return this.rows.insert(values).then(result => result.rowCount > 0);
     }
 

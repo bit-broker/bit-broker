@@ -93,7 +93,7 @@ module.exports = class Policy {
     // --- inserts a new policy
 
     insert(slug, values) {
-        values.slug = slug
+        values.slug = slug;
 
         return this.db.transaction(function(trx) {
             return trx

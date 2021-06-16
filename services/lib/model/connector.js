@@ -102,7 +102,7 @@ module.exports = class Connector {
     // --- inserts a new connector on the instance entity type
 
     insert(slug, values) {
-        values.slug = slug
+        values.slug = slug;
         values.contribution_id = Permit.CONTRIBUTION_ID;
         values.entity_id = this.db.from('entity').select('id').where({ slug: this.entity.slug }).first(); // this will *not* execute here, but is compounded into the SQL below
         return this.write.insert(values).then(result => result.rowCount > 0);
