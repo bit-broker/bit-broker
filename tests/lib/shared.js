@@ -47,7 +47,8 @@ class Shared {
         this.api = {  // apis listed by restful prefix
             entity: process.env.COORDINATOR_BASE,
             connector: process.env.CONTRIBUTOR_BASE,
-            policy: process.env.COORDINATOR_BASE
+            policy: process.env.COORDINATOR_BASE,
+            user: process.env.COORDINATOR_BASE
         };
     }
 
@@ -63,6 +64,9 @@ class Shared {
     nuke() {
         return this.db('entity').delete()  // will auto cascade to connectors, catalog, etc
         .then(() => {
+            return this.db('users').delete();
+        })
+        .then(() => {
             return this.db('policy').delete();
         });
     }
@@ -71,6 +75,15 @@ class Shared {
 
     wipe() {
         return this.db('catalog').delete();
+    }
+
+    // --- next sequence id value
+
+    next_id(table, column = 'id') {
+        return this.db(`${ table }_${ column }_seq`).select('last_value').first().then((item) => {
+            let next = parseInt(item.last_value);
+            return next == 1 ? 0 : next; // last_value == 1 when the sequence has never been used, so we shift to zero to allow clients to +1 it
+        });
     }
 
     // --- before any tests are run

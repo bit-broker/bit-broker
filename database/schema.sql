@@ -28,10 +28,10 @@
 DROP DATABASE IF EXISTS bit_broker;
 
 DROP USER IF EXISTS bbk_admin;
-DROP USER IF EXISTS bbk_tests;
 DROP USER IF EXISTS bbk_coordinator;
 DROP USER IF EXISTS bbk_contributor;
 DROP USER IF EXISTS bbk_consumer;
+DROP USER IF EXISTS bbk_tests;
 
 DROP ROLE IF EXISTS bbk_reader;
 DROP ROLE IF EXISTS bbk_writer;
@@ -42,13 +42,12 @@ CREATE ROLE bbk_reader;
 CREATE ROLE bbk_writer;
 
 CREATE USER bbk_admin WITH ENCRYPTED PASSWORD 'bbk_admin_pwd';
-CREATE USER bbk_tests WITH ENCRYPTED PASSWORD 'bbk_tests_pwd';
 CREATE USER bbk_coordinator WITH ENCRYPTED PASSWORD 'bbk_coordinator_pwd';
 CREATE USER bbk_contributor WITH ENCRYPTED PASSWORD 'bbk_contributor_pwd';
 CREATE USER bbk_consumer WITH ENCRYPTED PASSWORD 'bbk_consumer_pwd';
 
 GRANT bbk_reader TO bbk_consumer;
-GRANT bbk_writer TO bbk_admin, bbk_tests, bbk_coordinator, bbk_contributor;
+GRANT bbk_writer TO bbk_admin, bbk_coordinator, bbk_contributor;
 
 -- create the database
 
@@ -58,6 +57,17 @@ CREATE DATABASE bit_broker WITH ENCODING = 'UTF8' OWNER = bbk_admin;
 -- extensions
 
 CREATE EXTENSION postgis;
+
+-- user table
+
+CREATE TABLE users
+(
+    id SERIAL PRIMARY KEY,
+    email VARCHAR (256) UNIQUE NOT NULL,
+    properties JSONB NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 
 -- entity table
 
@@ -143,6 +153,25 @@ CREATE TABLE policy
 );
 
 CREATE INDEX idx_policy_slug ON policy (slug);
+
+-- access table
+
+CREATE TYPE access_scopes AS ENUM ('coordinator', 'contributor', 'consumer');
+
+CREATE TABLE access
+(
+    id SERIAL PRIMARY KEY,
+    user_id SERIAL REFERENCES users (id) ON DELETE CASCADE,
+    key_id CHAR(36) UNIQUE NOT NULL,
+    scope ACCESS_SCOPES NOT NULL,
+    policy_id SERIAL REFERENCES policy (id) ON DELETE CASCADE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (user_id, scope, policy_id)
+);
+
+CREATE INDEX idx_access_user ON access (user_id);
+CREATE INDEX idx_access_policy ON access (policy_id);
 
 -- grant permissions - TODO allocate more specific grants based on each user
 

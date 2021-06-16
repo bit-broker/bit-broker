@@ -34,12 +34,13 @@ module.exports = class Crud {
 
     // --- adds a resource
 
-    static add(url, body) {
+    static add(url, body, location) {
+        location = location || url.trim();
         return chakram.post(url, body)
         .then(response => {
             expect(response.body).to.be.undefined;
             expect(response).to.have.status(HTTP.CREATED);
-            expect(response).to.have.header('Location', url.trim());
+            expect(response).to.have.header('Location', location);
             return chakram.wait();
         });
     }
@@ -134,7 +135,7 @@ module.exports = class Crud {
     // --- verifies the entire resource list
 
     static verify_all(url, resources, include = true) {
-        resources.sort((a, b) => a.id.localeCompare(b.id)); // in id order
+        resources.sort((a, b) => a.id.toString().localeCompare(b.id.toString(), undefined, {'numeric': true})); // in id order
         return chakram.get(url)
         .then(response => {
             expect(response.body).to.be.an('array');

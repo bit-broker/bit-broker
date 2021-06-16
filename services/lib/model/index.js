@@ -30,6 +30,7 @@ const Entity = require('./entity.js');
 const Connector = require('./connector.js');
 const Catalog = require('./catalog.js');
 const Policy = require('./policy.js');
+const User = require('./user.js');
 const Validate = require('./validate.js');
 const Redis = require("ioredis");
 const log = require('../logger.js').Logger;
@@ -84,5 +85,6 @@ module.exports = {
     connector: new Connector(db),
     catalog: new Catalog(db),
     policy: new Policy(db, redis),
+    user: new User(db),
     validate: new Validate()
 };

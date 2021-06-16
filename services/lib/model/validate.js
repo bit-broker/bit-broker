@@ -31,7 +31,7 @@ const fs = require('fs');
 
 // --- scheme list
 
-const SCHEMES = [ 'id', 'slug', 'name', 'description', 'entity', 'connector', 'session', 'policy' ]; // we name them here, rather than just iterate the directory
+const SCHEMES = [ 'id', 'slug', 'name', 'description', 'entity', 'connector', 'session', 'policy', 'user' ]; // we name them here, rather than just iterate the directory
 
 // --- validate class (exported)
 
@@ -103,6 +103,18 @@ module.exports = class Validate {
 
     policy(properties) {
         return this.scheme(properties, 'policy');
+    }
+
+    // --- validates a user name
+
+    user_name(item) {
+        return this.scheme(item, 'user#/name', 'user name');
+    }
+
+    // --- validates an email
+
+    email(item) {
+        return this.scheme(item, 'user#/email', 'email');
     }
 
     // --- validates a session mode

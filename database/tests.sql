@@ -16,29 +16,14 @@
 
   ----------------------------------------------------------------------------
 
-  Provides process control abstraction for all bit-broker services, who should
-  all come via this model and never manipulate the domain entities directly.
+  The bit-broker database unit test user. NOTE: this script and user are NOT
+  to be deployed in production environments.
 
 */
 
-'use strict'; // code assumes ECMAScript 6
+\connect bit_broker
 
-// --- dependancies
-
-const Entity = require('./entity.js');
-const Connector = require('./connector.js');
-const Session = require('./session.js');
-const Consumer = require('./consumer.js');
-const Policy = require('./policy.js');
-const User = require('./user.js');
-
-// --- exports
-
-module.exports = {
-    entity: new Entity(),
-    connector: new Connector(),
-    session: new Session(),
-    consumer: new Consumer(),
-    policy: new Policy(),
-    user: new User()
-};
+DROP USER IF EXISTS bbk_tests;
+CREATE USER bbk_tests WITH ENCRYPTED PASSWORD 'bbk_tests_pwd';
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO bbk_tests;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO bbk_tests;

@@ -16,7 +16,7 @@
 
   ----------------------------------------------------------------------------
 
-  The policy server test harness - use command 'mocha policy'
+  The policy services test harness - use command 'mocha policy'
 
   WARNING: Running this script will reset the entire database!
 
@@ -51,7 +51,7 @@ describe('Policy Tests', function() {
         return Shared.after_all();
     });
 
-    // --- start up tests
+    // --- start up tests - its part of the coordinator service
 
     describe('start up tests', () => {
 
@@ -199,7 +199,7 @@ describe('Policy Tests', function() {
         });
 
         it('can delete the first policy', () => {
-            return Crud.delete(url(DATA.POLICY.ALLAREA.ID), DATA.POLICY.ALLAREA.DETAIL);
+            return Crud.delete(url(DATA.POLICY.ALLAREA.ID));
         });
     });
 });

@@ -68,6 +68,23 @@ api.router.post('/policy/:pid', controller.policy.insert);
 api.router.put('/policy/:pid', controller.policy.update);
 api.router.delete('/policy/:pid', controller.policy.delete);
 
+// --- user endpoints
+
+api.router.get('/user', controller.user.list);
+api.router.get('/user/:uid', controller.user.get);
+api.router.post('/user', controller.user.insert);
+api.router.put('/user/:uid', controller.user.update);
+api.router.delete('/user/:uid', controller.user.delete);  // rescinds all the user's keys
+
+// --- access endpoints
+
+/*
+api.router.get('/user/:uid/access', controller.access.list);
+api.router.get('/user/:uid/access/:aid', controller.access.get);
+api.router.post('/user/:uid/access/:aid', controller.access.insert);
+api.router.delete('/user/:uid/access/:aid', controller.access.delete); // rescinds a single user key
+*/
+
 // --- start the server
 
 api.listen(() => {

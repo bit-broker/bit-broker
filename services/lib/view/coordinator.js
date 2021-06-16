@@ -64,6 +64,35 @@ module.exports = class Coordinator extends View {
         return doc;
     }
 
+    // --- a user
+
+    static user(item, full = true) {
+        let doc = {
+            id: item.id,
+            url: this.rest(process.env.COORDINATOR_BASE, 'user', item.id),
+            name: item.properties.name,
+            email: item.email
+        };
+
+        if (full) {
+            // nothing more yet
+        }
+
+        return doc;
+    }
+
+    // --- a list of users
+
+    static users(items) {
+        let doc = [];
+
+        for (let i = 0; i < items.length; i++) {
+            doc.push(this.user(items[i], false));
+        }
+
+        return doc;
+    }
+
     // --- a policy
 
     static policy(item, full = true) {

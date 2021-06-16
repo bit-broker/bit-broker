@@ -167,10 +167,22 @@ const DATA = {
         LONGEST: 64
     },
 
+    USERNAME: {
+        SHORTEST: 1,
+        REASONABLE: 32,
+        LONGEST: 256
+    },
+
     DESCRIPTION: {
         SHORTEST: 1,
         REASONABLE: 64,
         LONGEST: 8192,
+    },
+
+    EMAIL: {
+        LONGEST: 256,
+        VALID: ['lorem1@ipsum.com', 'lorem2@ipsum.com', 'lorem3@ipsum.com', 'lorem4@ipsum.com', 'lorem5@ipsum.com', 'lorem6@ipsum.com', 'lorem7@ipsum.com', 'lorem8@ipsum.com'],
+        INVALID: ['foo', 'foo@', '@bar.com', 'foo @ bar.com', 'foo@bar']
     },
 
     WEBHOOK: {
