@@ -47,7 +47,7 @@ class Shared {
         this.api = {  // apis listed by restful prefix
             entity: process.env.COORDINATOR_BASE,
             connector: process.env.CONTRIBUTOR_BASE,
-            policy: process.env.POLICY_BASE
+            policy: process.env.COORDINATOR_BASE
         };
     }
 

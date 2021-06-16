@@ -23,6 +23,8 @@ services:
     depends_on:
       bbk-database:
         condition: service_healthy
+      bbk-policy-cache:
+        condition: service_healthy
     ports:
       - 8001:8001
 
@@ -51,21 +53,6 @@ services:
         condition: service_healthy
     ports:
       - 8003:8003
-
-  # --- policy service
-  bbk-policy:
-    build:
-      context: ../..
-      dockerfile: ./build/policy/Dockerfile
-    container_name: bbk-policy
-    image: bbk-policy
-    depends_on:
-      bbk-database:
-        condition: service_healthy
-      bbk-policy-cache:
-        condition: service_healthy
-    ports:
-      - 8004:8004
 
   # --- rate limit service
   bbk-rate-limit:

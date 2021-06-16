@@ -38,7 +38,7 @@ module.exports = class Policy extends View {
     static policy(item, full = true) {
         let doc = {
             id: item.slug,
-            url: this.rest(process.env.POLICY_BASE, 'policy', item.slug),
+            url: this.rest(process.env.COORDINATOR_BASE, 'policy', item.slug),
             name: item.properties.name,
             description: item.properties.description
         };

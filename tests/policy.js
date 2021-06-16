@@ -56,11 +56,11 @@ describe('Policy Tests', function() {
     describe('start up tests', () => {
 
         it('the server is up', () => {
-            return Shared.up(process.env.POLICY_BASE);
+            return Shared.up(process.env.COORDINATOR_BASE);
         });
 
         it('it responds to an announce request', () => {
-            return Shared.announce(process.env.POLICY_BASE, process.env.POLICY_NAME);
+            return Shared.announce(process.env.COORDINATOR_BASE, process.env.COORDINATOR_NAME);
         });
 
         it('the database is empty', () => {
