@@ -31,7 +31,6 @@ DROP USER IF EXISTS bbk_admin;
 DROP USER IF EXISTS bbk_coordinator;
 DROP USER IF EXISTS bbk_contributor;
 DROP USER IF EXISTS bbk_consumer;
-DROP USER IF EXISTS bbk_tests;
 
 DROP ROLE IF EXISTS bbk_reader;
 DROP ROLE IF EXISTS bbk_writer;

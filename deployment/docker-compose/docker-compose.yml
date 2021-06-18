@@ -73,8 +73,7 @@ services:
     container_name: bbk-database
     volumes:
       - dbdata:/var/lib/postgresql/data
-      - ../../database/schema.sql:/docker-entrypoint-initdb.d/1-init.sql
-      - ../../database/tests.sql:/docker-entrypoint-initdb.d/2-init.sql
+      - ../../database/schema.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       POSTGRES_PASSWORD: "bitbr0ker"
     ports:
