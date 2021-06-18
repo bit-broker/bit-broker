@@ -46,7 +46,7 @@ module.exports = class User {
         };
     }
 
-    // --- lists all user types
+    // --- lists all users
 
     list(req, res, next) {
 
@@ -59,7 +59,7 @@ module.exports = class User {
         .catch(error => next(error));
     }
 
-    // --- get details of a named user type
+    // --- get details of a named users
 
     get(req, res, next) {
         let uid = req.params.uid.toLowerCase();
@@ -74,7 +74,7 @@ module.exports = class User {
         .catch(error => next(error));
     }
 
-    // --- adds a new user type
+    // --- adds a new user
 
     insert(req, res, next) {
         log.info('coordinator', 'user', 'insert');
@@ -108,7 +108,7 @@ module.exports = class User {
         .catch(error => next(error));
     }
 
-    // --- modifies an existing user type
+    // --- modifies an existing user
 
     update(req, res, next) {
         log.info('coordinator', 'user', req.params.uid, 'update');
@@ -137,7 +137,7 @@ module.exports = class User {
         .catch(error => next(error));
     }
 
-    // --- deletes an user type
+    // --- deletes a user 
 
     delete(req, res, next) {
         log.info('coordinator', 'user', req.params.uid, 'delete');
