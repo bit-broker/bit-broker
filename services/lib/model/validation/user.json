@@ -1,15 +1,17 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "bbk://user",
-    "name": {
-        "type": "string",
-        "minLength": 1,
-        "maxLength": 256
+    "type": "object",
+    "properties": {
+        "name": {
+            "$ref": "bbk://name"
+        },
+        "email": {
+            "type": "string",
+            "format": "email",
+            "minLength": 1,
+            "maxLength": 256
+        }
     },
-    "email": {
-        "type": "string",
-        "format": "email",
-        "minLength": 1,
-        "maxLength": 256
-    }
+    "required": ["name", "email"]
 }

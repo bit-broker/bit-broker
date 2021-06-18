@@ -155,22 +155,21 @@ CREATE INDEX idx_policy_slug ON policy (slug);
 
 -- access table
 
-CREATE TYPE access_scopes AS ENUM ('coordinator', 'contributor', 'consumer');
+CREATE TYPE access_roles AS ENUM ('coordinator', 'contributor', 'consumer');
 
 CREATE TABLE access
 (
     id SERIAL PRIMARY KEY,
     user_id SERIAL REFERENCES users (id) ON DELETE CASCADE,
+    role ACCESS_ROLES NOT NULL,
+    context VARCHAR (32),
     key_id CHAR(36) UNIQUE NOT NULL,
-    scope ACCESS_SCOPES NOT NULL,
-    policy_id SERIAL REFERENCES policy (id) ON DELETE CASCADE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE (user_id, scope, policy_id)
+    UNIQUE (user_id, role, context)
 );
 
-CREATE INDEX idx_access_user ON access (user_id);
-CREATE INDEX idx_access_policy ON access (policy_id);
+CREATE INDEX idx_access_user ON access (user_id, role);
 
 -- grant permissions - TODO allocate more specific grants based on each user
 

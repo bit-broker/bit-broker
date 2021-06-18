@@ -1,0 +1,15 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "bbk://access",
+    "type": "object",
+    "properties": {
+        "role": {
+            "type": "string",
+            "enum": ["coordinator", "contributor", "consumer"]
+        },
+        "context": {
+            "$ref": "bbk://slug"
+        }
+    },
+    "required": ["role"]
+}

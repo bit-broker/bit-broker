@@ -81,9 +81,9 @@ db.raw('SELECT 1+1 AS result')
 // --- exports
 
 module.exports = {
-    entity: new Entity(db),
-    connector: new Connector(db),
     catalog: new Catalog(db),
+    connector: new Connector(db),
+    entity: new Entity(db),
     policy: new Policy(db, redis),
     user: new User(db),
     validate: new Validate()

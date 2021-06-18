@@ -196,7 +196,7 @@ describe('User Tests', function() {
             .then(() => Crud.bad_request(url(), [{ name: DATA.ERRORS.MIN }], { email: values.email }, chakram.post))
             .then(() => Crud.bad_request(url(), [{ name: DATA.ERRORS.MIN }], { ...values, name: null }, chakram.post))
             .then(() => Crud.bad_request(url(), [{ name: DATA.ERRORS.MIN }], { ...values, name: '' }, chakram.post))
-            .then(() => Crud.bad_request(url(), [{ name: DATA.ERRORS.MAX }], { ...values, name: DATA.name(DATA.USERNAME.LONGEST + 1)}, chakram.post))
+            .then(() => Crud.bad_request(url(), [{ name: DATA.ERRORS.MAX }], { ...values, name: DATA.name(DATA.NAME.LONGEST + 1)}, chakram.post))
             return test;
         });
 
@@ -223,7 +223,7 @@ describe('User Tests', function() {
             .then(() => Crud.bad_request(url(id), [{ name: DATA.ERRORS.MIN }], { email: values.email }, chakram.put))
             .then(() => Crud.bad_request(url(id), [{ name: DATA.ERRORS.MIN }], { ...values, name: null }, chakram.put))
             .then(() => Crud.bad_request(url(id), [{ name: DATA.ERRORS.MIN }], { ...values, name: '' }, chakram.put))
-            .then(() => Crud.bad_request(url(id), [{ name: DATA.ERRORS.MAX }], { ...values, name: DATA.name(DATA.USERNAME.LONGEST + 1)}, chakram.put))
+            .then(() => Crud.bad_request(url(id), [{ name: DATA.ERRORS.MAX }], { ...values, name: DATA.name(DATA.NAME.LONGEST + 1)}, chakram.put))
             return test;
         });
 

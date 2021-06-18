@@ -25,20 +25,22 @@
 
 // --- dependancies
 
-const Entity = require('./entity.js');
+const Access = require('./access.js');
 const Connector = require('./connector.js');
-const Session = require('./session.js');
 const Consumer = require('./consumer.js');
+const Entity = require('./entity.js');
 const Policy = require('./policy.js');
+const Session = require('./session.js');
 const User = require('./user.js');
 
 // --- exports
 
 module.exports = {
-    entity: new Entity(),
+    access: new Access(),
     connector: new Connector(),
-    session: new Session(),
     consumer: new Consumer(),
+    entity: new Entity(),
     policy: new Policy(),
+    session: new Session(),
     user: new User()
 };

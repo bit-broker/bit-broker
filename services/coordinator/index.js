@@ -78,12 +78,11 @@ api.router.delete('/user/:uid', controller.user.delete);  // rescinds all the us
 
 // --- access endpoints
 
-/*
 api.router.get('/user/:uid/access', controller.access.list);
 api.router.get('/user/:uid/access/:aid', controller.access.get);
-api.router.post('/user/:uid/access/:aid', controller.access.insert);
+api.router.post('/user/:uid/access', controller.access.insert);
+// api.router.put('/user/:uid/access', controller.access.update);  -- not currently supported
 api.router.delete('/user/:uid/access/:aid', controller.access.delete); // rescinds a single user key
-*/
 
 // --- start the server
 

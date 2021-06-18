@@ -167,12 +167,6 @@ const DATA = {
         LONGEST: 64
     },
 
-    USERNAME: {
-        SHORTEST: 1,
-        REASONABLE: 32,
-        LONGEST: 256
-    },
-
     DESCRIPTION: {
         SHORTEST: 1,
         REASONABLE: 64,

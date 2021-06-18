@@ -77,12 +77,11 @@ module.exports = class User {
     // --- adds a new user
 
     insert(req, res, next) {
-        log.info('coordinator', 'user', 'insert');
+        log.info('user', 'insert');
         let properties = User.properties(req.body);
         let errors = [];
 
-        errors = errors.concat(model.validate.email(properties.email));
-        errors = errors.concat(model.validate.user_name(properties.name));
+        errors = errors.concat(model.validate.user(properties));
 
         if (errors.length) {
             throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
@@ -92,7 +91,7 @@ module.exports = class User {
 
         .then(item => {
             if (item) {
-                log.info('coordinator', 'user', properties.email, 'insert', 'duplicate');
+                log.info('user', properties.email, 'insert', 'duplicate');
                 throw failure(HTTP.CONFLICT);
             }
 
@@ -100,7 +99,7 @@ module.exports = class User {
         })
 
         .then((id) => {
-            log.info('coordinator', 'user', properties.email, 'insert', 'complete', id);
+            log.info('user', properties.email, 'insert', 'complete', id);
             let href = `${ req.protocol }://${ req.get('host') }${ req.originalUrl }/${ id }`;
             res.set({ 'Location': href }).status(HTTP.CREATED).send();
         })
@@ -111,12 +110,12 @@ module.exports = class User {
     // --- modifies an existing user
 
     update(req, res, next) {
-        log.info('coordinator', 'user', req.params.uid, 'update');
+        log.info('user', req.params.uid, 'update');
         let uid = req.params.uid.toLowerCase();
         let properties = User.properties(req.body);
         let errors = [];
 
-        errors = errors.concat(model.validate.user_name(properties.name));
+        errors = errors.concat(model.validate.name(properties.name));
 
         if (errors.length) {
             throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
@@ -130,17 +129,17 @@ module.exports = class User {
         })
 
         .then(() => {
-            log.info('coordinator', 'user', uid, 'update', 'complete');
+            log.info('user', uid, 'update', 'complete');
             res.status(HTTP.NO_CONTENT).send();
         })
 
         .catch(error => next(error));
     }
 
-    // --- deletes a user 
+    // --- deletes a user
 
     delete(req, res, next) {
-        log.info('coordinator', 'user', req.params.uid, 'delete');
+        log.info('user', req.params.uid, 'delete');
         let uid = req.params.uid.toLowerCase();
 
         model.user.find(uid)
@@ -151,7 +150,7 @@ module.exports = class User {
         })
 
         .then(() => {
-            log.info('coordinator', 'user', uid, 'delete', 'complete');
+            log.info('user', uid, 'delete', 'complete');
             res.status(HTTP.NO_CONTENT).send();
         })
 
