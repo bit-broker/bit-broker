@@ -137,6 +137,35 @@ class Shared {
             return chakram.wait();
         });
     }
+
+    // --- tests a catalog query
+
+    catalog(test) {
+
+        test.except = test.except || [];
+        test.policy = test.policy || DATA.POLICY.ALLAREA.ID;
+
+        return chakram.get(`${ process.env.CONSUMER_BASE }/catalog?q=${ JSON.stringify(test.query) }`, { headers: { 'x-bb-policy': test.policy }})
+
+        .then(response => {
+            expect(response.body).to.be.an('array');
+            let items = response.body.map(i => i.name);
+
+            for (let i = 0; i < test.yields.length; i++) {
+                if (!test.except.includes(test.yields[i])) {
+                    expect(items).to.include(test.yields[i]);
+                }
+            }
+
+            for (let i = 0; i < test.except.length; i++) {
+                expect(items).to.not.include(test.except[i]);
+            }
+
+            expect(items.length).to.be.eq(test.yields.length - test.except.length);
+
+            return chakram.wait();
+        });
+    }
 }
 
 // --- exported classes
