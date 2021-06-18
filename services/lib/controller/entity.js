@@ -78,7 +78,7 @@ module.exports = class Entity {
     // --- adds a new entity type
 
     insert(req, res, next) {
-        log.info('coordinator', 'entity', req.params.eid, 'insert');
+        log.info('entity', req.params.eid, 'insert');
         let eid = req.params.eid.toLowerCase();
         let properties = Entity.properties(req.body);
         let errors = [];
@@ -94,7 +94,7 @@ module.exports = class Entity {
 
         .then(item => {
             if (item) {
-                log.info('coordinator', 'entity', eid, 'insert', 'duplicate');
+                log.info('entity', eid, 'insert', 'duplicate');
                 throw failure(HTTP.CONFLICT);
             }
 
@@ -102,7 +102,7 @@ module.exports = class Entity {
         })
 
         .then(() => {
-            log.info('coordinator', 'entity', eid, 'insert', 'complete');
+            log.info('entity', eid, 'insert', 'complete');
             let href = `${ req.protocol }://${ req.get('host') }${ req.originalUrl }`;
             res.set({ 'Location': href }).status(HTTP.CREATED).send();
         })
@@ -113,7 +113,7 @@ module.exports = class Entity {
     // --- modifies an existing entity type
 
     update(req, res, next) {
-        log.info('coordinator', 'entity', req.params.eid, 'update');
+        log.info('entity', req.params.eid, 'update');
         let eid = req.params.eid.toLowerCase();
         let properties = Entity.properties(req.body);
         let errors = [];
@@ -132,7 +132,7 @@ module.exports = class Entity {
         })
 
         .then(() => {
-            log.info('coordinator', 'entity', eid, 'update', 'complete');
+            log.info('entity', eid, 'update', 'complete');
             res.status(HTTP.NO_CONTENT).send();
         })
 
@@ -142,7 +142,7 @@ module.exports = class Entity {
     // --- deletes an entity type
 
     delete(req, res, next) {
-        log.info('coordinator', 'entity', req.params.eid, 'delete');
+        log.info('entity', req.params.eid, 'delete');
         let eid = req.params.eid.toLowerCase();
 
         model.entity.find(eid)
@@ -153,7 +153,7 @@ module.exports = class Entity {
         })
 
         .then(() => {
-            log.info('coordinator', 'entity', eid, 'delete', 'complete');
+            log.info('entity', eid, 'delete', 'complete');
             res.status(HTTP.NO_CONTENT).send();
         })
 

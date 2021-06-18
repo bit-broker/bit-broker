@@ -61,7 +61,7 @@ module.exports = class Connector {
         })
 
         .then(items => {
-            res.json(view.contributor.connectors(items));
+            res.json(view.contributor.connectors(items)); // can be empty
         })
 
         .catch(error => next(error));
@@ -91,7 +91,7 @@ module.exports = class Connector {
     // --- adds a new connector to the named entity type
 
     insert(req, res, next) {
-        log.info('coordinator', 'entity', req.params.eid, 'connector', req.params.cid, 'insert');
+        log.info('entity', req.params.eid, 'connector', req.params.cid, 'insert');
 
         let eid = req.params.eid.toLowerCase();
         let cid = req.params.cid.toLowerCase();
@@ -113,7 +113,7 @@ module.exports = class Connector {
 
             .then(item => {
                 if (item) {
-                    log.info('coordinator', 'entity', eid, 'connector', cid, 'insert', 'duplicate');
+                    log.info('entity', eid, 'connector', cid, 'insert', 'duplicate');
                     throw failure(HTTP.CONFLICT);
                 }
 
@@ -122,7 +122,7 @@ module.exports = class Connector {
         })
 
         .then(() => {
-            log.info('coordinator', 'entity', eid, 'connector', cid, 'insert', 'complete');
+            log.info('entity', eid, 'connector', cid, 'insert', 'complete');
             let href = `${ req.protocol }://${ req.get('host') }${ req.originalUrl }`;
             res.set({ 'Location': href }).status(HTTP.CREATED).send();
         })
@@ -133,7 +133,7 @@ module.exports = class Connector {
     // --- modifies an existing connector on the named entity type
 
     update(req, res, next) {
-        log.info('coordinator', 'entity', req.params.eid, 'connector', req.params.cid, 'update');
+        log.info('entity', req.params.eid, 'connector', req.params.cid, 'update');
 
         let eid = req.params.eid.toLowerCase();
         let cid = req.params.cid.toLowerCase();
@@ -159,7 +159,7 @@ module.exports = class Connector {
         })
 
         .then(() => {
-            log.info('coordinator', 'entity', eid, 'connector', cid, 'update', 'complete');
+            log.info('entity', eid, 'connector', cid, 'update', 'complete');
             res.status(HTTP.NO_CONTENT).send();
         })
 
@@ -169,7 +169,7 @@ module.exports = class Connector {
     // --- deletes a connector on the named entity type
 
     delete(req, res, next) {
-        log.info('coordinator', 'entity', req.params.eid, 'connector', req.params.cid, 'delete');
+        log.info('entity', req.params.eid, 'connector', req.params.cid, 'delete');
 
         let eid = req.params.eid.toLowerCase();
         let cid = req.params.cid.toLowerCase();
@@ -187,7 +187,7 @@ module.exports = class Connector {
         })
 
         .then(() => {
-            log.info('coordinator', 'entity', eid, 'connector', cid, 'delete', 'complete');
+            log.info('entity', eid, 'connector', cid, 'delete', 'complete');
             res.status(HTTP.NO_CONTENT).send();
         })
 
