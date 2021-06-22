@@ -40,7 +40,7 @@ const log = require('../logger.js').Logger;
 const POLICY_CACHE_KEY_PREFIX = 'BBK_DSP_ID_' ;
 const FETCH_TIMEOUT = 2000;
 const FETCH_HEADERS = {
-    'Accept': 'application/json, text/plain, */*',
+    'Accept': 'application/json, text/plain',
     'Content-Type': 'application/json'
 };
 
