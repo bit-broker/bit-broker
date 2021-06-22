@@ -10,7 +10,7 @@
         "context": {
             "oneOf": [
                 { "type": "null" },
-                { "$ref":"bbk://slug" }
+                { "type": "string" }
             ]
         }
     },

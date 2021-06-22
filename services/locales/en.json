@@ -1,5 +1,5 @@
 {
-    "error.access-invalid-role": "User access role '%s' is not allowed",
+    "error.access-invalid-role": "User access role '%s' is not valid",
     "error.access-invalid-context": "User access context '%s' is not valid for this role",
     "error.query-cannot-be-parse": "Catalog query cannot be parsed",
     "error.query-has-unrecognised-operations": "Catalog query contains unrecognised operations",

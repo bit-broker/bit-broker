@@ -239,9 +239,118 @@ describe('User Access Tests', function() {
         });
     });
 
-    // --- user access validation tests - here we test invalid entries only, on add and update
+    // --- user access validation tests
 
     describe('user access validation tests', () => {
 
+        let uid = null; // will be filled in during the first test
+        let aid = null;
+        let access = null;
+        let user = { name: DATA.name(), email: DATA.pluck(DATA.EMAIL.VALID) };  // pluck to ensure different emails
+        let coordinator = { role: 'coordinator' };
+        let consumer = { role: 'consumer' };
+        let all = Shared.urls.user();
+
+        function get_key(values) { // gets a key
+            return Crud.add(access, values, Shared.urls.access(uid, ++aid), (body) => {
+                expect(body).to.match(new RegExp(DATA.KEY.REGEX));
+            });
+        }
+
+        function get_del_key(values) { // gets and then deletes a key
+            return get_key(values)
+            .then (() => Crud.delete(Shared.urls.access(uid, aid)));
+        }
+
+        before(() => {
+            return Shared.empty();
+        });
+
+        after(() => {
+            return Shared.empty();
+        });
+
+        it('get the last user id sequence value', () => {
+            return Shared.last_id('users').then(last => {
+                uid = last + 1;
+                access = Shared.urls.access(uid);
+            });
+        });
+
+        it('get the last access id sequence value', () => {
+            return Shared.last_id('access').then(last => {
+                aid = last;
+            });
+        });
+
+        it('can add the housing user', () => {
+            return Crud.add(all, user, Shared.urls.user(uid));
+        });
+
+        it('can add first policy', () => {
+            return Crud.add(Shared.urls.policy(DATA.POLICY.ALLAREA.ID), DATA.POLICY.ALLAREA.DETAIL);
+        });
+
+        it('can add second policy', () => {
+            return Crud.add(Shared.urls.policy(DATA.POLICY.EXAMPLE.ID), DATA.POLICY.EXAMPLE.DETAIL);
+        });
+
+        it('disallows asking for keys with invalid roles', () => {
+            return Promise.resolve()
+            .then(() => Crud.bad_request(access, [{ role: DATA.ERRORS.ENUM }], { }, chakram.post))
+            .then(() => Crud.bad_request(access, [{ role: DATA.ERRORS.ENUM }], { role: '' }, chakram.post))
+            .then(() => Crud.bad_request(access, [{ role: DATA.ERRORS.ENUM }], { role: null }, chakram.post))
+            .then(() => Crud.bad_request(access, [{ role: DATA.ERRORS.ENUM }], { role: 123 }, chakram.post))
+            .then(() => Crud.bad_request(access, [{ role: DATA.ERRORS.ENUM }], { role: 'lorem' }, chakram.post));
+        });
+
+        it('disallows asking for coordinator keys without null context', () => {
+            return Promise.resolve()
+            .then(() => Crud.bad_request(access, [{ context: DATA.ERRORS.INVALID }], { ...coordinator, context: DATA.POLICY.ALLAREA.ID }, chakram.post))
+            .then(() => Crud.bad_request(access, [{ context: DATA.ERRORS.INVALID }], { ...coordinator, context: 'lorem' }, chakram.post))
+            .then(() => Crud.bad_request(access, [{ context: DATA.ERRORS.INVALID }], { ...coordinator, context: 123 }, chakram.post));
+        });
+
+        it('disallows asking for contributor keys with any context', () => {
+            return Promise.resolve()
+            .then(() => Crud.bad_request(access, [{ role: DATA.ERRORS.INVALID }], { role: 'contributor' }, chakram.post))
+            .then(() => Crud.bad_request(access, [{ role: DATA.ERRORS.INVALID }], { role: 'contributor', context: DATA.POLICY.ALLAREA.ID }, chakram.post))
+            .then(() => Crud.bad_request(access, [{ role: DATA.ERRORS.INVALID }], { role: 'contributor', context: 'lorem' }, chakram.post));
+        });
+
+        it('disallows asking for consumer keys with invalid contexts', () => {
+            return Promise.resolve()
+            .then(() => Crud.bad_request(access, [{ context: DATA.ERRORS.INVALID }], { role: 'consumer' }, chakram.post))
+            .then(() => Crud.bad_request(access, [{ context: DATA.ERRORS.INVALID }], { ...consumer, context: '' }, chakram.post))
+            .then(() => Crud.bad_request(access, [{ context: DATA.ERRORS.INVALID }], { ...consumer, context: null }, chakram.post))
+            .then(() => Crud.bad_request(access, [{ context: DATA.ERRORS.INVALID }], { ...consumer, context: 'lorem' }, chakram.post))
+            .then(() => Crud.bad_request(access, [{ context: DATA.ERRORS.INVALID }], { ...consumer, context: 123 }, chakram.post));
+        });
+
+        it('allows asking for coordinator keys with various valid contexts', () => {
+            return Promise.resolve()
+            .then(() => get_del_key(coordinator))
+            .then(() => get_del_key({ ...coordinator, context: null }))
+            .then(() => get_del_key({ ...coordinator, context: '' }))
+            .then(() => get_del_key({ ...coordinator, context: undefined }));
+        });
+
+        it('allows asking for contributor keys with various valid contexts', () => {
+            return Promise.resolve()
+            .then(() => get_key({ ...consumer, context: DATA.POLICY.ALLAREA.ID }))
+            .then(() => get_key({ ...consumer, context: DATA.POLICY.EXAMPLE.ID }));
+        });
+
+        it('can delete the second policy', () => {
+            return Crud.delete(Shared.urls.policy(DATA.POLICY.EXAMPLE.ID));
+        });
+
+        it('can delete the first policy', () => {
+            return Crud.delete(Shared.urls.policy(DATA.POLICY.ALLAREA.ID));
+        });
+
+        it('can delete the housing user', () => {
+            return Crud.delete(Shared.urls.user(uid));
+        });
     });
 });

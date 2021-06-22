@@ -42,8 +42,8 @@ module.exports = class Access {
 
     static properties(body) {
         return {
-            role: (body.role || '').toLowerCase(),
-            context: body.context || null // optional
+            role: (body.role || '').toString().toLowerCase(),
+            context: body.context ? body.context.toString() : null // optional
         };
     }
 
@@ -130,7 +130,6 @@ module.exports = class Access {
         Access.check_role_context (properties.role, properties.context)  // extended checks on role and context pair
 
         .then (error => {
-          console.log(error);
             if (error.length) {
                 throw failure(HTTP.BAD_REQUEST, error);
             }

@@ -124,6 +124,7 @@ const DATA = {
         CONFORM: 'does not conform to the',
         FORMAT: 'not match pattern',
         TYPE: 'is not of a type',
+        INVALID: 'is not valid',
         ENUM: 'is not one of enum values'
     },
 
