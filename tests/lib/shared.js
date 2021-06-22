@@ -63,12 +63,8 @@ class Shared {
 
     nuke() {
         return this.db('entity').delete()  // will auto cascade to connectors, catalog, etc
-        .then(() => {
-            return this.db('users').delete();
-        })
-        .then(() => {
-            return this.db('policy').delete();
-        });
+        .then(() => this.db('users').delete())
+        .then(() => this.db('policy').delete());
     }
 
     // --- resets the catalog
@@ -77,12 +73,12 @@ class Shared {
         return this.db('catalog').delete();
     }
 
-    // --- next sequence id value
+    // --- the last sequence id value
 
-    next_id(table, column = 'id') {
-        return this.db(`${ table }_${ column }_seq`).select('last_value').first().then((item) => {
-            let next = parseInt(item.last_value);
-            return next == 1 ? 0 : next; // last_value == 1 when the sequence has never been used, so we shift to zero to allow clients to +1 it
+    last_id(table, column = 'id') {
+        return this.db(`${ table }_${ column }_seq`).select('last_value').first().then(item => {
+            let last = parseInt(item.last_value);
+            return last == 1 ? 0 : last; // last_value == 1 when the sequence has never been used, so we shift to zero to allow clients to +1 it
         });
     }
 
@@ -126,16 +122,24 @@ class Shared {
         });
     }
 
-    // --- ensures that the register is empty
+    // --- checks there is nothing present at the rest resource point
 
-    empty() {
-        return chakram.get(this.rest('entity'))
+    nowt(url) {
+        return chakram.get(url)
         .then(response => {
             expect(response.body).to.be.an('array');
             expect(response.body.length).to.be.eq(0);
             expect(response).to.have.status(HTTP.OK);
             return chakram.wait();
         });
+    }
+
+    // --- ensures that the database is empty
+
+    empty() {
+        return this.nowt(this.rest('entity'))
+        .then(() => this.nowt(this.rest('user')))
+        .then(() => this.nowt(this.rest('policy')));
     }
 
     // --- tests a catalog query

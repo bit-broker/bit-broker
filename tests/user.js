@@ -89,10 +89,10 @@ describe('User Tests', function() {
         });
 
         it('get the last user id sequence value', () => {
-            return Shared.next_id('users')
-            .then((next) => {
-                id1 = next + 1;
-                id2 = next + 2;
+            return Shared.last_id('users')
+            .then(last => {
+                id1 = last + 1;
+                id2 = last + 2;
             });
         });
 
@@ -188,7 +188,7 @@ describe('User Tests', function() {
         function url(id) { return id == undefined ? Shared.rest('user') : Shared.rest('user', id.toString()); }
 
         it('get the last user id sequence value', () => {
-            return Shared.next_id('users').then((next) => { id = next + 1; });
+            return Shared.last_id('users').then(last => id = last + 1);
         });
 
         it('cannot create a user with an invalid name', () => {

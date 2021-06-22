@@ -36,11 +36,12 @@ var mocha = new Mocha();
 // --- test case list in preferred order - do NOT include the 'seed' script as this is for developmemnt testing only
 
 mocha.addFile('./coordinator.js');
-mocha.addFile('./user.js');
 mocha.addFile('./contributor.js');
 mocha.addFile('./sessions.js');
 mocha.addFile('./consumer.js');
 mocha.addFile('./policy.js');
+mocha.addFile('./user.js');
+mocha.addFile('./access.js');
 
 // --- run the tests
 

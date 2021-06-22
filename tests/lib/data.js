@@ -147,9 +147,8 @@ const DATA = {
         UNKNOWN: '6b50b0c0-7df3-40d5-8a5f-51cd0141a084',
     },
 
-    KEY: { // sha1
-        SIZE: 40,
-        REGEX: "^[a-z0-9]+$",
+    KEY: { // jwt
+        REGEX: "^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$",
     },
 
     SLUG: {
