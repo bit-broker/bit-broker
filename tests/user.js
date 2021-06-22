@@ -74,11 +74,12 @@ describe('User Tests', function() {
 
         let id1 = null; // will be filled in during the first test
         let id2 = null;
+        let user1 = null; // will be filled in during the first test
+        let user2 = null;
         let values1 = { name: DATA.name(), email: DATA.pluck(DATA.EMAIL.VALID) };  // pluck to ensure different emails
         let values2 = { name: DATA.name(), email: DATA.pluck(DATA.EMAIL.VALID) };
         let update1 = { name: DATA.name() };
-
-        function url(id) { return id == undefined ? Shared.rest('user') : Shared.rest('user', id.toString()); }
+        let all = Shared.urls.user();
 
         before(() => {
             return Shared.empty();
@@ -93,80 +94,82 @@ describe('User Tests', function() {
             .then(last => {
                 id1 = last + 1;
                 id2 = last + 2;
+                user1 = Shared.urls.user(id1);
+                user2 = Shared.urls.user(id2);
             });
         });
 
         it('the user is not there to start with', () => {
-            return Crud.not_found(url(id1));
+            return Crud.not_found(user1);
         });
 
         it('can add a user', () => {
-            return Crud.add(url(), values1, url(id1));
+            return Crud.add(all, values1, user1);
         });
 
         it('it is present in the user list', () => {
-            return Crud.verify_all(url(), [
-                { id: id1, url: url(id1), name: values1.name, email: values1.email }
+            return Crud.verify_all(all, [
+                { id: id1, url: user1, name: values1.name, email: values1.email }
             ]);
         });
 
         it('it is present when addressed directly', () => {
-            return Crud.verify(url(id1), { id: id1, url: url(id1), name: values1.name, email: values1.email });
+            return Crud.verify(user1, { id: id1, url: user1, name: values1.name, email: values1.email });
         });
 
         it('cannot add a duplicate user', () => {
-            return Crud.duplicate(url(), values1);
+            return Crud.duplicate(all, values1);
         });
 
         it('can update an user', () => {
-            return Crud.update(url(id1), update1);
+            return Crud.update(user1, update1);
         });
 
         it('new values are present in the user list', () => {
-            return Crud.verify_all(url(), [
-                { id: id1, url: url(id1), name: update1.name, email: values1.email }
+            return Crud.verify_all(all, [
+                { id: id1, url: user1, name: update1.name, email: values1.email }
             ]);
         });
 
         it('new values are present when addressed directly', () => {
-            return Crud.verify(url(id1), { id: id1, url: url(id1), name: update1.name, email: values1.email });
+            return Crud.verify(user1, { id: id1, url: user1, name: update1.name, email: values1.email });
         });
 
         it('the second user is not there to start with', () => {
-            return Crud.not_found(url(id2));
+            return Crud.not_found(user2);
         });
 
         it('can add a second user', () => {
-            return Crud.add(url(), values2, url(id2));
+            return Crud.add(all, values2, user2);
         });
 
         it('both are present in the user list', () => {
-            return Crud.verify_all(url(), [
-                { id: id1, url: url(id1), name: update1.name, email: values1.email },
-                { id: id2, url: url(id2), name: values2.name, email: values2.email }
+            return Crud.verify_all(all, [
+                { id: id1, url: user1, name: update1.name, email: values1.email },
+                { id: id2, url: user2, name: values2.name, email: values2.email }
             ]);
         });
 
         it('can delete the first user', () => {
-            return Crud.delete(url(id1));
+            return Crud.delete(user1);
         });
 
         it('it is gone from the user list', () => {
-            return Crud.verify_all(url(), [
-                { id: id2, url: url(id2), name: values2.name, email: values2.email }
+            return Crud.verify_all(all, [
+                { id: id2, url: user2, name: values2.name, email: values2.email }
             ]);
         });
 
         it('the user is gone when addressed directly', () => {
-            return Crud.not_found(url(id1));
+            return Crud.not_found(user1);
         });
 
         it('can delete the second user', () => {
-            return Crud.delete(url(id2));
+            return Crud.delete(user2);
         });
 
         it('the user list is empty', () => {
-            return Crud.verify_all(url(), []);
+            return Crud.verify_all(all, []);
         });
     });
 
@@ -175,7 +178,9 @@ describe('User Tests', function() {
     describe('user validation tests', () => {
 
         let id = null; // will be filled in during the first test
+        let user = null;
         let values = { email:DATA.pick(DATA.EMAIL.VALID), name: DATA.name() };
+        let all = Shared.urls.user();
 
         before(() => {
             return Shared.empty();
@@ -185,50 +190,51 @@ describe('User Tests', function() {
             return Shared.empty();
         });
 
-        function url(id) { return id == undefined ? Shared.rest('user') : Shared.rest('user', id.toString()); }
-
         it('get the last user id sequence value', () => {
-            return Shared.last_id('users').then(last => id = last + 1);
+            return Shared.last_id('users').then(last => {
+                id = last + 1;
+                user = Shared.urls.user(id);
+            });
         });
 
         it('cannot create a user with an invalid name', () => {
             let test = Promise.resolve()
-            .then(() => Crud.bad_request(url(), [{ name: DATA.ERRORS.MIN }], { email: values.email }, chakram.post))
-            .then(() => Crud.bad_request(url(), [{ name: DATA.ERRORS.MIN }], { ...values, name: null }, chakram.post))
-            .then(() => Crud.bad_request(url(), [{ name: DATA.ERRORS.MIN }], { ...values, name: '' }, chakram.post))
-            .then(() => Crud.bad_request(url(), [{ name: DATA.ERRORS.MAX }], { ...values, name: DATA.name(DATA.NAME.LONGEST + 1)}, chakram.post))
+            .then(() => Crud.bad_request(all, [{ name: DATA.ERRORS.MIN }], { email: values.email }, chakram.post))
+            .then(() => Crud.bad_request(all, [{ name: DATA.ERRORS.MIN }], { ...values, name: null }, chakram.post))
+            .then(() => Crud.bad_request(all, [{ name: DATA.ERRORS.MIN }], { ...values, name: '' }, chakram.post))
+            .then(() => Crud.bad_request(all, [{ name: DATA.ERRORS.MAX }], { ...values, name: DATA.name(DATA.NAME.LONGEST + 1)}, chakram.post))
             return test;
         });
 
         it('cannot create a user with an invalid email', () => {
             let test = Promise.resolve()
-            .then(() => Crud.bad_request(url(), [{ email: DATA.ERRORS.MIN }], { name: values.name }, chakram.post))
-            .then(() => Crud.bad_request(url(), [{ email: DATA.ERRORS.MIN }], { ...values, email: null }, chakram.post))
-            .then(() => Crud.bad_request(url(), [{ email: DATA.ERRORS.MIN }], { ...values, email: '' }, chakram.post))
-            .then(() => Crud.bad_request(url(), [{ email: DATA.ERRORS.MAX }], { ...values, email: DATA.name(DATA.EMAIL.LONGEST + 1) }, chakram.post))
+            .then(() => Crud.bad_request(all, [{ email: DATA.ERRORS.MIN }], { name: values.name }, chakram.post))
+            .then(() => Crud.bad_request(all, [{ email: DATA.ERRORS.MIN }], { ...values, email: null }, chakram.post))
+            .then(() => Crud.bad_request(all, [{ email: DATA.ERRORS.MIN }], { ...values, email: '' }, chakram.post))
+            .then(() => Crud.bad_request(all, [{ email: DATA.ERRORS.MAX }], { ...values, email: DATA.name(DATA.EMAIL.LONGEST + 1) }, chakram.post))
 
             for (let i = 0; i < DATA.EMAIL.INVALID.length; i++) {
-                test = test.then(() => Crud.bad_request(url(), [{ email: DATA.ERRORS.CONFORM }], { email: DATA.EMAIL.INVALID[i] }, chakram.post))
+                test = test.then(() => Crud.bad_request(all, [{ email: DATA.ERRORS.CONFORM }], { email: DATA.EMAIL.INVALID[i] }, chakram.post))
             }
 
             return test;
         });
 
         it('can add a user', () => {
-            return Crud.add(url(), values, url(id));
+            return Crud.add(all, values, user);
         });
 
         it('cannot update a user with an invalid name', () => {
             let test = Promise.resolve()
-            .then(() => Crud.bad_request(url(id), [{ name: DATA.ERRORS.MIN }], { email: values.email }, chakram.put))
-            .then(() => Crud.bad_request(url(id), [{ name: DATA.ERRORS.MIN }], { ...values, name: null }, chakram.put))
-            .then(() => Crud.bad_request(url(id), [{ name: DATA.ERRORS.MIN }], { ...values, name: '' }, chakram.put))
-            .then(() => Crud.bad_request(url(id), [{ name: DATA.ERRORS.MAX }], { ...values, name: DATA.name(DATA.NAME.LONGEST + 1)}, chakram.put))
+            .then(() => Crud.bad_request(user, [{ name: DATA.ERRORS.MIN }], { email: values.email }, chakram.put))
+            .then(() => Crud.bad_request(user, [{ name: DATA.ERRORS.MIN }], { ...values, name: null }, chakram.put))
+            .then(() => Crud.bad_request(user, [{ name: DATA.ERRORS.MIN }], { ...values, name: '' }, chakram.put))
+            .then(() => Crud.bad_request(user, [{ name: DATA.ERRORS.MAX }], { ...values, name: DATA.name(DATA.NAME.LONGEST + 1)}, chakram.put))
             return test;
         });
 
         it('can delete the first user', () => {
-            return Crud.delete(url(id));
+            return Crud.delete(user);
         });
     });
 });

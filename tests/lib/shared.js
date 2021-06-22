@@ -36,14 +36,13 @@ const url = require('url');
 const chakram = require('chakram');
 const expect = chakram.expect;
 
-// --- shared class
+// --- URLs class (embedded)
 
-class Shared {
+class URLs {
 
     // --- class constructor
 
     constructor() {
-        this.db = null;
         this.api = {  // apis listed by restful prefix
             entity: process.env.COORDINATOR_BASE,
             connector: process.env.CONTRIBUTOR_BASE,
@@ -55,8 +54,33 @@ class Shared {
     // --- returns a restful url to an known API service
 
     rest(...resources) {
-        resources.unshift(resources.length ? this.api[resources[0]] : '');
+        resources.unshift(resources.length ? this.api[resources[0]] : undefined);
+        resources = resources.filter(item => item != undefined);
         return resources.join('/');
+    }
+
+    // --- restful access points
+
+    entity(eid) { return this.rest('entity', eid); }
+    connector(eid, cid) { return this.rest('entity', eid, 'connector', cid); }
+    user(uid) { return this.rest('user', uid); }
+    access(uid, aid) { return this.rest('user', uid, 'access', aid); }
+    policy(pid, resource) { return this.rest('policy', pid, resource); }
+
+    session_open(cid, mode = 'stream') { return this.rest('connector', cid, 'session', 'open', mode); }
+    session_action(cid, sid, action = 'upsert') { return this.rest('connector', cid, 'session', sid, action); }
+    session_close(cid, sid, commit = true) { return this.rest('connector', cid, 'session', sid, 'close', commit ? 'true' : 'false'); }
+}
+
+// --- shared class
+
+class Shared {
+
+    // --- class constructor
+
+    constructor() {
+        this.db = null;
+        this.urls = new URLs();
     }
 
     // --- resets the underlying database
@@ -137,9 +161,9 @@ class Shared {
     // --- ensures that the database is empty
 
     empty() {
-        return this.nowt(this.rest('entity'))
-        .then(() => this.nowt(this.rest('user')))
-        .then(() => this.nowt(this.rest('policy')));
+        return this.nowt(this.urls.entity())
+        .then(() => this.nowt(this.urls.user()))
+        .then(() => this.nowt(this.urls.policy()));
     }
 
     // --- tests a catalog query

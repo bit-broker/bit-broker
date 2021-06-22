@@ -72,6 +72,10 @@ describe('Policy Tests', function() {
 
     describe('policy manipulation tests', () => {
 
+        let all = url();
+
+        function url(pid, resource) { return Shared.urls.policy(pid, resource); }
+
         before(() => {
             return Shared.empty();
         });
@@ -79,8 +83,6 @@ describe('Policy Tests', function() {
         after(() => {
             return Shared.empty();
         });
-
-        function url(slug = '', resource = undefined) { return resource ? Shared.rest('policy', slug, resource) : Shared.rest('policy', slug); }
 
         it('the policy is not there to start with', () => {
             return Crud.not_found(url(DATA.POLICY.ALLAREA.ID));
@@ -91,7 +93,7 @@ describe('Policy Tests', function() {
         });
 
         it('it is present in the policy list', () => {
-            return Crud.verify_all(url(), [
+            return Crud.verify_all(all, [
                 { id: DATA.POLICY.ALLAREA.ID, url: url(DATA.POLICY.ALLAREA.ID), name: DATA.POLICY.ALLAREA.DETAIL.name, description: DATA.POLICY.ALLAREA.DETAIL.description }
             ]);
         });
@@ -113,7 +115,7 @@ describe('Policy Tests', function() {
         });
 
         it('new values are present in the policy list', () => {
-            return Crud.verify_all(url(), [
+            return Crud.verify_all(all, [
                 { id: DATA.POLICY.ALLAREA.ID, url: url(DATA.POLICY.ALLAREA.ID), name: DATA.POLICY.EXAMPLE.DETAIL.name, description: DATA.POLICY.EXAMPLE.DETAIL.description }
             ]);
         });
@@ -131,7 +133,7 @@ describe('Policy Tests', function() {
         });
 
         it('both are present in the policy list', () => {
-            return Crud.verify_all(url(), [
+            return Crud.verify_all(all, [
                 { id: DATA.POLICY.ALLAREA.ID, url: url(DATA.POLICY.ALLAREA.ID), name: DATA.POLICY.EXAMPLE.DETAIL.name, description: DATA.POLICY.EXAMPLE.DETAIL.description },
                 { id: DATA.POLICY.EXAMPLE.ID, url: url(DATA.POLICY.EXAMPLE.ID), name: DATA.POLICY.EXAMPLE.DETAIL.name, description: DATA.POLICY.EXAMPLE.DETAIL.description }
             ]);
@@ -142,7 +144,7 @@ describe('Policy Tests', function() {
         });
 
         it('it is gone from the policy list', () => {
-            return Crud.verify_all(url(), [
+            return Crud.verify_all(all, [
                 { id: DATA.POLICY.EXAMPLE.ID, url: url(DATA.POLICY.EXAMPLE.ID), name: DATA.POLICY.EXAMPLE.DETAIL.name, description: DATA.POLICY.EXAMPLE.DETAIL.description }
             ]);
         });
@@ -156,13 +158,15 @@ describe('Policy Tests', function() {
         });
 
         it('the policy list is empty', () => {
-            return Crud.verify_all(url(), []);
+            return Crud.verify_all(all, []);
         });
     });
 
     // --- policy validation tests - here we test invalid entries only, on add and update
 
     describe('policy validation tests', () => {
+
+        function url(pid, resource) { return Shared.urls.policy(pid, resource); }
 
         before(() => {
             return Shared.empty();
@@ -171,8 +175,6 @@ describe('Policy Tests', function() {
         after(() => {
             return Shared.empty();
         });
-
-        function url(slug) { return Shared.rest('policy', slug); }
 
         it('cannot open a policy with various invalid ids', () => {
             let test = Promise.resolve()

@@ -85,11 +85,11 @@ describe('Contributor Tests', function() {
         });
 
         it('can create the housing entity', () => {
-            return Crud.add(Shared.rest('entity', entity), DATA.some_info());
+            return Crud.add(Shared.urls.entity(entity), DATA.some_info());
         });
 
         it('can create the housing connector', () => {
-            return Crud.add(Shared.rest('entity', entity, 'connector', connector), DATA.some_info());
+            return Crud.add(Shared.urls.connector(entity, connector), DATA.some_info());
         });
 
         it('can open a session', () => {
@@ -129,7 +129,7 @@ describe('Contributor Tests', function() {
         });
 
         it('can delete the housing entity', () => {
-            return Crud.delete(Shared.rest('entity', entity))
+            return Crud.delete(Shared.urls.entity(entity))
         });
     });
 
@@ -141,10 +141,6 @@ describe('Contributor Tests', function() {
         let connector = DATA.pick(DATA.SLUG.VALID);
         let session = {};
 
-        function url_open(cid, mode = 'stream') { return Shared.rest('connector', cid, 'session', 'open', mode); }
-        function url_action(cid, sid, action = 'upsert') { return Shared.rest('connector', cid, 'session', sid, action); }
-        function url_close(cid, sid, commit = true) { return Shared.rest('connector', cid, 'session', sid, 'close', commit); }
-
         before(() => {
             return Shared.empty();
         });
@@ -154,23 +150,23 @@ describe('Contributor Tests', function() {
         });
 
         it('can create the housing entity', () => {
-            return Crud.add(Shared.rest('entity', entity), DATA.some_info());
+            return Crud.add(Shared.urls.entity(entity), DATA.some_info());
         });
 
         it('can create the housing connector', () => {
-            return Crud.add(Shared.rest('entity', entity, 'connector', connector), DATA.some_info());
+            return Crud.add(Shared.urls.connector(entity, connector), DATA.some_info());
         });
 
         it('cannot open a session with an unknown contribution id', () => {
-            return Crud.not_found(url_open(DATA.ID.UNKNOWN));
+            return Crud.not_found(Shared.urls.session_open(DATA.ID.UNKNOWN));
         });
 
         it('cannot open a session with various invalid ids and modes', () => {
             return Promise.resolve()
-            .then (() => Crud.bad_request(url_open('x'), [{ id: DATA.ERRORS.MIN }]))
-            .then (() => Crud.bad_request(url_open(DATA.ID.UNKNOWN + 'x'), [{ id: DATA.ERRORS.MAX }]))
-            .then (() => Crud.bad_request(url_open(DATA.ID.UNKNOWN + 'X'), [{ id: DATA.ERRORS.FORMAT }]))
-            .then (() => Crud.bad_request(url_open(DATA.ID.UNKNOWN, DATA.slug()), [{ mode: DATA.ERRORS.ENUM }]));
+            .then (() => Crud.bad_request(Shared.urls.session_open('x'), [{ id: DATA.ERRORS.MIN }]))
+            .then (() => Crud.bad_request(Shared.urls.session_open(DATA.ID.UNKNOWN + 'x'), [{ id: DATA.ERRORS.MAX }]))
+            .then (() => Crud.bad_request(Shared.urls.session_open(DATA.ID.UNKNOWN + 'X'), [{ id: DATA.ERRORS.FORMAT }]))
+            .then (() => Crud.bad_request(Shared.urls.session_open(DATA.ID.UNKNOWN, DATA.slug()), [{ mode: DATA.ERRORS.ENUM }]));
         });
 
         it('can now open a session', () => {
@@ -178,35 +174,35 @@ describe('Contributor Tests', function() {
         });
 
         it('cannot post data with an unknown contribution id', () => {
-            return Crud.not_found(url_action(DATA.ID.UNKNOWN, session.sid), [], chakram.post);
+            return Crud.not_found(Shared.urls.session_action(DATA.ID.UNKNOWN, session.sid), [], chakram.post);
         });
 
         it('cannot post data with an unknown session id', () => {
-            return Crud.unauthorized(url_action(session.cid, DATA.ID.UNKNOWN), [], chakram.post);
+            return Crud.unauthorized(Shared.urls.session_action(session.cid, DATA.ID.UNKNOWN), [], chakram.post);
         });
 
         it('cannot post data with various invalid id and actions', () => {
             return Promise.resolve()
-            .then (() => Crud.bad_request(url_action(DATA.ID.UNKNOWN + 'x', session.sid), [{ id: DATA.ERRORS.MAX }], [], chakram.post))
-            .then (() => Crud.bad_request(url_action(session.cid, DATA.ID.UNKNOWN + 'x'), [{ id: DATA.ERRORS.MAX }], [], chakram.post))
-            .then (() => Crud.bad_request(url_action(session.cid, session.sid, DATA.slug()), [{ action: DATA.ERRORS.ENUM }], [], chakram.post));
+            .then (() => Crud.bad_request(Shared.urls.session_action(DATA.ID.UNKNOWN + 'x', session.sid), [{ id: DATA.ERRORS.MAX }], [], chakram.post))
+            .then (() => Crud.bad_request(Shared.urls.session_action(session.cid, DATA.ID.UNKNOWN + 'x'), [{ id: DATA.ERRORS.MAX }], [], chakram.post))
+            .then (() => Crud.bad_request(Shared.urls.session_action(session.cid, session.sid, DATA.slug()), [{ action: DATA.ERRORS.ENUM }], [], chakram.post));
         });
 
         it('cannot close a session with an unknown contribution id', () => {
-            return Crud.not_found(url_close(DATA.ID.UNKNOWN, session.sid));
+            return Crud.not_found(Shared.urls.session_close(DATA.ID.UNKNOWN, session.sid));
         });
 
         it('cannot close a session with an unknown session id', () => {
-            return Crud.unauthorized(url_close(session.cid, DATA.ID.UNKNOWN));
+            return Crud.unauthorized(Shared.urls.session_close(session.cid, DATA.ID.UNKNOWN));
         });
 
         it('cannot close a session with various invalid ids and commits', () => {
             return Promise.resolve()
-            .then (() => Crud.bad_request(url_close(DATA.ID.UNKNOWN + 'x', session.sid, 'true'), [{ id: DATA.ERRORS.MAX }]))
-            .then (() => Crud.bad_request(url_close(DATA.ID.UNKNOWN + 'X', session.sid, 'true'), [{ id: DATA.ERRORS.FORMAT }]))
-            .then (() => Crud.bad_request(url_close(session.cid, DATA.ID.UNKNOWN + 'x', 'true'), [{ id: DATA.ERRORS.MAX }]))
-            .then (() => Crud.bad_request(url_close(session.cid, DATA.ID.UNKNOWN + 'X', 'true'), [{ id: DATA.ERRORS.FORMAT }]))
-            .then (() => Crud.bad_request(url_close(session.cid, session.sid, DATA.slug()), [{ commit: DATA.ERRORS.ENUM }]));
+            .then (() => Crud.bad_request(Shared.urls.session_close(DATA.ID.UNKNOWN + 'x', session.sid), [{ id: DATA.ERRORS.MAX }]))
+            .then (() => Crud.bad_request(Shared.urls.session_close(DATA.ID.UNKNOWN + 'X', session.sid), [{ id: DATA.ERRORS.FORMAT }]))
+            .then (() => Crud.bad_request(Shared.urls.session_close(session.cid, DATA.ID.UNKNOWN + 'x'), [{ id: DATA.ERRORS.MAX }]))
+            .then (() => Crud.bad_request(Shared.urls.session_close(session.cid, DATA.ID.UNKNOWN + 'X'), [{ id: DATA.ERRORS.FORMAT }]))
+            .then (() => Crud.bad_request(Shared.urls.rest('connector', session.cid, 'session', session.sid, 'close', DATA.slug()), [{ commit: DATA.ERRORS.ENUM }]));
         });
 
         it('can close the session', () => {
@@ -214,7 +210,7 @@ describe('Contributor Tests', function() {
         });
 
         it('can delete the housing entity', () => {
-            return Crud.delete(Shared.rest('entity', entity))
+            return Crud.delete(Shared.urls.entity(entity))
         });
     });
 
@@ -235,11 +231,11 @@ describe('Contributor Tests', function() {
         });
 
         it('can create the housing entity', () => {
-            return Crud.add(Shared.rest('entity', entity), DATA.some_info());
+            return Crud.add(Shared.urls.entity(entity), DATA.some_info());
         });
 
         it('can create the housing connector', () => {
-            return Crud.add(Shared.rest('entity', entity, 'connector', connector), DATA.some_info());
+            return Crud.add(Shared.urls.connector(entity, connector), DATA.some_info());
         });
 
         it('can now open a session', () => {
@@ -263,7 +259,7 @@ describe('Contributor Tests', function() {
         });
 
         it('can delete the housing entity', () => {
-            return Crud.delete(Shared.rest('entity', entity))
+            return Crud.delete(Shared.urls.entity(entity))
         });
     });
 });

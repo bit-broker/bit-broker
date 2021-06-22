@@ -41,7 +41,7 @@ module.exports = class Session {
     // --- opens a new sesson on the given connector
 
     static open(entity, connector, mode, cb = null) { // this cb should never by async - just stash the info
-        return chakram.get(Shared.rest('entity', entity, 'connector', connector))
+        return chakram.get(Shared.urls.connector(entity, connector))
 
         .then(response => {
             expect(response.body).to.be.an('object');
@@ -52,7 +52,7 @@ module.exports = class Session {
         })
 
         .then(cid => {
-            return chakram.get(Shared.rest('connector', cid, 'session', 'open', mode))
+            return chakram.get(Shared.urls.session_open(cid, mode))
 
             .then(response => {
                 expect(response.body).to.be.a('string');
@@ -76,7 +76,7 @@ module.exports = class Session {
 
         for (let i = 0 ; i < data.length ; i += DATA_PAGE_SIZE) {
             actions = actions.then(() => {
-                return chakram.post(Shared.rest('connector', cid, 'session', sid, action), data.slice(i, i + DATA_PAGE_SIZE))
+                return chakram.post(Shared.urls.session_action(cid, sid, action), data.slice(i, i + DATA_PAGE_SIZE))
                 .then(response => {
                     expect(response.body).to.be.undefined;
                     expect(response).to.have.status(HTTP.NO_CONTENT);
@@ -91,7 +91,7 @@ module.exports = class Session {
     // --- closes an existing sesson on the given connector
 
     static close(cid, sid, commit) {
-        return chakram.get(Shared.rest('connector', cid, 'session', sid, 'close', commit ? 'true' : 'false'))
+        return chakram.get(Shared.urls.session_close(cid, sid, commit))
         .then(response => {
             expect(response.body).to.be.undefined;
             expect(response).to.have.status(HTTP.OK);
