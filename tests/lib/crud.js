@@ -34,13 +34,13 @@ module.exports = class Crud {
 
     // --- adds a resource
 
-    static add(url, body, location) {
+    static add(url, body, location, checker) {
         location = location || url.trim();
         return chakram.post(url, body)
         .then(response => {
-            expect(response.body).to.be.undefined;
             expect(response).to.have.status(HTTP.CREATED);
             expect(response).to.have.header('Location', location);
+            checker ? checker(response.body) : expect(response.body).to.be.undefined;
             return chakram.wait();
         });
     }
