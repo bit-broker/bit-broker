@@ -26,6 +26,14 @@
 // --- dependancies
 
 const crypto = require('crypto');
+const fetch = require('node-fetch');
+
+// --- constants - not externally configurable
+
+const FETCH_HEADERS = {
+    'Accept': 'application/json, text/plain',
+    'Content-Type': 'application/json'
+};
 
 // --- session class (exported)
 
@@ -47,5 +55,16 @@ module.exports = class Permit {
 
     static public_key(connector_id, vendor_id) {
         return crypto.createHash('sha256').update(`${connector_id}:${vendor_id}`).digest('hex');
+    }
+
+    // --- obtains an access token and a JTI from the auth-service
+
+    static access_token(scope, audience) {
+        return fetch(process.env.AUTH_SERVICE, {
+            method: 'post',
+            headers: FETCH_HEADERS,
+            body: JSON.stringify({ scope: scope, aud: audience })
+        })
+        .then(res => res.json());
     }
 }

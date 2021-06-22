@@ -93,6 +93,36 @@ module.exports = class Coordinator extends View {
         return doc;
     }
 
+    // --- an access
+
+    static access(item, full = true) {
+        let doc = {
+            id: item.id,
+            url: this.rest(process.env.COORDINATOR_BASE, 'user', item.user_id, 'access', item.id),
+            role: item.role,
+            context: item.context,
+            created: item.created_at
+        };
+
+        if (full) {
+            // nothing more yet
+        }
+
+        return doc;
+    }
+
+    // --- a list of accesses
+
+    static accesses(items) {
+        let doc = [];
+
+        for (let i = 0; i < items.length; i++) {
+            doc.push(this.access(items[i], false));
+        }
+
+        return doc;
+    }
+
     // --- a policy
 
     static policy(item, full = true) {

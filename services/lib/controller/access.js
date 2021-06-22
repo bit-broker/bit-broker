@@ -29,6 +29,7 @@
 
 const HTTP = require('http-status-codes');
 const failure = require('http-errors');
+const locales = require('../locales.js');
 const model = require('../model/index.js');
 const view = require('../view/index.js');
 const log = require('../logger.js').Logger;
@@ -42,7 +43,7 @@ module.exports = class Access {
     static properties(body) {
         return {
             role: (body.role || '').toLowerCase(),
-            context: (body.context || '').toLowerCase()
+            context: body.context || null // optional
         };
     }
 
@@ -51,7 +52,7 @@ module.exports = class Access {
     list(req, res, next) {
         let uid = req.params.uid.toLowerCase();
 
-        model.entity.user(uid)
+        model.user.access(uid)
 
         .then(accesses => {
             if (!accesses) throw failure(HTTP.NOT_FOUND);
@@ -59,7 +60,7 @@ module.exports = class Access {
         })
 
         .then(items => {
-            res.json(view.contributor.accesses(items)); // can be empty
+            res.json(view.coordinator.accesses(items)); // can be empty
         })
 
         .catch(error => next(error));
@@ -71,7 +72,7 @@ module.exports = class Access {
         let uid = req.params.uid.toLowerCase();
         let aid = req.params.aid.toLowerCase();
 
-        model.entity.user(uid)
+        model.user.access(uid)
 
         .then(accesses => {
             if (!accesses) throw failure(HTTP.NOT_FOUND);
@@ -80,10 +81,35 @@ module.exports = class Access {
 
         .then(item => {
             if (!item) throw failure(HTTP.NOT_FOUND);
-            res.json(view.contributor.access(item));
+            res.json(view.coordinator.access(item));
         })
 
         .catch(error => next(error));
+    }
+
+    // --- checks that the role and context pair are a valid combination
+
+    static check_role_context(role, context) {
+        let check = null;
+
+        switch (role) {
+            case 'coordinator':
+                check = Promise.resolve(context === null ? '' : locales.__('error.access-invalid-context', context));
+            break;
+
+            case 'contributor':
+                check = Promise.resolve(locales.__('error.access-invalid-role', role));
+            break;
+
+            case 'consumer':
+                check = model.policy.find(context).then (item => item ? '' : locales.__('error.access-invalid-context', context));
+            break;
+
+            default:
+                check = Promise.resolve(locales.__('error.access-invalid-role', role));
+        }
+
+        return check;
     }
 
     // --- adds a new access for a given user
@@ -101,11 +127,20 @@ module.exports = class Access {
             throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
         }
 
-        model.entity.user(uid)
+        Access.check_role_context (properties.role, properties.context)  // extended checks on role and context pair
+
+        .then (error => {
+          console.log(error);
+            if (error.length) {
+                throw failure(HTTP.BAD_REQUEST, error);
+            }
+
+            return model.user.access(uid);
+        })
 
         .then(accesses => {
             if (!accesses) throw failure(HTTP.NOT_FOUND);
-            return accesses.find_by_role_context(uid, properties.role, properties.context)
+            return accesses.find_by_role_context(properties.role, properties.context)
 
             .then(item => {
                 if (item) {
@@ -113,15 +148,14 @@ module.exports = class Access {
                     throw failure(HTTP.CONFLICT);
                 }
 
-                key_id = '012345678901234567890123456789012345';  // TODO: get from auth-service
-                return accesses.insert({ key_id, role, context });
+                return accesses.insert(properties);
             });
         })
 
-        .then((id) => {
-            log.info('coordinator', 'user', uid, 'access', 'insert', 'complete', id);
-            let href = `${ req.protocol }://${ req.get('host') }${ req.originalUrl }/${ id }`;
-            res.set({ 'Location': href }).status(HTTP.CREATED).send();
+        .then(result => {
+            log.info('coordinator', 'user', uid, 'access', 'insert', 'complete', result.id);
+            let href = `${ req.protocol }://${ req.get('host') }${ req.originalUrl }/${ result.id }`;
+            res.set({ 'Location': href }).status(HTTP.CREATED).send(result.token);
         })
 
         .catch(error => next(error));
@@ -135,7 +169,7 @@ module.exports = class Access {
         let uid = req.params.uid.toLowerCase();
         let aid = req.params.aid.toLowerCase();
 
-        model.entity.user(uid)
+        model.user.access(uid)
 
         .then(accesses => {
             if (!accesses) throw failure(HTTP.NOT_FOUND);

@@ -8,8 +8,11 @@
             "enum": ["coordinator", "contributor", "consumer"]
         },
         "context": {
-            "$ref": "bbk://slug"
+            "oneOf": [
+                { "type": "null" },
+                { "$ref":"bbk://slug" }
+            ]
         }
     },
-    "required": ["role"]
+    "required": ["role", "context"]
 }

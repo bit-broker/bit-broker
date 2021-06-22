@@ -35,6 +35,10 @@
 
 'use strict'; // code assumes ECMAScript 6
 
+// --- dependancies
+
+const Permit = require('./permit.js');
+
 // --- access class (exported)
 
 module.exports = class Access {
@@ -53,7 +57,7 @@ module.exports = class Access {
             'id',
             'user_id',
             'key_id',
-            'scope',
+            'role',
             'context',
             'created_at',
             'updated_at'
@@ -72,22 +76,35 @@ module.exports = class Access {
         return this.rows.orderBy('id');
     }
 
-    // --- find a access by id on the instance user
+    // --- find an access by id on the instance user
 
     find(id) {
         return this.rows.where({ id }).first();
     }
 
+    // --- find an access by role and context on the instance user
+
+    find_by_role_context(role, context) {
+        return this.rows.where({ role, context }).first();
+    }
+
     // --- inserts a new access on the instance user type
 
     insert(values) {
-        values.user_id = this.user.id;
-        return this.rows.insert(values).returning('id').then((id) => id && id.length ? id[0] : 0);
+        return Permit.access_token(values.role, values.context)
+
+        .then (token => {
+            values.user_id = this.user.id;
+            values.key_id = token.jti;
+            return this.rows.insert(values).returning('id')
+
+            .then(id => id && id.length ? { id: id, token: token.token } : { id: 0, token: '' });
+        });
     }
 
     // --- deletes an access on the instance user type
 
     delete(id) {
-        return this.rows.where({ id }).delete().then(result => result.rowCount > 0);
+        return this.find(id).delete().then(result => result.rowCount > 0);
     }
 }
