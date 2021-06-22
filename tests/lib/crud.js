@@ -120,6 +120,18 @@ module.exports = class Crud {
         });
     }
 
+    // --- gets a resource
+
+    static get(url, checker) {
+        return chakram.get(url)
+        .then(response => {
+            expect(response.body).to.be.an('object');
+            if (checker) checker(response.body);
+            expect(response).to.have.status(HTTP.OK);
+            return chakram.wait();
+        });
+    }
+
     // --- verifies a resource
 
     static verify(url, resource, include = true) {

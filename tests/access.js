@@ -148,6 +148,12 @@ describe('User Access Tests', function() {
             return Crud.verify(url_access(uid1, aid1), { ...values1, id: aid1, url: url_access(uid1, aid1) });
         });
 
+        it('the date is present when addressed directly', () => {
+            return Crud.get(url_access(uid1, aid1), (body) => {
+                expect(body.created).to.match(new RegExp(DATA.DATE.REGEX));
+            });
+        });
+
         it('cannot ask for the same token twice', () => {
             return Crud.duplicate(url_access(uid1), values1);
         });
