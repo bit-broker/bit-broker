@@ -158,7 +158,7 @@ const DATA = {
         LONGEST: 32,
         CHARS: 'abcdefghijklmnopqrstuvwxyz0123456789_',
         VALID: ['lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing', 'elit', 'eiusmod', 'tempor', 'incididunt', 'labore', 'dolore', 'magna', 'aliqua', 'enim', 'minim', 'veniam', 'quis', 'nostrud', 'exercitation', 'ullamco', 'laboris', 'nisi', 'aliquip', 'commodo', 'consequat', 'duis', 'aute', 'irure', 'dolor', 'reprehenderit'],
-        INVALID: ['0_number_at_start', '_starts_with_undescore', 'has spaces', 'has_invalid_chars!'],
+        INVALID: ['0-starts-with-number', '-starts-with-dash', 'has spaces', 'has_underscore', 'has-invalid-char!'],
     },
 
     NAME: {

@@ -2,7 +2,7 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "bbk://slug",
     "type": "string",
-    "pattern": "^[a-z0-9][a-z0-9-]+$",
+    "pattern": "^[a-z][a-z0-9-]+$",
     "minLength": 3,
     "maxLength": 32
 }
