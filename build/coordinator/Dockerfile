@@ -13,7 +13,6 @@ RUN apk --no-cache add curl && apk --no-cache add busybox-extras
 RUN mkdir /home/node/app/services && \
     chown -R bitbroker:bitbroker /home/node/app/services
 
-
 # Switch to bitbroker services root folder
 WORKDIR /home/node/app/services
 
@@ -37,13 +36,6 @@ RUN chown -R bitbroker:bitbroker /home/node/app/services/tests
 
 COPY .env.example /home/node/app/.env
 RUN chown bitbroker:bitbroker /home/node/app/.env
-
-
-
-# Create logs folder
-WORKDIR /home/node/app/services/coordinator
-RUN mkdir -p ./logs && \
-    chown -R bitbroker:bitbroker ./logs
 
 #Set bitbroker non root user
 USER bitbroker

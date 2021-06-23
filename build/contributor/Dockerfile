@@ -4,7 +4,6 @@ FROM node:16-alpine3.12
 # Add some development tools (To be removed)
 RUN apk --no-cache add curl && apk --no-cache add busybox-extras
 
-
 # Create bitbroker group and user
 #RUN addgroup bitbroker && adduser bitbroker
 RUN addgroup -S bitbroker -g 1999\
@@ -37,12 +36,6 @@ RUN chown -R bitbroker:bitbroker /home/node/app/services/locales
 
 COPY .env.example /home/node/app/.env
 RUN chown bitbroker:bitbroker /home/node/app/.env
-
-
-# Create logs folder
-WORKDIR /home/node/app/services/contributor
-RUN mkdir -p ./logs && \
-    chown -R bitbroker:bitbroker ./logs
 
 #Set bitbroker non root user
 USER bitbroker
