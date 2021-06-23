@@ -63,7 +63,7 @@ api.router.delete('/entity/:eid/connector/:cid', controller.connector.delete);
 
 api.router.get('/policy', controller.policy.list);
 api.router.get('/policy/:pid', controller.policy.get);
-api.router.get('/policy/:pid/access_control', controller.policy.get_access_control);
+api.router.get('/policy/:pid/access-control', controller.policy.get_access_control);
 api.router.post('/policy/:pid', controller.policy.insert);
 api.router.put('/policy/:pid', controller.policy.update);
 api.router.delete('/policy/:pid', controller.policy.delete);
