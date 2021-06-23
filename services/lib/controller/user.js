@@ -100,7 +100,7 @@ module.exports = class User {
 
         .then(id => {
             log.info('user', properties.email, 'insert', 'complete', id);
-            let href = `${ req.protocol }://${ req.get('host') }${ req.originalUrl }/${ id }`;
+            let href = `${ req.protocol }://${ req.get('host') }${ req.originalUrl.replace(/\/$/, '') }/${ id }`;
             res.set({ 'Location': href }).status(HTTP.CREATED).send();
         })
 

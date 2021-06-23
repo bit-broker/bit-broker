@@ -195,6 +195,13 @@ describe('Coordinator Service Tests', function() {
             .then(() => Crud.add_del(some_name(), { ...values, description: DATA.text(DATA.DESCRIPTION.LONGEST) }));
         });
 
+        it('allows add with trailing slash', () => {
+            let slashed = entity + '/';
+            return Crud.add(slashed, values, entity)
+            .then (() => Crud.verify(slashed, values))
+            .then (() => Crud.delete(slashed));
+        });
+
         it('disallows various invalid slugs', () => {
             let test = Promise.resolve()
             .then(() => Crud.bad_request(Shared.urls.entity(DATA.slug(DATA.SLUG.SHORTEST - 1)), [{ slug: DATA.ERRORS.MIN }], values, chakram.post))

@@ -123,7 +123,7 @@ module.exports = class Connector {
 
         .then(() => {
             log.info('entity', eid, 'connector', cid, 'insert', 'complete');
-            let href = `${ req.protocol }://${ req.get('host') }${ req.originalUrl }`;
+            let href = `${ req.protocol }://${ req.get('host') }${ req.originalUrl.replace(/\/$/, '') }`;
             res.set({ 'Location': href }).status(HTTP.CREATED).send();
         })
 

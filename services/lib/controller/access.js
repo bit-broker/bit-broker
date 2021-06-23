@@ -153,7 +153,7 @@ module.exports = class Access {
 
         .then(result => {
             log.info('coordinator', 'user', uid, 'access', 'insert', 'complete', result.id);
-            let href = `${ req.protocol }://${ req.get('host') }${ req.originalUrl }/${ result.id }`;
+            let href = `${ req.protocol }://${ req.get('host') }${ req.originalUrl.replace(/\/$/, '') }/${ result.id }`;
             res.set({ 'Location': href }).status(HTTP.CREATED).send(result.token);
         })
 
