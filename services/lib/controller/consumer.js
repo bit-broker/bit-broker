@@ -81,7 +81,7 @@ module.exports = class Consumer {
 
             .then(item => {
                 if (!item) throw failure(HTTP.FORBIDDEN);
-                return item.segment_query;
+                return item.data_segment.segment_query;
             })
         } else {
             return Promise.resolve(NO_POLICY_SEGMENT);

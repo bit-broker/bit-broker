@@ -190,47 +190,51 @@ const DATA = {
     PROSE: 'lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum',
 
     POLICY: {
-       ALLAREA: {
-           ID: 'access-all-areas',
-           DETAIL: {
-               "name": "Access all areas",
-               "description": "Access all entities in the catalog, no fields hidden",
-               "policy": {
-                   "access_control": {
+        ALLAREA: {
+            ID: 'access-all-areas',
+            DETAIL: {
+                "name": "Access all areas",
+                "description": "Access all entities in the catalog, no fields hidden",
+                "policy": {
+                    "access_control": {
+                        "enabled": true,
+                        "quota": {
+                            "max_number": 24000,
+                            "interval_type": "day"
+                        },
+                        "rate": 1000
+                    },
+                    "data_segment": {
+                        "segment_query": {},
+                        "hidden_types": [],
+                        "field_masks": []
+                    },
+                    "legal_context": [{ "type": "attribution", "text": "test attribution", "link": "https://bit-broker.io" }]
+                }
+            }
+        },
+        EXAMPLE: {
+            ID: 'example-policy',
+            DETAIL: {
+                "name": "An example policy",
+                "description": "Access is restricted to countries only",
+                "policy": {
+                    "access_control": {
                        "enabled": true,
                        "quota": {
                            "max_number": 24000,
                            "interval_type": "day"
                        },
                        "rate": 1000
-                   },
-                   "segment_query": {},
-                   "hidden_types": [],
-                   "field_masks": [],
-
-               }
-           }
-       },
-       EXAMPLE: {
-           ID: 'example-policy',
-           DETAIL: {
-               "name": "An example policy",
-               "description": "Access is restricted to countries only",
-               "policy": {
-                   "access_control": {
-                       "enabled": true,
-                       "quota": {
-                           "max_number": 24000,
-                           "interval_type": "day"
-                       },
-                       "rate": 1000
-                   },
-                   "segment_query": { "type": "country" },
-                   "hidden_types": [],
-                   "field_masks": ["movie.rating"],
-                   "legal_context": [{ "type": "attribution", "text": "test attribution", "link": "https://bit-broker.io" }]
-               }
-           }
+                    },
+                    "data_segment": {
+                        "segment_query": { "type": "country" },
+                        "hidden_types": [],
+                        "field_masks": ["movie.rating"]
+                    },
+                    "legal_context": [{ "type": "attribution", "text": "test attribution", "link": "https://bit-broker.io" }]
+                }
+            }
         },
         INVALID: {
             ID: 'invalid-policy',
@@ -246,9 +250,11 @@ const DATA = {
                         },
                         "rate": 1000
                     },
-                    "segment_query": { "type": "movie" },
-                    "hidden_types": [],
-                    "field_masks": ["movie.rating"],
+                    "data_segment": {
+                        "segment_query": { "type": "movie" },
+                        "hidden_types": [],
+                        "field_masks": ["movie.rating"]
+                    },
                     "legal_context": [{ "type": "invalid_type", "text": "test attribution", "link": "https://bit-broker.io" }]
                 }
             }

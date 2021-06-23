@@ -8,19 +8,21 @@
                 "access_control": {
                     "$ref": "#/definitions/access_control_obj"
                 },
-                "segment_query": {
-                    "type": "object"
-                },
-                "hidden_types": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "field_masks": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
+                "data_segment": {
+                    "segment_query": {
+                        "type": "object"
+                    },
+                    "hidden_types": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "field_masks": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     }
                 },
                 "legal_context": {
