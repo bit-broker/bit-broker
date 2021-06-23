@@ -98,7 +98,7 @@ module.exports = class User {
             return model.user.insert({ email: properties.email, properties: { name: properties.name } });
         })
 
-        .then((id) => {
+        .then(id => {
             log.info('user', properties.email, 'insert', 'complete', id);
             let href = `${ req.protocol }://${ req.get('host') }${ req.originalUrl }/${ id }`;
             res.set({ 'Location': href }).status(HTTP.CREATED).send();
