@@ -58,7 +58,7 @@ module.exports = class Policy {
     // --- returns the rate limit url for a given slug
 
     static rate_limiter(slug) {
-        return `${ process.env.RATE_LIMIT_BASE }/${ slug }/config`;
+        return `${ process.env.RATE_SERVICE }/${ slug }/config`;
     }
 
     // --- select column list
