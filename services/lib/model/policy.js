@@ -34,15 +34,11 @@
 const fetch = require('node-fetch');
 const cloneDeep = require('clone-deep');
 const log = require('../logger.js').Logger;
+const FETCH = require('./fetch.js');
 
 // --- constants - not .env configurable
 
 const POLICY_CACHE_KEY_PREFIX = 'BBK_DSP_ID_' ;
-const FETCH_TIMEOUT = 2000;
-const FETCH_HEADERS = {
-    'Accept': 'application/json, text/plain',
-    'Content-Type': 'application/json'
-};
 
 // --- policy class (exported)
 
@@ -100,10 +96,10 @@ module.exports = class Policy {
             .insert(values)
             .into('policy')
             .then(() => fetch(Policy.rate_limiter(slug), {
-                method: 'put',
-                headers: FETCH_HEADERS,
+                method: 'PUT',
                 body: JSON.stringify(values.properties.policy.access_control),
-                timeout: FETCH_TIMEOUT
+                headers: FETCH.HEADERS,
+                timeout: FETCH.TIMEOUT
             }))
             .then(result => result.rowCount > 0);
         });
@@ -119,10 +115,10 @@ module.exports = class Policy {
             .where({ slug }).first()
             .update(values)
             .then(() => fetch(Policy.rate_limiter(slug), {
-                method: 'put',
-                headers: FETCH_HEADERS,
+                method: 'PUT',
                 body: JSON.stringify(values.properties.policy.access_control),
-                timeout: FETCH_TIMEOUT
+                headers: FETCH.HEADERS,
+                timeout: FETCH.TIMEOUT
             }))
             .then(result => result.rowCount > 0);
         });
@@ -138,9 +134,9 @@ module.exports = class Policy {
             .where({ slug }).first()
             .delete()
             .then(() => fetch(Policy.rate_limiter(slug), {
-                method: 'delete',
-                headers: FETCH_HEADERS,
-                timeout: FETCH_TIMEOUT
+                method: 'DELETE',
+                headers: FETCH.HEADERS,
+                timeout: FETCH.TIMEOUT
             }))
             .then(result => result.rowCount > 0);
         });

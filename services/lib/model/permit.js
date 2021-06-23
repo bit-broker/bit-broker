@@ -27,13 +27,7 @@
 
 const crypto = require('crypto');
 const fetch = require('node-fetch');
-
-// --- constants - not externally configurable
-
-const FETCH_HEADERS = {
-    'Accept': 'application/json, text/plain',
-    'Content-Type': 'application/json'
-};
+const FETCH = require('./fetch.js');
 
 // --- session class (exported)
 
@@ -61,9 +55,10 @@ module.exports = class Permit {
 
     static access_token(scope, audience) {
         return fetch(process.env.AUTH_SERVICE, {
-            method: 'post',
-            headers: FETCH_HEADERS,
-            body: JSON.stringify({ scope: scope, aud: audience })
+            method: 'POST',
+            body: JSON.stringify({ scope: scope, aud: audience }),
+            headers: FETCH.HEADERS,
+            timeout: FETCH.TIMEOUT
         })
         .then(res => res.json());
     }
