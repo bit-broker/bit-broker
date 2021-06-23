@@ -36,8 +36,8 @@ services:
     container_name: bbk-contributor
     image: bbk-contributor
     depends_on:
-      bbk-database:
-        condition: service_healthy
+      - bbk-auth-service
+      - bbk-database
     ports:
       - 8002:8002
 
@@ -66,6 +66,16 @@ services:
     ports:
       - 4000:4000
       - 7000:7000
+
+  # --- auth service
+  bbk-auth-service:
+    build:
+      context: ../../..
+      dockerfile: ./bit-broker/build/auth-service/Dockerfile
+    container_name: bbk-auth-service
+    image: bbk-auth-service
+    ports:
+      - 8080:8080
 
   # --- main database
   bbk-database:
