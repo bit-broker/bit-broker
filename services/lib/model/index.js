@@ -41,7 +41,7 @@ const REDIS_TIMEOUT = 2000;
 
 // --- running contexts
 
-var db = new Knex({ client: 'pg', connection: process.env.DATABASE }); // TODO: should we fix the client version here?
+var db = new Knex({ client: 'pg', connection: process.env.APP_DATABASE }); // TODO: should we fix the client version here?
 var redis = new Redis(process.env.POLICY_CACHE, { commandTimeout: REDIS_TIMEOUT });
 
 // --- redis event logging

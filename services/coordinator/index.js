@@ -31,7 +31,7 @@ const PATH_CFG = process.env.PATH_CFG || '../..';
 // --- load configuration - do this first
 
 require('dotenv').config({ path: `${ PATH_CFG }/.env` });
-process.env.DATABASE = process.env.DATABASE.replace('CREDENTIALS', process.env.COORDINATOR_USER);
+process.env.APP_DATABASE = process.env.APP_DATABASE.replace('CREDENTIALS', process.env.COORDINATOR_USER);
 
 // --- dependancies
 

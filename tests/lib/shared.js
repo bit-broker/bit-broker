@@ -25,7 +25,7 @@
 // --- load configuration - do this first
 
 require('dotenv').config({ path: '../.env' });
-process.env.DATABASE = process.env.DATABASE.replace('CREDENTIALS', process.env.TESTS_USER);
+process.env.APP_DATABASE = process.env.APP_DATABASE.replace('CREDENTIALS', process.env.TESTS_USER);
 
 // --- dependancies
 
@@ -109,7 +109,7 @@ class Shared {
     // --- before any tests are run
 
     before_any() {
-        this.db = new Knex({ client: 'pg', connection: process.env.DATABASE });
+        this.db = new Knex({ client: 'pg', connection: process.env.APP_DATABASE });
         return this.nuke();
     }
 
