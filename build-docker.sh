@@ -8,4 +8,5 @@
 
 cd ..
 ./bit-broker/build/rate-limit/build-docker.sh
+./bit-broker/build/auth-service/build-docker.sh
 cd bit-broker
