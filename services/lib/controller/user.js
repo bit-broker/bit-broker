@@ -42,7 +42,7 @@ module.exports = class User {
     static properties(body) {
         return {
             name: body.name || '',
-            email: (body.email || '').toLowerCase()
+            email: (body.email || '').toString().toLowerCase()
         };
     }
 
