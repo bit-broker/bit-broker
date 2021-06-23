@@ -85,7 +85,7 @@ module.exports = class user {
     // --- inserts a new user
 
     insert(values) {
-        return this.rows.insert(values).returning('id').then(id => id && id.length ? id[0] : 0);
+        return this.rows.insert(values).returning('id').then(id => id && id.length ? id[0] : false);
     }
 
     // --- updates an existing user

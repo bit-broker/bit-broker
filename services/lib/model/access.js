@@ -98,7 +98,7 @@ module.exports = class Access {
             values.key_id = token.jti;
             return this.rows.insert(values).returning('id')
 
-            .then(id => id && id.length ? { id: id, token: token.token } : { id: 0, token: '' });
+            .then(id => id && id.length ? { id: id, token: token.token } : false);
         });
     }
 
