@@ -5,7 +5,8 @@
   "main": "all.js",
   "scripts": {
     "test": "node all.js",
-    "start": "node all.js"
+    "start": "node all.js",
+    "seed": "mocha seed.js"
   },
   "author": "Cisco",
   "license": "UNLICENSED",
