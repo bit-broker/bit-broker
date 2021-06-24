@@ -25,8 +25,15 @@ services:
         condition: service_healthy
       bbk-policy-cache:
         condition: service_healthy
+      bbk-auth-service:
+        condition: service_healthy
     ports:
       - 8001:8001
+    healthcheck:
+      test: ["CMD-SHELL", "wget http://localhost:8001/v1 -q --spider"]
+      interval: 4s
+      timeout: 4s
+      retries: 4
 
   # --- contributor service
   bbk-contributor:
@@ -36,10 +43,15 @@ services:
     container_name: bbk-contributor
     image: bbk-contributor
     depends_on:
-      - bbk-auth-service
-      - bbk-database
+      bbk-database:
+        condition: service_healthy
     ports:
       - 8002:8002
+    healthcheck:
+      test: ["CMD-SHELL", "wget http://localhost:8002/v1 -q --spider"]
+      interval: 4s
+      timeout: 4s
+      retries: 4
 
   # --- consumer service
   bbk-consumer:
@@ -53,29 +65,11 @@ services:
         condition: service_healthy
     ports:
       - 8003:8003
-
-  # --- rate limit service
-  bbk-rate-limit:
-    build:
-      context: ../../..
-      dockerfile: ./bit-broker/build/rate-limit/Dockerfile
-    container_name: bbk-rate-limit
-    image: bbk-rate-limit
-    depends_on:
-      - bbk-rate-limit-cache
-    ports:
-      - 4000:4000
-      - 7000:7000
-
-  # --- auth service
-  bbk-auth-service:
-    build:
-      context: ../../..
-      dockerfile: ./bit-broker/build/auth-service/Dockerfile
-    container_name: bbk-auth-service
-    image: bbk-auth-service
-    ports:
-      - 8080:8080
+    healthcheck:
+      test: ["CMD-SHELL", "wget http://localhost:8003/v1 -q --spider"]
+      interval: 4s
+      timeout: 4s
+      retries: 4
 
   # --- main database
   bbk-database:
@@ -89,22 +83,29 @@ services:
     ports:
       - 5432:5432
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", 'psql -U postgres -lqt | cut -d \| -f 1 | grep -qw bit_broker']
       interval: 4s
       timeout: 4s
-      retries: 16
+      retries: 4
 
-  # --- policy cache
-  bbk-policy-cache:
-    image: redis:6.2.3-alpine
-    container_name: bbk-policy-cache
+  # --- rate limit service
+  bbk-rate-limit:
+    build:
+      context: ../../..
+      dockerfile: ./bit-broker/build/rate-limit/Dockerfile
+    container_name: bbk-rate-limit
+    image: bbk-rate-limit
+    depends_on:
+      bbk-rate-limit-cache:
+        condition: service_healthy
     ports:
-      - 6379:6379
+      - 4000:4000
+      - 7000:7000
     healthcheck:
-      test: ["CMD-SHELL", "redis-cli ping"]
+      test: ["CMD-SHELL", 'ls']
       interval: 4s
       timeout: 4s
-      retries: 16
+      retries: 4
 
   # --- rate limit cache
   bbk-rate-limit-cache:
@@ -116,4 +117,31 @@ services:
       test: ["CMD-SHELL", "redis-cli ping"]
       interval: 4s
       timeout: 4s
-      retries: 16
+      retries: 4
+
+  # --- auth service
+  bbk-auth-service:
+    build:
+      context: ../../..
+      dockerfile: ./bit-broker/build/auth-service/Dockerfile
+    container_name: bbk-auth-service
+    image: bbk-auth-service
+    ports:
+      - 8080:8080
+    healthcheck:
+      test: ["CMD-SHELL", "wget http://localhost:8080/api/v1 -q --spider"]
+      interval: 4s
+      timeout: 4s
+      retries: 4
+
+  # --- policy cache
+  bbk-policy-cache:
+    image: redis:6.2.3-alpine
+    container_name: bbk-policy-cache
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping"]
+      interval: 4s
+      timeout: 4s
+      retries: 4
