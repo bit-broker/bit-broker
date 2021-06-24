@@ -68,6 +68,8 @@ CREATE TABLE users
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+INSERT INTO users (email, properties) VALUES ('noreply@bit-broker.io', '{ "name": "admin" }');
+
 -- entity table
 
 CREATE TABLE entity

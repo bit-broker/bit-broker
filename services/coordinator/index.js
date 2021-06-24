@@ -19,6 +19,16 @@
   The bit-broker coordinator server - offering services to add, remove and
   update entity types and their associated connectors.
 
+  Use the following command to generate a bootstrap coordinator access key
+
+      curl \
+        --silent \
+        --request POST \
+        --header "Content-Type: application/json" \
+        --data "{\"role\":\"coordinator\"}" \
+        --output bootstrap.key \
+          http://bbk-coordinator:8001/v1/user/1/access
+
 */
 
 'use strict'; // code assumes ECMAScript 6
