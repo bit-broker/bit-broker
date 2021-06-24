@@ -25,7 +25,7 @@
 // --- dependancies
 
 const DATA = require('./data.js');
-const Shared = require('./shared.js');
+const Shared = require('./shared.js');  // include first for dotenv
 const Session = require('./session.js');
 const chakram = require('chakram');
 const expect = chakram.expect;

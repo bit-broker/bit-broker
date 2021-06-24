@@ -28,7 +28,8 @@
 
 const HTTP = require('http-status-codes');
 const DATA = require('./lib/data.js');
-const Shared = require('./lib/shared.js');
+const Shared = require('./lib/shared.js');  // include first for dotenv
+const URLs = require('./lib/urls.js');
 const Crud = require('./lib/crud.js');
 const chakram = require('chakram');
 const expect = chakram.expect;
@@ -74,7 +75,7 @@ describe('Policy Tests', function() {
 
         let all = url();
 
-        function url(pid, resource) { return Shared.urls.policy(pid, resource); }
+        function url(pid, resource) { return URLs.policy(pid, resource); }
 
         before(() => {
             return Shared.empty();
@@ -166,7 +167,7 @@ describe('Policy Tests', function() {
 
     describe('policy validation tests', () => {
 
-        function url(pid, resource) { return Shared.urls.policy(pid, resource); }
+        function url(pid, resource) { return URLs.policy(pid, resource); }
 
         before(() => {
             return Shared.empty();

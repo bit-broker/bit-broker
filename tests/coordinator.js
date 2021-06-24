@@ -28,7 +28,8 @@
 
 const HTTP = require('http-status-codes');
 const DATA = require('./lib/data.js');
-const Shared = require('./lib/shared.js');
+const Shared = require('./lib/shared.js');  // include first for dotenv
+const URLs = require('./lib/urls.js');
 const Crud = require('./lib/crud.js');
 const chakram = require('chakram');
 const expect = chakram.expect;
@@ -73,11 +74,11 @@ describe('Coordinator Service Tests', function() {
     describe('entity manipulation tests', () => {
         let slug1 = DATA.pluck(DATA.SLUG.VALID); // pluck - so as to never get duplicate
         let slug2 = DATA.pick(DATA.SLUG.VALID);
-        let entity1 = Shared.urls.entity(slug1);
-        let entity2 = Shared.urls.entity(slug2);
+        let entity1 = URLs.entity(slug1);
+        let entity2 = URLs.entity(slug2);
         let values1 = { name: DATA.name(), description: DATA.text(DATA.DESCRIPTION.REASONABLE) };
         let values2 = { name: DATA.name(), description: DATA.text(DATA.DESCRIPTION.REASONABLE + 1) }; // +1 - so as to be different from first
-        let all = Shared.urls.entity();
+        let all = URLs.entity();
 
         before(() => {
             return Shared.empty();
@@ -162,10 +163,10 @@ describe('Coordinator Service Tests', function() {
     // --- entity validation tests - here we test valid and invalid, on add and update
 
     describe('entity validation tests', () => {
-        let entity = Shared.urls.entity(DATA.pick(DATA.SLUG.VALID));
+        let entity = URLs.entity(DATA.pick(DATA.SLUG.VALID));
         let values = DATA.some_info();
 
-        function some_name() { return Shared.urls.entity(DATA.slug(DATA.SLUG.REASONABLE)); } // some reasonable name
+        function some_name() { return URLs.entity(DATA.slug(DATA.SLUG.REASONABLE)); } // some reasonable name
 
         before(() => {
             return Shared.empty();
@@ -177,10 +178,10 @@ describe('Coordinator Service Tests', function() {
 
         it('allows various valid slug', () => {
             return Promise.resolve()
-            .then(() => Crud.add_del(Shared.urls.entity(DATA.slug(DATA.SLUG.SHORTEST)), values))
-            .then(() => Crud.add_del(Shared.urls.entity(DATA.slug(DATA.SLUG.LONGEST)), values))
-            .then(() => Crud.add_del(Shared.urls.entity(DATA.slug(DATA.SLUG.REASONABLE).toUpperCase()), values))
-            .then(() => Crud.add_del(Shared.urls.entity(DATA.slug(DATA.SLUG.REASONABLE).concat('   ')), values));
+            .then(() => Crud.add_del(URLs.entity(DATA.slug(DATA.SLUG.SHORTEST)), values))
+            .then(() => Crud.add_del(URLs.entity(DATA.slug(DATA.SLUG.LONGEST)), values))
+            .then(() => Crud.add_del(URLs.entity(DATA.slug(DATA.SLUG.REASONABLE).toUpperCase()), values))
+            .then(() => Crud.add_del(URLs.entity(DATA.slug(DATA.SLUG.REASONABLE).concat('   ')), values));
         });
 
         it('allows various valid names', () => {
@@ -204,11 +205,11 @@ describe('Coordinator Service Tests', function() {
 
         it('disallows various invalid slugs', () => {
             let test = Promise.resolve()
-            .then(() => Crud.bad_request(Shared.urls.entity(DATA.slug(DATA.SLUG.SHORTEST - 1)), [{ slug: DATA.ERRORS.MIN }], values, chakram.post))
-            .then(() => Crud.bad_request(Shared.urls.entity(DATA.slug(DATA.SLUG.LONGEST + 1)), [{ slug: DATA.ERRORS.MAX }], values, chakram.post));
+            .then(() => Crud.bad_request(URLs.entity(DATA.slug(DATA.SLUG.SHORTEST - 1)), [{ slug: DATA.ERRORS.MIN }], values, chakram.post))
+            .then(() => Crud.bad_request(URLs.entity(DATA.slug(DATA.SLUG.LONGEST + 1)), [{ slug: DATA.ERRORS.MAX }], values, chakram.post));
 
             for (let i = 0; i < DATA.SLUG.INVALID.length; i++) {
-                test = test.then(() => Crud.bad_request(Shared.urls.entity(DATA.SLUG.INVALID[i]), [{ slug: DATA.ERRORS.FORMAT }], values, chakram.post));
+                test = test.then(() => Crud.bad_request(URLs.entity(DATA.SLUG.INVALID[i]), [{ slug: DATA.ERRORS.FORMAT }], values, chakram.post));
             }
 
             return test;
@@ -273,9 +274,9 @@ describe('Coordinator Service Tests', function() {
         let entity = DATA.pluck(DATA.SLUG.VALID); // pluck - so as to never get duplicate
         let slug1 = DATA.pluck(DATA.SLUG.VALID); // pluck - so as to never get duplicate
         let slug2 = DATA.pick(DATA.SLUG.VALID);
-        let connector1 = Shared.urls.connector(entity, slug1);
-        let connector2 = Shared.urls.connector(entity, slug2);
-        let all = Shared.urls.connector(entity);
+        let connector1 = URLs.connector(entity, slug1);
+        let connector2 = URLs.connector(entity, slug2);
+        let all = URLs.connector(entity);
         let base = {
             name: DATA.name(DATA.NAME.REASONABLE),
             description: DATA.text(DATA.DESCRIPTION.REASONABLE)
@@ -306,7 +307,7 @@ describe('Coordinator Service Tests', function() {
         });
 
         it('no connectors are returned for a missing parent entity', () => {
-            return Crud.not_found(Shared.urls.entity(entity));
+            return Crud.not_found(URLs.entity(entity));
         });
 
         it('cannot add a connector to a missing parent entity', () => {
@@ -322,7 +323,7 @@ describe('Coordinator Service Tests', function() {
         });
 
         it('add the housing entity', () => {
-            return Crud.add(Shared.urls.entity(entity), base);
+            return Crud.add(URLs.entity(entity), base);
         });
 
         it('it has no connectors', () => {
@@ -420,7 +421,7 @@ describe('Coordinator Service Tests', function() {
         });
 
         it('can delete the entity type and all hence its connectors', () => {
-            return Crud.delete(Shared.urls.entity(entity));
+            return Crud.delete(URLs.entity(entity));
         });
     });
 
@@ -429,7 +430,7 @@ describe('Coordinator Service Tests', function() {
     describe('connector validation tests', () => {
         let entity = DATA.pick(DATA.SLUG.VALID);
         let slug = DATA.pick(DATA.SLUG.VALID);
-        let connector = Shared.urls.connector(entity, slug);
+        let connector = URLs.connector(entity, slug);
         let values = {
             name: DATA.name(DATA.NAME.REASONABLE),
             description: DATA.text(DATA.DESCRIPTION.REASONABLE),
@@ -437,7 +438,7 @@ describe('Coordinator Service Tests', function() {
             cache: DATA.integer(DATA.CACHE.REASONABLE),
         };
 
-        function url(cid) { return Shared.urls.connector(entity, cid); }
+        function url(cid) { return URLs.connector(entity, cid); }
 
         before(() => {
             return Shared.empty();
@@ -448,7 +449,7 @@ describe('Coordinator Service Tests', function() {
         });
 
         it('add the housing entity', () => {
-            return Crud.add(Shared.urls.entity(entity), DATA.some_info());
+            return Crud.add(URLs.entity(entity), DATA.some_info());
         });
 
         it('disallows invalid connector slug', () => {
@@ -534,7 +535,7 @@ describe('Coordinator Service Tests', function() {
         });
 
         it('can delete the entity type and all its connectors', () => {
-            return Crud.delete(Shared.urls.entity(entity));
+            return Crud.delete(URLs.entity(entity));
         });
     });
 });

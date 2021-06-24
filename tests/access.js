@@ -28,7 +28,8 @@
 
 const HTTP = require('http-status-codes');
 const DATA = require('./lib/data.js');
-const Shared = require('./lib/shared.js');
+const Shared = require('./lib/shared.js');  // include first for dotenv
+const URLs = require('./lib/urls.js');
 const Crud = require('./lib/crud.js');
 const chakram = require('chakram');
 const expect = chakram.expect;
@@ -81,7 +82,7 @@ describe('User Access Tests', function() {
         let user2 = { name: DATA.name(), email: DATA.pick(DATA.EMAIL.VALID) };
         let values1 = { role: 'coordinator' };
         let values2 = { role: 'consumer', context: DATA.POLICY.ALLAREA.ID };
-        let all = Shared.urls.user();
+        let all = URLs.user();
 
         before(() => {
             return Shared.empty();
@@ -111,131 +112,132 @@ describe('User Access Tests', function() {
         });
 
         it('can add the first housing user', () => {
-            return Crud.add(all, user1, Shared.urls.user(uid1));
+            return Crud.add(all, user1, URLs.user(uid1));
         });
 
         it('can add the second housing user', () => {
-            return Crud.add(all, user2, Shared.urls.user(uid2));
+            return Crud.add(all, user2, URLs.user(uid2));
         });
 
         it('they are both present in the user list', () => {
             return Crud.verify_all(all, [
-                { ...user1, id: uid1, url: Shared.urls.user(uid1) },
-                { ...user2, id: uid2, url: Shared.urls.user(uid2) }
+                { ...user1, id: uid1, url: URLs.user(uid1) },
+                { ...user2, id: uid2, url: URLs.user(uid2) }
             ]);
         });
 
         it('can add a policy', () => {
-            return Crud.add(Shared.urls.policy(DATA.POLICY.ALLAREA.ID), DATA.POLICY.ALLAREA.DETAIL);
+            return Crud.add(URLs.policy(DATA.POLICY.ALLAREA.ID), DATA.POLICY.ALLAREA.DETAIL);
         });
 
         it('can ask for a coordinator token for first user', () => {
-            return Crud.add(Shared.urls.access(uid1), values1, Shared.urls.access(uid1, aid1), (body) => {
+            return Crud.add(URLs.access(uid1), values1, URLs.access(uid1, aid1), (body) => {
                 expect(body).to.match(new RegExp(DATA.KEY.REGEX));
             });
         });
 
         it('it is present in the user access list', () => {
-            return Crud.verify_all(Shared.urls.access(uid1), [
-                { ...values1, id: aid1, url: Shared.urls.access(uid1, aid1) }
+            return Crud.verify_all(URLs.access(uid1), [
+                { ...values1, id: aid1, url: URLs.access(uid1, aid1) }
             ]);
         });
 
         it('it is present when addressed directly', () => {
-            return Crud.verify(Shared.urls.access(uid1, aid1), { ...values1, id: aid1, url: Shared.urls.access(uid1, aid1) });
+            return Crud.verify(URLs.access(uid1, aid1), { ...values1, id: aid1, url: URLs.access(uid1, aid1) });
         });
 
         it('the date is present when addressed directly', () => {
-            return Crud.get(Shared.urls.access(uid1, aid1), (body) => {
+            return Crud.get(URLs.access(uid1, aid1), (body) => {
+                expect(body).to.be.an('object');
                 expect(body.created).to.match(new RegExp(DATA.DATE.REGEX));
             });
         });
 
         it('cannot ask for the same token twice', () => {
-            return Crud.duplicate(Shared.urls.access(uid1), values1);
+            return Crud.duplicate(URLs.access(uid1), values1);
         });
 
         it('cannot update a token', () => {
-            return Crud.not_found(Shared.urls.access(uid1, aid1), values1, chakram.post);
+            return Crud.not_found(URLs.access(uid1, aid1), values1, chakram.post);
         });
 
         it('can ask for a coordinator token for second user', () => {
-            return Crud.add(Shared.urls.access(uid2), values1, Shared.urls.access(uid2, aid2), (body) => {
+            return Crud.add(URLs.access(uid2), values1, URLs.access(uid2, aid2), (body) => {
                 expect(body).to.match(new RegExp(DATA.KEY.REGEX));
             });
         });
 
         it('it is present in the user access list', () => {
-            return Crud.verify_all(Shared.urls.access(uid2), [
-                { ...values1, id: aid2, url: Shared.urls.access(uid2, aid2) }
+            return Crud.verify_all(URLs.access(uid2), [
+                { ...values1, id: aid2, url: URLs.access(uid2, aid2) }
             ]);
         });
 
         it('it is present when addressed directly', () => {
-            return Crud.verify(Shared.urls.access(uid2, aid2), { ...values1, id: aid2, url: Shared.urls.access(uid2, aid2) });
+            return Crud.verify(URLs.access(uid2, aid2), { ...values1, id: aid2, url: URLs.access(uid2, aid2) });
         });
 
         it('can ask for a consumer token for first user', () => {
-            return Crud.add(Shared.urls.access(uid1), values2, Shared.urls.access(uid1, aid3), (body) => {
+            return Crud.add(URLs.access(uid1), values2, URLs.access(uid1, aid3), (body) => {
                 expect(body).to.match(new RegExp(DATA.KEY.REGEX));
             });
         });
 
         it('it is present in the user access list', () => {
-            return Crud.verify_all(Shared.urls.access(uid1), [
-                { ...values1, id: aid1, url: Shared.urls.access(uid1, aid1) },
-                { ...values2, id: aid3, url: Shared.urls.access(uid1, aid3) }
+            return Crud.verify_all(URLs.access(uid1), [
+                { ...values1, id: aid1, url: URLs.access(uid1, aid1) },
+                { ...values2, id: aid3, url: URLs.access(uid1, aid3) }
             ]);
         });
 
         it('it is present when addressed directly', () => {
-            return Crud.verify(Shared.urls.access(uid1, aid3), { ...values2, id: aid3, url: Shared.urls.access(uid1, aid3) });
+            return Crud.verify(URLs.access(uid1, aid3), { ...values2, id: aid3, url: URLs.access(uid1, aid3) });
         });
 
         it('cannot get access for wrong user', () => {
-            return Crud.not_found(Shared.urls.access(uid1, aid2));
+            return Crud.not_found(URLs.access(uid1, aid2));
         });
 
         it('can delete the coordinator key on first user', () => {
-            return Crud.delete(Shared.urls.access(uid1, aid1));
+            return Crud.delete(URLs.access(uid1, aid1));
         });
 
         it('it is no longer present in the user access list', () => {
-            return Crud.verify_all(Shared.urls.access(uid1), [
-                { ...values2, id: aid3, url: Shared.urls.access(uid1, aid3) }
+            return Crud.verify_all(URLs.access(uid1), [
+                { ...values2, id: aid3, url: URLs.access(uid1, aid3) }
             ]);
         });
 
         it('it is no longer present when addressed directly', () => {
-            return Crud.not_found(Shared.urls.access(uid1, aid1));
+            return Crud.not_found(URLs.access(uid1, aid1));
         });
 
         it('cannot re-delete the coordinator key on first user', () => {
-            return Crud.not_found(Shared.urls.access(uid1, aid1), undefined, chakram.delete);
+            return Crud.not_found(URLs.access(uid1, aid1), undefined, chakram.delete);
         });
 
         it('can delete the consumer key on first user', () => {
-            return Crud.delete(Shared.urls.access(uid1, aid3));
+            return Crud.delete(URLs.access(uid1, aid3));
         });
 
         it('it is no longer present in the user access list', () => {
-            return Crud.verify_all(Shared.urls.access(uid1), []);
+            return Crud.verify_all(URLs.access(uid1), []);
         });
 
         it('it is no longer present when addressed directly', () => {
-            return Crud.not_found(Shared.urls.access(uid1, aid3));
+            return Crud.not_found(URLs.access(uid1, aid3));
         });
 
         it('can delete the policy', () => {
-            return Crud.delete(Shared.urls.policy(DATA.POLICY.ALLAREA.ID));
+            return Crud.delete(URLs.policy(DATA.POLICY.ALLAREA.ID));
         });
 
         it('can delete the second housing user', () => {
-            return Crud.delete(Shared.urls.user(uid1));
+            return Crud.delete(URLs.user(uid1));
         });
 
         it('can delete the first housing user', () => {
-            return Crud.delete(Shared.urls.user(uid2));
+            return Crud.delete(URLs.user(uid2));
         });
     });
 
@@ -249,17 +251,17 @@ describe('User Access Tests', function() {
         let user = { name: DATA.name(), email: DATA.pluck(DATA.EMAIL.VALID) };  // pluck to ensure different emails
         let coordinator = { role: 'coordinator' };
         let consumer = { role: 'consumer' };
-        let all = Shared.urls.user();
+        let all = URLs.user();
 
         function get_key(values) { // gets a key
-            return Crud.add(access, values, Shared.urls.access(uid, ++aid), (body) => {
+            return Crud.add(access, values, URLs.access(uid, ++aid), (body) => {
                 expect(body).to.match(new RegExp(DATA.KEY.REGEX));
             });
         }
 
         function get_del_key(values) { // gets and then deletes a key
             return get_key(values)
-            .then (() => Crud.delete(Shared.urls.access(uid, aid)));
+            .then (() => Crud.delete(URLs.access(uid, aid)));
         }
 
         before(() => {
@@ -273,7 +275,7 @@ describe('User Access Tests', function() {
         it('get the last user id sequence value', () => {
             return Shared.last_id('users').then(last => {
                 uid = last + 1;
-                access = Shared.urls.access(uid);
+                access = URLs.access(uid);
             });
         });
 
@@ -284,15 +286,15 @@ describe('User Access Tests', function() {
         });
 
         it('can add the housing user', () => {
-            return Crud.add(all, user, Shared.urls.user(uid));
+            return Crud.add(all, user, URLs.user(uid));
         });
 
         it('can add first policy', () => {
-            return Crud.add(Shared.urls.policy(DATA.POLICY.ALLAREA.ID), DATA.POLICY.ALLAREA.DETAIL);
+            return Crud.add(URLs.policy(DATA.POLICY.ALLAREA.ID), DATA.POLICY.ALLAREA.DETAIL);
         });
 
         it('can add second policy', () => {
-            return Crud.add(Shared.urls.policy(DATA.POLICY.EXAMPLE.ID), DATA.POLICY.EXAMPLE.DETAIL);
+            return Crud.add(URLs.policy(DATA.POLICY.EXAMPLE.ID), DATA.POLICY.EXAMPLE.DETAIL);
         });
 
         it('disallows asking for keys with invalid roles', () => {
@@ -342,15 +344,15 @@ describe('User Access Tests', function() {
         });
 
         it('can delete the second policy', () => {
-            return Crud.delete(Shared.urls.policy(DATA.POLICY.EXAMPLE.ID));
+            return Crud.delete(URLs.policy(DATA.POLICY.EXAMPLE.ID));
         });
 
         it('can delete the first policy', () => {
-            return Crud.delete(Shared.urls.policy(DATA.POLICY.ALLAREA.ID));
+            return Crud.delete(URLs.policy(DATA.POLICY.ALLAREA.ID));
         });
 
         it('can delete the housing user', () => {
-            return Crud.delete(Shared.urls.user(uid));
+            return Crud.delete(URLs.user(uid));
         });
     });
 });

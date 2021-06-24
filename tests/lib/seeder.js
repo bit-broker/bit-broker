@@ -24,7 +24,8 @@
 
 // -- dependancies
 
-const Shared = require('./shared.js');
+const Shared = require('./shared.js');  // include first for dotenv
+const URLs = require('./urls.js');
 const Crud = require('./crud.js');
 const Session = require('./session.js');
 const fs = require('fs');
@@ -59,7 +60,7 @@ module.exports = class Seeder {
 
         for (let i = 0; i < entities.length; i++) {
             let entity = entities[i];
-            steps.push(Crud.add(Shared.urls.entity(entity.slug), entity.properties));
+            steps.push(Crud.add(URLs.entity(entity.slug), entity.properties));
         }
 
         return Promise.all(steps);
@@ -76,7 +77,7 @@ module.exports = class Seeder {
 
             for (let j = 0; j < entity.connectors.length; j++) {
                 let connector = entity.connectors[j];
-                steps.push(Crud.add(Shared.urls.connector(entity.slug, connector.slug), connector.properties));
+                steps.push(Crud.add(URLs.connector(entity.slug, connector.slug), connector.properties));
             }
         }
 
@@ -110,7 +111,7 @@ module.exports = class Seeder {
 
         for (let i = 0; i < policies.length; i++) {
             let policy = policies[i];
-            steps.push(Crud.add(Shared.urls.policy(policy.slug), policy.properties));
+            steps.push(Crud.add(URLs.policy(policy.slug), policy.properties));
         }
 
         return Promise.all(steps);

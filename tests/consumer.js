@@ -28,7 +28,7 @@
 
 const HTTP = require('http-status-codes');
 const DATA = require('./lib/data.js');
-const Shared = require('./lib/shared.js');
+const Shared = require('./lib/shared.js');  // include first for dotenv
 const Seeder = require('./lib/seeder.js');
 const chakram = require('chakram');
 const expect = chakram.expect;

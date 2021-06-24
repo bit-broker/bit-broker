@@ -29,7 +29,7 @@
 
 // -- dependancies
 
-const Shared = require('./lib/shared.js');
+const Shared = require('./lib/shared.js');  // include first for dotenv
 const Seeder = require('./lib/seeder.js');
 
 // --- the test cases

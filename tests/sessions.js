@@ -15,7 +15,8 @@
 // -- dependancies
 
 const DATA = require('./lib/data.js');
-const Shared = require('./lib/shared.js');
+const Shared = require('./lib/shared.js');  // include first for dotenv
+const URLs = require('./lib/urls.js');
 const Crud = require('./lib/crud.js');
 const Script = require('./lib/script.js');
 const chakram = require('chakram');
@@ -46,15 +47,15 @@ describe('Connector Session Tests', function() {
     let script = new Script(entity, connector, DATA.POLICY.ALLAREA.ID);
 
     it('can create the housing entity', () => {
-        return Crud.add(Shared.urls.entity(entity), DATA.some_info());
+        return Crud.add(URLs.entity(entity), DATA.some_info());
     });
 
     it('can create the housing connector', () => {
-        return Crud.add(Shared.urls.connector(entity, connector), DATA.some_info());
+        return Crud.add(URLs.connector(entity, connector), DATA.some_info());
     });
 
     it('can create the policy', () => {
-        return Crud.add(Shared.urls.policy(DATA.POLICY.ALLAREA.ID), DATA.POLICY.ALLAREA.DETAIL);
+        return Crud.add(URLs.policy(DATA.POLICY.ALLAREA.ID), DATA.POLICY.ALLAREA.DETAIL);
     });
 
     it('- STREAM TESTS -----------------------------------', () => { return true; });
@@ -818,6 +819,6 @@ describe('Connector Session Tests', function() {
     });
 
     it('can delete the housing entity', () => {
-        return Crud.delete(Shared.urls.entity(entity));
+        return Crud.delete(URLs.entity(entity));
     });
 });

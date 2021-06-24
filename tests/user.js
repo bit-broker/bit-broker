@@ -28,7 +28,8 @@
 
 const HTTP = require('http-status-codes');
 const DATA = require('./lib/data.js');
-const Shared = require('./lib/shared.js');
+const Shared = require('./lib/shared.js');  // include first for dotenv
+const URLs = require('./lib/urls.js');
 const Crud = require('./lib/crud.js');
 const chakram = require('chakram');
 const expect = chakram.expect;
@@ -79,7 +80,7 @@ describe('User Tests', function() {
         let values1 = { name: DATA.name(), email: DATA.pluck(DATA.EMAIL.VALID) };  // pluck to ensure different emails
         let values2 = { name: DATA.name(), email: DATA.pluck(DATA.EMAIL.VALID) };
         let update1 = { name: DATA.name() };
-        let all = Shared.urls.user();
+        let all = URLs.user();
 
         before(() => {
             return Shared.empty();
@@ -94,8 +95,8 @@ describe('User Tests', function() {
             .then(last => {
                 id1 = last + 1;
                 id2 = last + 2;
-                user1 = Shared.urls.user(id1);
-                user2 = Shared.urls.user(id2);
+                user1 = URLs.user(id1);
+                user2 = URLs.user(id2);
             });
         });
 
@@ -180,7 +181,7 @@ describe('User Tests', function() {
         let id = null; // will be filled in during the first test
         let user = null;
         let values = { email:DATA.pick(DATA.EMAIL.VALID), name: DATA.name() };
-        let all = Shared.urls.user();
+        let all = URLs.user();
 
         before(() => {
             return Shared.empty();
@@ -193,7 +194,7 @@ describe('User Tests', function() {
         it('get the last user id sequence value', () => {
             return Shared.last_id('users').then(last => {
                 id = last + 1;
-                user = Shared.urls.user(id);
+                user = URLs.user(id);
             });
         });
 
