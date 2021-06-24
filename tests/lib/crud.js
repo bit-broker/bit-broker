@@ -32,6 +32,12 @@ const expect = chakram.expect;
 
 module.exports = class Crud {
 
+    // --- sets the headers for all future requests
+
+    static headers(headers = {}) {
+        chakram.setRequestDefaults ({ headers });
+    }
+
     // --- adds a resource
 
     static add(url, body, location, checker) {
