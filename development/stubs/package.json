@@ -1,0 +1,35 @@
+{
+  "name": "dummy-services",
+  "version": "1.0.0",
+  "description": "bit-broker dummy services - development only",
+  "main": "index.js",
+  "scripts": {
+    "rate": "NODE_PATH=./node_modules node dummy-rate-limit.js",
+    "auth": "NODE_PATH=./node_modules node dummy-auth-service.js"
+  },
+  "author": "Cisco",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "clone-deep": "^4.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-prom-bundle": "^6.3.6",
+    "express-winston": "^4.1.0",
+    "http-errors": "^1.7.2",
+    "http-status-codes": "^2.1.4",
+    "i18n": "^0.13.2",
+    "ioredis": "^4.27.2",
+    "json-keys-sort": "^2.0.0",
+    "jsonschema": "^1.4.0",
+    "knex": "^0.95.4",
+    "mongo-query-to-postgres-jsonb": "^0.2.12",
+    "node-fetch": "^2.6.1",
+    "pg": "^8.6.0",
+    "prom-client": "^13.1.0",
+    "validator": "^13.6.0",
+    "winston": "^3.3.3",
+    "winston-daily-rotate-file": "^4.5.2"
+  }
+}
