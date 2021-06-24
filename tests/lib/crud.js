@@ -40,7 +40,7 @@ module.exports = class Crud {
         .then(response => {
             expect(response).to.have.status(HTTP.CREATED);
             expect(response).to.have.header('Location', location);
-            checker ? checker(response.body) : expect(response.body).to.be.undefined;
+            if (checker) checker(response.body);
             return chakram.wait();
         });
     }

@@ -330,7 +330,9 @@ describe('Coordinator Service Tests', function() {
         });
 
         it('add the connector to the entity', () => {
-            return Crud.add(connector1, values1);
+            return Crud.add(connector1, values1, connector1, (body) => {
+                expect(body).to.match(new RegExp(DATA.KEY.REGEX));
+            });
         });
 
         it('it is present in the entities connector list', () => {
@@ -348,7 +350,9 @@ describe('Coordinator Service Tests', function() {
         });
 
         it('can add a second connector', () => {
-            return Crud.add(connector2, values2);
+            return Crud.add(connector2, values2, connector2, (body) => {
+                expect(body).to.match(new RegExp(DATA.KEY.REGEX));
+            });
         });
 
         it('both are present in the connector list', () => {

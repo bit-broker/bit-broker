@@ -92,7 +92,7 @@ CREATE TABLE connector
     slug VARCHAR (32) UNIQUE NOT NULL,
     properties JSONB NOT NULL,
     contribution_id CHAR(36) UNIQUE,
-    contribution_key CHAR(36),
+    contribution_key_id CHAR(36) UNIQUE NOT NULL,
     session_id CHAR(36) UNIQUE,
     session_mode SESSION_MODES,
     session_started TIMESTAMP,

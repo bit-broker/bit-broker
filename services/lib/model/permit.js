@@ -54,7 +54,7 @@ module.exports = class Permit {
     // --- obtains an access token and a JTI from the auth-service
 
     static access_token(scope, audience) {
-        return fetch(process.env.AUTH_SERVICE, {
+        return fetch(process.env.AUTH_SERVICE + '/token', {
             method: 'POST',
             body: JSON.stringify({ scope: scope, aud: audience }),
             headers: FETCH.HEADERS,
