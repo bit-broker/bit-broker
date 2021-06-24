@@ -47,36 +47,18 @@ var redis = new Redis(process.env.POLICY_CACHE, { commandTimeout: REDIS_TIMEOUT 
 // --- redis event logging
 
 redis
-.on('connect', () => {
-    log.info('redis', 'connected')
-})
-.on('ready', () => {
-    log.info('redis', 'ready')
-})
-.on('error', (err) => {
-    log.error('redis', 'error', err)
-})
-.on('close', () => {
-    log.info('redis', 'close')
-})
-.on('reconnecting', () => {
-    log.info('redis', 'reconnecting')
-})
-.on('end', () => {
-    log.info('redis', 'end')
-});
+.on('connect', () => { log.info('redis', 'connected') })
+.on('ready', () => { log.info('redis', 'ready') })
+.on('error', (error) => { log.error('redis', 'error', error) })
+.on('close', () => { log.info('redis', 'close') })
+.on('reconnecting', () => { log.info('redis', 'reconnecting') })
+.on('end', () => { log.info('redis', 'end') });
 
 // --- postgres test and report
 
-db.raw('SELECT 1+1 AS result')
-
-.then(() => {
-    log.info('postgres', 'connected');
-})
-
-.catch(err => {
-    log.error('postgres', 'error', err);
-});
+db.raw('SELECT COUNT(id) FROM entity')
+.then(result => { result.rowCount == 1 ? log.info('postgres', 'connected') : log.warn('postgres', 'connected', 'database not reachable') })
+.catch(error => { log.error('postgres', 'error', error) });
 
 // --- exports
 
