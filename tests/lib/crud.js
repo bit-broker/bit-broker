@@ -28,6 +28,10 @@ const HTTP = require('http-status-codes');
 const chakram = require('chakram');
 const expect = chakram.expect;
 
+// --- constants
+
+const OK_CODES = [HTTP.OK, HTTP.NO_CONTENT]
+
 // --- crud class (exported)
 
 module.exports = class Crud {
@@ -131,8 +135,19 @@ module.exports = class Crud {
     static get(url, checker) {
         return chakram.get(url)
         .then(response => {
+            expect(response.response.statusCode).to.be.oneOf(OK_CODES);
             if (checker) checker(response.body);
-            expect(response).to.have.status(HTTP.OK);
+            return chakram.wait();
+        });
+    }
+
+    // --- post  a resource
+
+    static post(url, body, checker) {
+        return chakram.post(url, body)
+        .then(response => {
+            expect(response.response.statusCode).to.be.oneOf(OK_CODES);
+            if (checker) checker(response.body);
             return chakram.wait();
         });
     }
