@@ -30,19 +30,43 @@ function status
     echo "------------------------"
 }
 
+function logs
+{
+    tail -f bbk-coordinator.out bbk-contributor.out bbk-consumer.out bbk-rate-limit.out bbk-auth-service.out
+}
+
+function start
+{
+    echo "starting services..."
+    npm start bbk-coordinator     --prefix ../../services/coordinator > bbk-coordinator.out  2>&1 &
+    npm start bbk-contributor     --prefix ../../services/contributor > bbk-contributor.out  2>&1 &
+    npm start bbk-consumer        --prefix ../../services/consumer    > bbk-consumer.out     2>&1 &
+    npm run rate bbk-rate-limit   --prefix ../stubs                   > bbk-rate-limit.out   2>&1 &
+    npm run auth bbk-auth-service --prefix ../stubs                   > bbk-auth-service.out 2>&1 &
+    sleep 2
+}
+
+function stop
+{
+    echo "killing services..."
+    ps -ef | grep "$(services)" | awk '{print $2 }' | xargs kill -s INT
+    sleep 2
+}
+
+function wipe
+{
+    echo "wiping the database..."
+    psql -U postgres -a -f ../../database/schema.sql > /dev/null
+    sleep 1
+}
+
 echo
 
 case $1 in
 
     start)
         if [ $(count) -eq "0" ]; then
-            echo "starting services..."
-            npm start bbk-coordinator     --prefix ../../services/coordinator > bbk-coordinator.out  2>&1 &
-            npm start bbk-contributor     --prefix ../../services/contributor > bbk-contributor.out  2>&1 &
-            npm start bbk-consumer        --prefix ../../services/consumer    > bbk-consumer.out     2>&1 &
-            npm run rate bbk-rate-limit   --prefix ../stubs                   > bbk-rate-limit.out   2>&1 &
-            npm run auth bbk-auth-service --prefix ../stubs                   > bbk-auth-service.out 2>&1 &
-            sleep 2
+            start
         else
             error "some services are already running - stop those first"
         fi
@@ -55,9 +79,7 @@ case $1 in
         if [ $(count) -eq "0" ]; then
             error "no services are running"
         else
-            echo "killing services..."
-            ps -ef | grep "$(services)" | awk '{print $2 }' | xargs kill -s INT
-            sleep 2
+            stop
         fi
 
         echo
@@ -72,21 +94,33 @@ case $1 in
         if [ $(count) -eq "0" ]; then
             error "no services are running"
         else
-            tail -f bbk-coordinator.out bbk-contributor.out bbk-consumer.out bbk-rate-limit.out bbk-auth-service.out
+            logs
         fi
     ;;
 
-    reset)
+    wipe)
         if [ $(count) -eq "0" ]; then
-            echo "resettting the database..."
-            psql -U postgres -a -f ../../database/schema.sql > /dev/null
+            wipe
             echo
-            echo "reset complete"
+            echo "wipe complete"
         else
             error "some services are already running - stop those first"
             echo
             status
         fi
+    ;;
+
+    reset)
+        if [ $(count) -ne "0" ]; then
+            stop
+        else
+            echo "no services running"
+        fi
+
+        wipe
+        start
+        echo
+        status
     ;;
 
     *)
@@ -98,7 +132,8 @@ case $1 in
         echo "  stop   - stops bbk services"
         echo "  status - show bbk service status"
         echo "  logs   - tails all bbk services logs"
-        echo "  reset  - resets the bbk database"
+        echo "  wipe   - resets the bbk database"
+        echo "  reset  - stop » wipe » start"
     ;;
 
 esac
