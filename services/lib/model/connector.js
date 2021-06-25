@@ -112,7 +112,7 @@ module.exports = class Connector {
 
             return this.write.insert(values)
             .then(result => result.rowCount > 0)
-            .then(worked => worked ? token.token : false);
+            .then(worked => worked ? { id: values.contribution_id, token: token.token } : false);
         });
     }
 

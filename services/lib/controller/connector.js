@@ -121,10 +121,10 @@ module.exports = class Connector {
             });
         })
 
-        .then(token => {
+        .then(details => {
             log.info('entity', eid, 'connector', cid, 'insert', 'complete');
             let href = `${ req.protocol }://${ req.get('host') }${ req.originalUrl.replace(/\/$/, '') }`;
-            res.set({ 'Location': href }).status(HTTP.CREATED).send(token);
+            res.set({ 'Location': href }).status(HTTP.CREATED).send(details);
         })
 
         .catch(error => next(error));

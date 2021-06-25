@@ -332,7 +332,9 @@ describe('Coordinator Service Tests', function() {
 
         it('add the connector to the entity', () => {
             return Crud.add(connector1, values1, connector1, (body) => {
-                expect(body).to.match(new RegExp(DATA.KEY.REGEX));
+                expect(body).to.be.an('object');
+                expect(body.id).to.match(new RegExp(DATA.ID.REGEX));
+                expect(body.token).to.match(new RegExp(DATA.KEY.REGEX));
             });
         });
 
@@ -352,7 +354,9 @@ describe('Coordinator Service Tests', function() {
 
         it('can add a second connector', () => {
             return Crud.add(connector2, values2, connector2, (body) => {
-                expect(body).to.match(new RegExp(DATA.KEY.REGEX));
+                expect(body).to.be.an('object');
+                expect(body.id).to.match(new RegExp(DATA.ID.REGEX));
+                expect(body.token).to.match(new RegExp(DATA.KEY.REGEX));
             });
         });
 
