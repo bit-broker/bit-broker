@@ -47,6 +47,10 @@ class URLs {
 
     // --- restful access points
 
+    coordinator() { return process.env.COORDINATOR_BASE; }
+    contributor() { return process.env.CONTRIBUTOR_BASE; }
+    consumer() { return process.env.CONSUMER_BASE; }
+
     entity(eid) { return this.rest('entity', eid); }
     connector(eid, cid) { return this.rest('entity', eid, 'connector', cid); }
     user(uid) { return this.rest('user', uid); }
@@ -56,6 +60,9 @@ class URLs {
     session_open(cid, mode = 'stream') { return this.rest('connector', cid, 'session', 'open', mode); }
     session_action(cid, sid, action = 'upsert') { return this.rest('connector', cid, 'session', sid, action); }
     session_close(cid, sid, commit = true) { return this.rest('connector', cid, 'session', sid, 'close', commit ? 'true' : 'false'); }
+
+    consumer_entity() { return process.env.CONSUMER_BASE + '/entity'; }
+    consumer_catalog() { return process.env.CONSUMER_BASE + '/catalog'; }
 }
 
 // --- exported classes

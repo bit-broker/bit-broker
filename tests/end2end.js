@@ -60,7 +60,7 @@ describe('End-to-End Tests', function() {
 
     it('the coordinator api is accessible', function () {
         return Promise.all([
-            Crud.get(process.env.COORDINATOR_BASE),
+            Crud.get(URLs.coordinator()),
             Crud.get(URLs.entity()),
             Crud.get(URLs.policy()),
             Crud.get(URLs.user())
@@ -68,14 +68,14 @@ describe('End-to-End Tests', function() {
     });
 
     it('the contributor api not is accessible', function () {
-        return LOCAL ? this.skip() : Crud.not_found(process.env.CONTRIBUTOR_BASE);
+        return LOCAL ? this.skip() : Crud.not_found(URLs.contributor());
     });
 
     it('the consumer api is not accessible', function () {
         return LOCAL ? this.skip() : Promise.all([
-            Crud.not_found(process.env.CONSUMER_BASE),
-            Crud.not_found(process.env.CONSUMER_BASE + '/entity'),
-            Crud.not_found(process.env.CONSUMER_BASE + '/catalog')
+            Crud.not_found(URLs.consumer()),
+            Crud.not_found(URLs.consumer_entity()),
+            Crud.not_found(URLs.consumer_catalog())
         ]);
     });
 
@@ -107,7 +107,7 @@ describe('End-to-End Tests', function() {
 
     it('the coordinator api is still accessible', function () {
         return Promise.all([
-            Crud.get(process.env.COORDINATOR_BASE),
+            Crud.get(URLs.coordinator()),
             Crud.get(URLs.entity()),
             Crud.get(URLs.policy()),
             Crud.get(URLs.user())
@@ -115,14 +115,14 @@ describe('End-to-End Tests', function() {
     });
 
     it('the contributor api is still not accessible', function () {
-        return LOCAL ? this.skip() : Crud.not_found(process.env.CONTRIBUTOR_BASE);
+        return LOCAL ? this.skip() : Crud.not_found(URLs.contributor());
     });
 
     it('the consumer api is still not accessible', function () {
         return LOCAL ? this.skip() : Promise.all([
-            Crud.not_found(process.env.CONSUMER_BASE),
-            Crud.not_found(process.env.CONSUMER_BASE + '/entity'),
-            Crud.not_found(process.env.CONSUMER_BASE + '/catalog')
+            Crud.not_found(URLs.consumer()),
+            Crud.not_found(URLs.consumer_entity()),
+            Crud.not_found(URLs.consumer_catalog())
         ]);
     });
 
@@ -143,7 +143,7 @@ describe('End-to-End Tests', function() {
 
     it('the coordinator api is not accessible', function () {
         return LOCAL ? this.skip() : Promise.all([
-            Crud.not_found(process.env.COORDINATOR_BASE),
+            Crud.not_found(URLs.coordinator()),
             Crud.not_found(URLs.entity()),
             Crud.not_found(URLs.policy()),
             Crud.not_found(URLs.user())
@@ -151,14 +151,14 @@ describe('End-to-End Tests', function() {
     });
 
     it('the contributor api is accessible', function () {
-        return Crud.get(process.env.CONTRIBUTOR_BASE);
+        return Crud.get(URLs.contributor());
     });
 
     it('the consumer api is not accessible', function () {
         return LOCAL ? this.skip() : Promise.all([
-            Crud.not_found(process.env.CONSUMER_BASE),
-            Crud.not_found(process.env.CONSUMER_BASE + '/entity'),
-            Crud.not_found(process.env.CONSUMER_BASE + '/catalog')
+            Crud.not_found(URLs.consumer()),
+            Crud.not_found(URLs.consumer_entity()),
+            Crud.not_found(URLs.consumer_catalog())
         ]);
     });
 
