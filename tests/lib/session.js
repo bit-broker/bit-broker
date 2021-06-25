@@ -33,7 +33,7 @@ const expect = chakram.expect;
 
 // --- constants
 
-const DATA_PAGE_SIZE  = 50; // number of records in a singel data upsert
+const DATA_PAGE_SIZE = 50; // number of records in a singel data upsert
 
 // --- session test class (exported)
 
