@@ -45,11 +45,10 @@ module.exports = class Crud {
     // --- adds a resource
 
     static add(url, body, location, checker) {
-        location = location || url.trim();
         return chakram.post(url, body)
         .then(response => {
             expect(response).to.have.status(HTTP.CREATED);
-            expect(response).to.have.header('Location', location);
+            if (location) expect(response).to.have.header('Location', location.trim());
             if (checker) checker(response.body);
             return chakram.wait();
         });

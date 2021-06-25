@@ -90,7 +90,7 @@ describe('Policy Tests', function() {
         });
 
         it('can add a policy', () => {
-            return Crud.add(url(DATA.POLICY.ALLAREA.ID), DATA.POLICY.ALLAREA.DETAIL);
+            return Crud.add(url(DATA.POLICY.ALLAREA.ID), DATA.POLICY.ALLAREA.DETAIL, url(DATA.POLICY.ALLAREA.ID));
         });
 
         it('it is present in the policy list', () => {
@@ -130,7 +130,7 @@ describe('Policy Tests', function() {
         });
 
         it('can add a second policy', () => {
-            return Crud.add(url(DATA.POLICY.EXAMPLE.ID), DATA.POLICY.EXAMPLE.DETAIL);
+            return Crud.add(url(DATA.POLICY.EXAMPLE.ID), DATA.POLICY.EXAMPLE.DETAIL, url(DATA.POLICY.EXAMPLE.ID));
         });
 
         it('both are present in the policy list', () => {
@@ -194,7 +194,7 @@ describe('Policy Tests', function() {
         });
 
         it('can add a policy', () => {
-            return Crud.add(url(DATA.POLICY.ALLAREA.ID), DATA.POLICY.ALLAREA.DETAIL);
+            return Crud.add(url(DATA.POLICY.ALLAREA.ID), DATA.POLICY.ALLAREA.DETAIL, url(DATA.POLICY.ALLAREA.ID));
         });
 
         it('cannot update a policy with an invalid policy object', () => {

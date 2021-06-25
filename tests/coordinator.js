@@ -93,7 +93,7 @@ describe('Coordinator Service Tests', function() {
         });
 
         it('can add an entity type', () => {
-            return Crud.add(entity1, values1);
+            return Crud.add(entity1, values1, entity1);
         });
 
         it('it is present in the entity type list', () => {
@@ -125,7 +125,7 @@ describe('Coordinator Service Tests', function() {
         });
 
         it('can add a second entity type', () => {
-            return Crud.add(entity2, values2);
+            return Crud.add(entity2, values2, entity2);
         });
 
         it('both are present in the entity type list', () => {
@@ -232,7 +232,7 @@ describe('Coordinator Service Tests', function() {
         });
 
         it('create update test entity', () => {
-            return Crud.add(entity, values);
+            return Crud.add(entity, values, entity);
         });
 
         it('allows update of various valid names', () => {
@@ -323,7 +323,7 @@ describe('Coordinator Service Tests', function() {
         });
 
         it('add the housing entity', () => {
-            return Crud.add(URLs.entity(entity), base);
+            return Crud.add(URLs.entity(entity), base, URLs.entity(entity));
         });
 
         it('it has no connectors', () => {
@@ -453,7 +453,7 @@ describe('Coordinator Service Tests', function() {
         });
 
         it('add the housing entity', () => {
-            return Crud.add(URLs.entity(entity), DATA.some_info());
+            return Crud.add(URLs.entity(entity), DATA.some_info(), URLs.entity(entity));
         });
 
         it('disallows invalid connector slug', () => {
@@ -502,7 +502,7 @@ describe('Coordinator Service Tests', function() {
         });
 
         it('create update test entity', () => {
-            return Crud.add(connector, values);
+            return Crud.add(connector, values, connector);
         });
 
         it('disallows update of invalid webhook url', () => {
