@@ -43,21 +43,20 @@ function start
     npm start bbk-consumer        --prefix ../../services/consumer    > bbk-consumer.out     2>&1 &
     npm run rate bbk-rate-limit   --prefix ../stubs                   > bbk-rate-limit.out   2>&1 &
     npm run auth bbk-auth-service --prefix ../stubs                   > bbk-auth-service.out 2>&1 &
-    sleep 2
+    sleep 1
 }
 
 function stop
 {
     echo "killing services..."
     ps -ef | grep "$(services)" | awk '{print $2 }' | xargs kill -s INT
-    sleep 2
+    sleep 1
 }
 
 function wipe
 {
     echo "wiping the database..."
     psql -U postgres -a -f ../../database/schema.sql > /dev/null
-    sleep 1
 }
 
 echo
