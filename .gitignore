@@ -4,6 +4,5 @@
 node_modules/
 logs/
 tests/*.json
-
-# VIM Files
+*.out
 .swp
