@@ -43,10 +43,16 @@ describe('End-to-End Tests', function() {
     this.timeout(0); // we are not interested in non-functional tests here
 
     let admin = { id: 1, url: URLs.user(1), name: 'admin' };
-    let coordinator = { uid: 2, aid: 1, token: null, details: { name: 'alice', email: 'alice@foo.com' }};
+    let users = {
+        alice: { uid: 2, token: null, details: { name: 'alice', email: 'alice@domain.com' }}, // coordinator
+        bob: { uid: 3, token: null, details: { name: 'bob', email: 'bob@domain.com' }},
+        carol: { uid: 4, token: null, details: { name: 'carol', email: 'carol@domain.com' }},
+        ted: { uid: 5, token: null, details: { name: 'ted', email: 'ted@domain.com' }},
+    };
+    let coordinator = users.alice;
     let country = Seeder.entities.find(e => e.slug === 'country');
-    let countries = Seeder.records(country.slug);
     let site = Seeder.entities.find(e => e.slug === 'heritage-site');
+    let countries = Seeder.records(country.slug);
     let sites = Seeder.records(site.slug);
     let policies = Seeder.policies;
 
@@ -92,11 +98,11 @@ describe('End-to-End Tests', function() {
     });
 
     it('create the coordinator user', function () {
-        return Crud.add(URLs.user(), coordinator.details, URLs.user(coordinator.uid));
+        return Crud.add(URLs.user(), coordinator.details);
     });
 
     it('generate a key for the coordinator user', function () {
-        return Crud.add(URLs.access(coordinator.uid), { role: 'coordinator' }, URLs.access(coordinator.uid, coordinator.aid), (token) => {
+        return Crud.add(URLs.access(coordinator.uid), { role: 'coordinator' }, undefined, (token) => {
             coordinator.token = token;
         });
     });
@@ -187,28 +193,28 @@ describe('End-to-End Tests', function() {
         Crud.headers({ authorizaion: coordinator.token });
     });
 
-    it('create the world heritage site entity', function () {
+    it('create the heritage-site entity', function () {
         return Crud.add(URLs.entity(site.slug), site.properties);
     });
 
-    it('create the world heritage site entity connector', function () {
+    it('create the heritage-site entity connector', function () {
         return Crud.add(URLs.connector(site.slug, site.connectors[0].slug), site.connectors[0].properties, undefined, (details) => {
             site.connectors[0].id = details.id;
             site.connectors[0].token = details.token;
         });
     });
 
-    it('switch to world heritage site connector key', function () {
+    it('switch to heritage-site connector key', function () {
         Crud.headers({ authorizaion: site.connectors[0].token });
     });
 
-    it('open a stream session on world heritage site', function () {
+    it('open a stream session on heritage-site', function () {
         return Crud.get(URLs.session_open(site.connectors[0].id, 'stream'), (session) => {
             site.connectors[0].session = session;
         });
     });
 
-    it('upsert the world heritage site records into the session', function () {
+    it('upsert the heritage-site records into the session', function () {
         let act = Promise.resolve();
         let url = URLs.session_action(site.connectors[0].id, site.connectors[0].session, 'upsert');
 
@@ -219,7 +225,7 @@ describe('End-to-End Tests', function() {
         return act;
     });
 
-    it('close the stream session on world heritage site', function () {
+    it('close the stream session on heritage-site', function () {
         return Crud.get(URLs.session_close(site.connectors[0].id, site.connectors[0].session, 'true'));
     });
 
@@ -236,4 +242,56 @@ describe('End-to-End Tests', function() {
 
         return Promise.all(act);
     });
+
+    it('add all the consumers', function () {
+        let act = Promise.resolve();  // must do these in order to preserve uid index
+
+        act = act.then(() => Crud.add(URLs.user(), users.bob.details));
+        act = act.then(() => Crud.add(URLs.user(), users.carol.details));
+        act = act.then(() => Crud.add(URLs.user(), users.ted.details));
+
+        return act;
+    });
+
+    it('generate a key consumer for bob for the access-all-areas policy', function () {
+        return Crud.add(URLs.access(users.bob.uid), { role: 'consumer', context: 'access-all-areas' }, undefined, (token) => {
+            users.bob.token = token;
+        });
+    });
+
+    it('switch to bob\'s consumer key', function () {
+        let headers = { authorizaion: coordinator.token };
+        if (LOCAL) headers ['x-bb-policy'] = 'access-all-areas';
+        Crud.headers(headers);
+    });
+
+    it('the coordinator api is not accessible', function () {
+        return LOCAL ? this.skip() : Promise.all([
+            Crud.not_found(URLs.coordinator()),
+            Crud.not_found(URLs.entity()),
+            Crud.not_found(URLs.policy()),
+            Crud.not_found(URLs.user())
+        ]);
+    });
+
+    it('the contributor api is not accessible', function () {
+        return LOCAL ? this.skip() : Crud.not_found(URLs.contributor());
+    });
+
+    it('the consumer api is accessible', function () {
+        return Promise.all([
+            Crud.get(URLs.consumer()),
+            Crud.get(URLs.consumer_entity()),
+            Crud.get(URLs.consumer_catalog())
+        ]);
+    });
+
+    it('all entities are present in the entity list', function () {
+        return Crud.verify_all(URLs.consumer_entity(), [
+            { id: 'country' },
+            { id: 'heritage-site' }
+        ]);
+    });
+
+
 });
