@@ -173,6 +173,8 @@ CREATE TABLE access
 
 CREATE INDEX idx_access_user ON access (user_id, role);
 
+INSERT INTO access (user_id, role, key_id) VALUES (1, 'coordinator', '012345678901234567890123456789012345');
+
 -- grant permissions - TODO allocate more specific grants based on each user
 
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO bbk_reader;
