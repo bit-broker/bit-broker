@@ -64,8 +64,7 @@ class Shared {
 
     last_id(table, column = 'id') {
         return this.db(`${ table }_${ column }_seq`).select('last_value').first().then(item => {
-            let last = parseInt(item.last_value);
-            return last == 1 ? 0 : last; // last_value == 1 when the sequence has never been used, so we shift to zero to allow clients to +1 it
+            return parseInt(item.last_value);
         });
     }
 
