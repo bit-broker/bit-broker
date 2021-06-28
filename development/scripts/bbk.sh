@@ -2,7 +2,13 @@
 
 function error
 {
-    printf "\033[0;31m$1\033[0m\n"
+    printf "\033[0;31m  » $1\033[0m\n"
+}
+
+
+function info
+{
+    printf "\033[0;37m  » $1\033[0m\n"
 }
 
 function services
@@ -17,17 +23,17 @@ function count
 
 function status
 {
-    echo "--- services running ---"
-    echo
+    echo "  ┌────── services running ──────┐"
+    echo "  │                              │"
 
     if [ $(count) -eq "0" ]; then
-        echo "none"
+        echo "  │          none found          │"
     else
-        ps -ef | grep "$(services)" | awk '{printf "%-5s - %s\n", $2, $10 }'
+        ps -ef | grep "$(services)" | awk '{printf "  │   %-5s » %-16s   │\n", $2, $10 }'
     fi
 
-    echo
-    echo "------------------------"
+    echo "  │                              │"
+    echo "  └──────────────────────────────┘"
 }
 
 function logs
@@ -37,7 +43,7 @@ function logs
 
 function start
 {
-    echo "starting services..."
+    info "starting services..."
     npm start bbk-coordinator     --prefix ../../services/coordinator > bbk-coordinator.out  2>&1 &
     npm start bbk-contributor     --prefix ../../services/contributor > bbk-contributor.out  2>&1 &
     npm start bbk-consumer        --prefix ../../services/consumer    > bbk-consumer.out     2>&1 &
@@ -48,14 +54,14 @@ function start
 
 function stop
 {
-    echo "killing services..."
+    info "killing services..."
     ps -ef | grep "$(services)" | awk '{print $2 }' | xargs kill -s INT
     sleep 1
 }
 
 function wipe
 {
-    echo "wiping the database..."
+    info "wiping the database..."
     psql -U postgres -a -f ../../database/schema.sql > /dev/null
 }
 
@@ -100,8 +106,7 @@ case $1 in
     wipe)
         if [ $(count) -eq "0" ]; then
             wipe
-            echo
-            echo "wipe complete"
+            info "wipe complete"
         else
             error "some services are already running - stop those first"
             echo
@@ -113,7 +118,7 @@ case $1 in
         if [ $(count) -ne "0" ]; then
             stop
         else
-            echo "no services running"
+            info "no services running"
         fi
 
         wipe
@@ -123,16 +128,16 @@ case $1 in
     ;;
 
     *)
-        echo "$0 <command>"
+        echo "  $0 <command>"
         echo
-        echo "commands:"
+        echo "  command:"
         echo
-        echo "  start  - starts bbk services"
-        echo "  stop   - stops bbk services"
-        echo "  status - show bbk service status"
-        echo "  logs   - tails all bbk services logs"
-        echo "  wipe   - resets the bbk database"
-        echo "  reset  - stop » wipe » start"
+        echo "    start  → starts bbk services"
+        echo "    stop   → stops bbk services"
+        echo "    status → show bbk service status"
+        echo "    logs   → tails all bbk services logs"
+        echo "    wipe   → resets the bbk database"
+        echo "    reset  → stop » wipe » start"
     ;;
 
 esac
