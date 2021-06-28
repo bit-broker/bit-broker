@@ -62,8 +62,6 @@ module.exports = class Operation {
 
         for (let i = 0; i < records.length; i++) {
             let record = records[i];
-
-            record.id = Permit.public_key(this.connector.id, record.id);
             record.type = this.connector.entity_slug;
 
             values.push({
@@ -98,7 +96,7 @@ module.exports = class Operation {
                     if (items[i].action === 'upsert') {
                         return catalog.upsert({
                             connector_id: this.connector.id,
-                            public_id: Permit.public_key(this.connector.id, items[i].record.id),
+                            public_id: Permit.public_key(this.connector.contribution_id, items[i].record.id),
                             vendor_id: items[i].record.id,
                             record: items[i].record
                         });
