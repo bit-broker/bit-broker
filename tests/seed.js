@@ -67,4 +67,8 @@ describe('Database Seeding', function() {
     it('create the policies', () => {
         return Seeder.add_policies();
     });
+
+    it('create the users', () => {
+        return Seeder.add_users();
+    });
 });

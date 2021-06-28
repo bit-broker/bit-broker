@@ -1,0 +1,26 @@
+[
+    {
+        "properties": {
+            "name": "alice",
+            "email": "alice@domain.com"
+        }
+    },
+    {
+        "properties": {
+            "name": "bob",
+            "email": "bob@domain.com"
+        }
+    },
+    {
+        "properties": {
+            "name": "carol",
+            "email": "carol@domain.com"
+        }
+    },
+    {
+        "properties": {
+            "name": "ted",
+            "email": "ted@domain.com"
+        }
+    }
+]

@@ -46,6 +46,12 @@ module.exports = class Seeder {
         return JSON.parse(fs.readFileSync('./data/policies.json'));
     }
 
+    // --- returns user seed data
+
+    static get users() {
+        return JSON.parse(fs.readFileSync('./data/users.json'));
+    }
+
     // --- returns record data for the given name
 
     static records(name) {
@@ -112,6 +118,20 @@ module.exports = class Seeder {
         for (let i = 0; i < policies.length; i++) {
             let policy = policies[i];
             steps.push(Crud.add(URLs.policy(policy.slug), policy.properties));
+        }
+
+        return Promise.all(steps);
+    }
+
+    // --- adds the users
+
+    static add_users() {
+        let steps = [];
+        let users = Seeder.users;
+
+        for (let i = 0; i < users.length; i++) {
+            let user = users[i];
+            steps.push(Crud.add(URLs.user(), user.properties));
         }
 
         return Promise.all(steps);
