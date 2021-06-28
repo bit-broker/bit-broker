@@ -56,37 +56,95 @@ describe('End-to-End Tests', function() {
 
     let posit = {
         'country': [
-            { name: 'Afghanistan', policies: ['access-all-areas'] },
-            { name: 'Austria', policies: ['access-all-areas', 'european-union'] },
+            { name: 'Afghanistan', policies: ['access-all-areas', 'all-countries'] },
+            { name: 'Austria', policies: ['access-all-areas', 'all-countries', 'european-union'] },
+            { name: 'Ireland', policies: ['access-all-areas', 'all-countries', 'european-union', 'british-isles'] },
+            { name: 'United Kingdom', policies: ['access-all-areas', 'all-countries', 'british-isles'] }
         ],
         'heritage-site': [
-            { name: 'Monastery of Horezu', policies: ['access-all-areas'] },
-            { name: 'Abbey of St Gall', policies: ['access-all-areas']}
+            { name: 'Abbey of St Gall', policies: ['access-all-areas', 'all-heritage-sites'] },
+            { name: 'Maritime Greenwich', policies: ['access-all-areas', 'all-heritage-sites', 'british-isles'] }
         ]
     };
 
-    // --- helper to check expected instances for a given policy
+    // --- helper to make the access headers
 
-    function expectations(pid) {
+    function headers(token, policy) {
+        let header = { authorizaion: token };
+        if (LOCAL) header['x-bb-policy'] = policy;
+        Crud.headers(header);
+    }
+
+    // --- helpers to check expected server access
+
+    function server_accessible(access, url) {
+        return access ? Crud.get(url) : (LOCAL ? Promise.resolve() : Crud.not_found(url));
+    }
+
+    function server_access(coordinator, contributor, consumer) {
         let tests = [];
 
-        for (let eid in posit) {
-            tests.push (Crud.get(URLs.consumer_entity(eid), (list) => {
-                for (let i = 0 ; i < posit[eid].length ; i++) {
-                    let instance = list.find(e => e.name === posit[eid][i].name);
-                    posit[eid][i].policies.includes(pid) ? expect(instance).to.be.an('object') : expect(instance).to.be.undefined;
-                }
-            }));
-
-            for (let i = 0 ; i < posit[eid].length ; i++) {
-                tests.push (Crud.get(URLs.consumer_catalog({ "type": eid, "name": posit[eid][i].name }), (list) => {
-                    let instance = list.find(e => e.name === posit[eid][i].name);
-                    posit[eid][i].policies.includes(pid) ? expect(instance).to.be.an('object') : expect(instance).to.be.undefined;
-                }));
-            }
-        }
+        tests.push (server_accessible (coordinator, URLs.coordinator()));
+        tests.push (server_accessible (coordinator, URLs.entity()));
+        tests.push (server_accessible (coordinator, URLs.policy()));
+        tests.push (server_accessible (coordinator, URLs.user()));
+        tests.push (server_accessible (contributor, URLs.contributor()));
+        tests.push (server_accessible (consumer, URLs.consumer()));
+        tests.push (server_accessible (consumer, URLs.consumer_entity()));
+        tests.push (server_accessible (consumer, URLs.consumer_catalog()));
 
         return Promise.all(tests);
+    }
+
+    // --- helpers to check expected instances for a given policy
+
+    function expectation(list, policy, posited) {
+        let instance = list.find(e => e.name === posited.name);
+        posited.policies.includes(policy) ? expect(instance).to.be.an('object') : expect(instance).to.be.undefined;
+    }
+
+    function expectations(policy) {
+        return Crud.add(URLs.access(consumer.uid), { role: 'consumer', context: policy }, undefined, (token) => headers(token, policy))
+
+        .then(() => {
+            let tests = [];
+            let entities = [];
+
+            for (let entity in posit) {
+                let posited = posit[entity];
+
+                // --- gather entity types
+
+                for (let i = 0 ; i < posited.length ; i++) {
+                    if (posited[i].policies.includes(policy)) {
+                        entities.push ({ id: entity });
+                        break;
+                    }
+                }
+
+                // --- check entity instances in entity list
+
+                tests.push (Crud.get(URLs.consumer_entity(entity), (list) => {
+                    for (let i = 0 ; i < posited.length ; i++) {
+                        expectation(list, policy, posited[i]);
+                    }
+                }));
+
+                // --- check entity instances in catalog
+
+                for (let i = 0 ; i < posited.length ; i++) {
+                    tests.push (Crud.get(URLs.consumer_catalog({ type: entity, name: posited[i].name }), (list) => {
+                        expectation(list, policy, posited[i]);
+                    }));
+                }
+            }
+
+            // --- check entity types
+
+            tests.push (Crud.verify_all(URLs.consumer_entity(), entities));
+
+            return Promise.all(tests);
+        });
     }
 
     // --- the tests themselves
@@ -96,28 +154,11 @@ describe('End-to-End Tests', function() {
     });
 
     it('enable the bootstrap key', function () {
-        Crud.headers({ authorizaion: process.env.TESTS_BOOTSTRAP_KEY });
+        headers(process.env.TESTS_BOOTSTRAP_KEY);
     });
 
-    it('the coordinator api is accessible', function () {
-        return Promise.all([
-            Crud.get(URLs.coordinator()),
-            Crud.get(URLs.entity()),
-            Crud.get(URLs.policy()),
-            Crud.get(URLs.user())
-        ]);
-    });
-
-    it('the contributor api not is accessible', function () {
-        return LOCAL ? this.skip() : Crud.not_found(URLs.contributor());
-    });
-
-    it('the consumer api is not accessible', function () {
-        return LOCAL ? this.skip() : Promise.all([
-            Crud.not_found(URLs.consumer()),
-            Crud.not_found(URLs.consumer_entity()),
-            Crud.not_found(URLs.consumer_catalog())
-        ]);
+    it('the server access rules are met (coor: true, cont: false, cons: false)', function () {
+        return server_access(true, false, false);
     });
 
     it('there are no entities present', function () {
@@ -145,28 +186,11 @@ describe('End-to-End Tests', function() {
     });
 
     it('switch to the coordinator key', function () {
-        Crud.headers({ authorizaion: coordinator.token });
+        headers(coordinator.token);
     });
 
-    it('the coordinator api is still accessible', function () {
-        return Promise.all([
-            Crud.get(URLs.coordinator()),
-            Crud.get(URLs.entity()),
-            Crud.get(URLs.policy()),
-            Crud.get(URLs.user())
-        ]);
-    });
-
-    it('the contributor api is still not accessible', function () {
-        return LOCAL ? this.skip() : Crud.not_found(URLs.contributor());
-    });
-
-    it('the consumer api is still not accessible', function () {
-        return LOCAL ? this.skip() : Promise.all([
-            Crud.not_found(URLs.consumer()),
-            Crud.not_found(URLs.consumer_entity()),
-            Crud.not_found(URLs.consumer_catalog())
-        ]);
+    it('the server access rules are still met (coor: true, cont: false, cons: false)', function () {
+        return server_access(true, false, false);
     });
 
     it('create the country entity', function () {
@@ -181,28 +205,11 @@ describe('End-to-End Tests', function() {
     });
 
     it('switch to country connector key', function () {
-        Crud.headers({ authorizaion: country.connectors[0].token });
+        headers(country.connectors[0].token);
     });
 
-    it('the coordinator api is not accessible', function () {
-        return LOCAL ? this.skip() : Promise.all([
-            Crud.not_found(URLs.coordinator()),
-            Crud.not_found(URLs.entity()),
-            Crud.not_found(URLs.policy()),
-            Crud.not_found(URLs.user())
-        ]);
-    });
-
-    it('the contributor api is accessible', function () {
-        return Crud.get(URLs.contributor());
-    });
-
-    it('the consumer api is not accessible', function () {
-        return LOCAL ? this.skip() : Promise.all([
-            Crud.not_found(URLs.consumer()),
-            Crud.not_found(URLs.consumer_entity()),
-            Crud.not_found(URLs.consumer_catalog())
-        ]);
+    it('the server access rules are met (coor: false, cont: true, cons: false)', function () {
+        return server_access(false, true, false);
     });
 
     it('open a stream session on country', function () {
@@ -228,7 +235,7 @@ describe('End-to-End Tests', function() {
     });
 
     it('switch to the coordinator key', function () {
-        Crud.headers({ authorizaion: coordinator.token });
+        headers(coordinator.token);
     });
 
     it('create the heritage-site entity', function () {
@@ -243,7 +250,7 @@ describe('End-to-End Tests', function() {
     });
 
     it('switch to heritage-site connector key', function () {
-        Crud.headers({ authorizaion: site.connectors[0].token });
+        headers(site.connectors[0].token);
     });
 
     it('open a stream session on heritage-site', function () {
@@ -269,7 +276,7 @@ describe('End-to-End Tests', function() {
     });
 
     it('switch to the coordinator key', function () {
-        Crud.headers({ authorizaion: coordinator.token });
+        headers(coordinator.token);
     });
 
     it('add all the policies', function () {
@@ -290,69 +297,41 @@ describe('End-to-End Tests', function() {
     });
 
     it('generate a key for the consumer user for the "access-all-areas" policy', function () {
-        return Crud.add(URLs.access(consumer.uid), { role: 'consumer', context: 'access-all-areas' }, undefined, (token) => {
+        return Crud.add(URLs.access(consumer.uid), { role: 'consumer', context: 'access-all-areas' }, undefined, (token, location) => {
             consumer.token = token;
+            consumer.aid = parseInt(location.match(/\d+$/).shift());
         });
     });
 
-    it('switch to the current policy consumer key', function () {
-        let headers = { authorizaion: consumer.token };
-        if (LOCAL) headers ['x-bb-policy'] = 'access-all-areas';
-        Crud.headers(headers);
+    it('switch to the consumer key', function () {
+        headers(consumer.token, 'access-all-areas');
     });
 
-    it('the coordinator api is not accessible', function () {
-        return LOCAL ? this.skip() : Promise.all([
-            Crud.not_found(URLs.coordinator()),
-            Crud.not_found(URLs.entity()),
-            Crud.not_found(URLs.policy()),
-            Crud.not_found(URLs.user())
-        ]);
+    it('the server access rules are still met (coor: false, cont: false, cons: true)', function () {
+        return server_access(false, false, true);
     });
 
-    it('the contributor api is not accessible', function () {
-        return LOCAL ? this.skip() : Crud.not_found(URLs.contributor());
+    it('delete the consumer key', function () {
+        return Crud.delete(URLs.access(consumer.uid, consumer.aid));
     });
 
-    it('the consumer api is accessible', function () {
-        return Promise.all([
-            Crud.get(URLs.consumer()),
-            Crud.get(URLs.consumer_entity()),
-            Crud.get(URLs.consumer_catalog())
-        ]);
-    });
-
-    it('all entity type are present in the entity list', function () {
-        return Crud.verify_all(URLs.consumer_entity(), [
-            { id: country.slug },
-            { id: site.slug }
-        ]);
-    });
-
-    it('all entity instance expectations are met for the current policy', function () {
+    it('expectations met for policy "access-all-areas"', function () {
         return expectations('access-all-areas');
     });
 
-    it('generate a key for the consumer user for the "european-union" policy', function () {
-        return Crud.add(URLs.access(consumer.uid), { role: 'consumer', context: 'european-union' }, undefined, (token) => {
-            consumer.token = token;
-        });
+    it('expectations met for policy "all-countries"', function () {
+        return expectations('all-countries');
     });
 
-    it('switch to the current policy consumer key', function () {
-        let headers = { authorizaion: consumer.token };
-        if (LOCAL) headers ['x-bb-policy'] = 'european-union';
-        Crud.headers(headers);
+    it('expectations met for policy "all-heritage-sites"', function () {
+        return expectations('all-heritage-sites');
     });
 
-    it('all entity type are present in the entity list', function () {
-        return Crud.verify_all(URLs.consumer_entity(), [
-            { id: country.slug },
-        ]);
-    });
-
-    it('all entity instance expectations are met for the current policy', function () {
+    it('expectations met for policy "european-union"', function () {
         return expectations('european-union');
     });
 
+    it('expectations met for policy "british-isles"', function () {
+        return expectations('british-isles');
+    });
 });
