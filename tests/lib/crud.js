@@ -49,7 +49,7 @@ module.exports = class Crud {
         .then(response => {
             expect(response).to.have.status(HTTP.CREATED);
             if (location) expect(response).to.have.header('Location', location.trim());
-            if (checker) checker(response.body);
+            if (checker) checker(response.body, response.response.headers['location']);
             return chakram.wait();
         });
     }
