@@ -61,8 +61,8 @@ class URLs {
     session_action(cid, sid, action = 'upsert') { return this.rest('connector', cid, 'session', sid, action); }
     session_close(cid, sid, commit = true) { return this.rest('connector', cid, 'session', sid, 'close', commit ? 'true' : 'false'); }
 
-    consumer_entity() { return process.env.CONSUMER_BASE + '/entity'; }
-    consumer_catalog() { return process.env.CONSUMER_BASE + '/catalog'; }
+    consumer_entity(eid, iid) { return process.env.CONSUMER_BASE + '/entity' + (eid ? `/${eid}` : '') + (iid ? `/${iid}` : ''); }
+    consumer_catalog(q) { return process.env.CONSUMER_BASE + '/catalog' + (q ? `?q=${ JSON.stringify(q) }` : ''); }
 }
 
 // --- exported classes
