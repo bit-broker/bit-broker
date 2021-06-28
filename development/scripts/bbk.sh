@@ -103,6 +103,10 @@ case $1 in
         fi
     ;;
 
+    db)
+        psql -U postgres bit_broker
+    ;;
+
     wipe)
         if [ $(count) -eq "0" ]; then
             wipe
@@ -136,6 +140,7 @@ case $1 in
         echo "    stop   → stops bbk services"
         echo "    status → show bbk service status"
         echo "    logs   → tails all bbk services logs"
+        echo "    db     → start a sql session"
         echo "    wipe   → resets the bbk database"
         echo "    reset  → stop » wipe » start"
     ;;
