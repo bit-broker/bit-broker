@@ -33,7 +33,7 @@ const chakram = require('chakram');
 
 // --- constanst
 
-const LOCAL = true; // tests on a local environment not a full k8s deployment
+const LOCAL = process.env.TESTS_LOCAL_MODE || false; // tests on a local environment not a full k8s deployment
 const PAGE = 50; // number of records in a singel data upsert
 
 // --- the test cases
@@ -43,25 +43,20 @@ describe('End-to-End Tests', function() {
     this.timeout(0); // we are not interested in non-functional tests here
 
     let admin = { id: 1, url: URLs.user(1), name: 'admin' };
-    let users = {
-        alice: { uid: 2, token: null, details: { name: 'alice', email: 'alice@domain.com' }}, // coordinator
-        bob: { uid: 3, token: null, details: { name: 'bob', email: 'bob@domain.com' }},
-        carol: { uid: 4, token: null, details: { name: 'carol', email: 'carol@domain.com' }},
-        ted: { uid: 5, token: null, details: { name: 'ted', email: 'ted@domain.com' }},
-    };
-    let coordinator = users.alice;
+    let policies = Seeder.policies;
+    let coordinator = Seeder.users.find(e => e.properties.name === 'alice');
+    let consumer = Seeder.users.find(e => e.properties.name === 'bob');
     let country = Seeder.entities.find(e => e.slug === 'country');
     let site = Seeder.entities.find(e => e.slug === 'heritage-site');
     let countries = Seeder.records(country.slug);
     let sites = Seeder.records(site.slug);
-    let policies = Seeder.policies;
 
     it('tests are in production mode', function () {
         return LOCAL ? this.skip() : true;
     });
 
     it('enable the bootstrap key', function () {
-        Crud.headers({ authorizaion: process.env.BOOTSTRAP_KEY });
+        Crud.headers({ authorizaion: process.env.TESTS_BOOTSTRAP_KEY });
     });
 
     it('the coordinator api is accessible', function () {
@@ -98,7 +93,9 @@ describe('End-to-End Tests', function() {
     });
 
     it('create the coordinator user', function () {
-        return Crud.add(URLs.user(), coordinator.details);
+        return Crud.add(URLs.user(), coordinator.properties, undefined, (body, location) => {
+            coordinator.uid = parseInt(location.match(/\d+$/).shift());
+        });
     });
 
     it('generate a key for the coordinator user', function () {
@@ -107,7 +104,7 @@ describe('End-to-End Tests', function() {
         });
     });
 
-    it('switch to the coordinator user\'s key', function () {
+    it('switch to the coordinator key', function () {
         Crud.headers({ authorizaion: coordinator.token });
     });
 
@@ -189,7 +186,7 @@ describe('End-to-End Tests', function() {
         return Crud.get(URLs.session_close(country.connectors[0].id, country.connectors[0].session, 'true'));
     });
 
-    it('switch to the coordinator user\'s key', function () {
+    it('switch to the coordinator key', function () {
         Crud.headers({ authorizaion: coordinator.token });
     });
 
@@ -229,7 +226,7 @@ describe('End-to-End Tests', function() {
         return Crud.get(URLs.session_close(site.connectors[0].id, site.connectors[0].session, 'true'));
     });
 
-    it('switch to the coordinator user\'s key', function () {
+    it('switch to the coordinator key', function () {
         Crud.headers({ authorizaion: coordinator.token });
     });
 
@@ -243,24 +240,20 @@ describe('End-to-End Tests', function() {
         return Promise.all(act);
     });
 
-    it('add all the consumers', function () {
-        let act = Promise.resolve();  // must do these in order to preserve uid index
-
-        act = act.then(() => Crud.add(URLs.user(), users.bob.details));
-        act = act.then(() => Crud.add(URLs.user(), users.carol.details));
-        act = act.then(() => Crud.add(URLs.user(), users.ted.details));
-
-        return act;
-    });
-
-    it('generate a key consumer for bob for the access-all-areas policy', function () {
-        return Crud.add(URLs.access(users.bob.uid), { role: 'consumer', context: 'access-all-areas' }, undefined, (token) => {
-            users.bob.token = token;
+    it('add the consumer user', function () {
+        return Crud.add(URLs.user(), consumer.properties, undefined, (body, location) => {
+            consumer.uid = parseInt(location.match(/\d+$/).shift());
         });
     });
 
-    it('switch to bob\'s consumer key', function () {
-        let headers = { authorizaion: coordinator.token };
+    it('generate a key for the consumer user for the access-all-areas policy', function () {
+        return Crud.add(URLs.access(consumer.uid), { role: 'consumer', context: 'access-all-areas' }, undefined, (token) => {
+            consumer.token = token;
+        });
+    });
+
+    it('switch to the consumer key', function () {
+        let headers = { authorizaion: consumer.token };
         if (LOCAL) headers ['x-bb-policy'] = 'access-all-areas';
         Crud.headers(headers);
     });
