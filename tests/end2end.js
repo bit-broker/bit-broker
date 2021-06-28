@@ -18,8 +18,9 @@
 
   Whole system end-to-end test - use command 'mocha end2end'
 
-  WARNING: Running this script will reset the entire database!
-
+  NOTE: This script, unlike the others in this directory, only works the
+        system from the published APIs. It makes NO direct access to the
+        database.
 */
 
 'use strict'; // code assumes ECMAScript 6
@@ -30,6 +31,7 @@ const Crud = require('./lib/crud.js');
 const Seeder = require('./lib/seeder.js');
 const URLs = require('./lib/urls.js');
 const chakram = require('chakram');
+const expect = chakram.expect;
 
 // --- constanst
 
@@ -42,14 +44,52 @@ describe('End-to-End Tests', function() {
 
     this.timeout(0); // we are not interested in non-functional tests here
 
+    // --- setup test context
+
     let admin = { id: 1, url: URLs.user(1), name: 'admin' };
-    let policies = Seeder.policies;
     let coordinator = Seeder.users.find(e => e.properties.name === 'alice');
     let consumer = Seeder.users.find(e => e.properties.name === 'bob');
     let country = Seeder.entities.find(e => e.slug === 'country');
     let site = Seeder.entities.find(e => e.slug === 'heritage-site');
-    let countries = Seeder.records(country.slug);
-    let sites = Seeder.records(site.slug);
+
+    // --- setup test expectations - keep these to teh first page of results based on insert order of seed data
+
+    let posit = {
+        'country': [
+            { name: 'Afghanistan', policies: ['access-all-areas'] },
+            { name: 'Austria', policies: ['access-all-areas', 'european-union'] },
+        ],
+        'heritage-site': [
+            { name: 'Monastery of Horezu', policies: ['access-all-areas'] },
+            { name: 'Abbey of St Gall', policies: ['access-all-areas']}
+        ]
+    };
+
+    // --- helper to check expected instances for a given policy
+
+    function expectations(pid) {
+        let tests = [];
+
+        for (let eid in posit) {
+            tests.push (Crud.get(URLs.consumer_entity(eid), (list) => {
+                for (let i = 0 ; i < posit[eid].length ; i++) {
+                    let instance = list.find(e => e.name === posit[eid][i].name);
+                    posit[eid][i].policies.includes(pid) ? expect(instance).to.be.an('object') : expect(instance).to.be.undefined;
+                }
+            }));
+
+            for (let i = 0 ; i < posit[eid].length ; i++) {
+                tests.push (Crud.get(URLs.consumer_catalog({ "type": eid, "name": posit[eid][i].name }), (list) => {
+                    let instance = list.find(e => e.name === posit[eid][i].name);
+                    posit[eid][i].policies.includes(pid) ? expect(instance).to.be.an('object') : expect(instance).to.be.undefined;
+                }));
+            }
+        }
+
+        return Promise.all(tests);
+    }
+
+    // --- the tests themselves
 
     it('tests are in production mode', function () {
         return LOCAL ? this.skip() : true;
@@ -174,9 +214,10 @@ describe('End-to-End Tests', function() {
     it('upsert the country records into the session', function () {
         let act = Promise.resolve();
         let url = URLs.session_action(country.connectors[0].id, country.connectors[0].session, 'upsert');
+        let all = Seeder.records(country.slug);
 
-        for (let i = 0 ; i < countries.length ; i += PAGE) {
-            act = act.then(() => Crud.post(url, countries.slice(i, i + PAGE)));
+        for (let i = 0 ; i < all.length ; i += PAGE) {
+            act = act.then(() => Crud.post(url, all.slice(i, i + PAGE)));
         };
 
         return act;
@@ -214,9 +255,10 @@ describe('End-to-End Tests', function() {
     it('upsert the heritage-site records into the session', function () {
         let act = Promise.resolve();
         let url = URLs.session_action(site.connectors[0].id, site.connectors[0].session, 'upsert');
+        let all = Seeder.records(site.slug);
 
-        for (let i = 0 ; i < sites.length ; i += PAGE) {
-            act = act.then(() => Crud.post(url, sites.slice(i, i + PAGE)));
+        for (let i = 0 ; i < all.length ; i += PAGE) {
+            act = act.then(() => Crud.post(url, all.slice(i, i + PAGE)));
         };
 
         return act;
@@ -232,9 +274,10 @@ describe('End-to-End Tests', function() {
 
     it('add all the policies', function () {
         let act = [];
+        let all = Seeder.policies;
 
-        for (let i = 0; i < policies.length; i++) {
-            act.push (Crud.add(URLs.policy(policies[i].slug), policies[i].properties));
+        for (let i = 0; i < all.length; i++) {
+            act.push (Crud.add(URLs.policy(all[i].slug), all[i].properties));
         }
 
         return Promise.all(act);
@@ -246,13 +289,13 @@ describe('End-to-End Tests', function() {
         });
     });
 
-    it('generate a key for the consumer user for the access-all-areas policy', function () {
+    it('generate a key for the consumer user for the "access-all-areas" policy', function () {
         return Crud.add(URLs.access(consumer.uid), { role: 'consumer', context: 'access-all-areas' }, undefined, (token) => {
             consumer.token = token;
         });
     });
 
-    it('switch to the consumer key', function () {
+    it('switch to the current policy consumer key', function () {
         let headers = { authorizaion: consumer.token };
         if (LOCAL) headers ['x-bb-policy'] = 'access-all-areas';
         Crud.headers(headers);
@@ -279,12 +322,37 @@ describe('End-to-End Tests', function() {
         ]);
     });
 
-    it('all entities are present in the entity list', function () {
+    it('all entity type are present in the entity list', function () {
         return Crud.verify_all(URLs.consumer_entity(), [
-            { id: 'country' },
-            { id: 'heritage-site' }
+            { id: country.slug },
+            { id: site.slug }
         ]);
     });
 
+    it('all entity instance expectations are met for the current policy', function () {
+        return expectations('access-all-areas');
+    });
+
+    it('generate a key for the consumer user for the "european-union" policy', function () {
+        return Crud.add(URLs.access(consumer.uid), { role: 'consumer', context: 'european-union' }, undefined, (token) => {
+            consumer.token = token;
+        });
+    });
+
+    it('switch to the current policy consumer key', function () {
+        let headers = { authorizaion: consumer.token };
+        if (LOCAL) headers ['x-bb-policy'] = 'european-union';
+        Crud.headers(headers);
+    });
+
+    it('all entity type are present in the entity list', function () {
+        return Crud.verify_all(URLs.consumer_entity(), [
+            { id: country.slug },
+        ]);
+    });
+
+    it('all entity instance expectations are met for the current policy', function () {
+        return expectations('european-union');
+    });
 
 });
