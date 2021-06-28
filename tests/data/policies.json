@@ -23,6 +23,52 @@
         }
     },
     {
+        "slug": "all-countries",
+        "properties": {
+            "name": "All Countries",
+            "description": "All the countries in the world as defined by the UN",
+            "policy": {
+                "access_control": {
+                    "enabled": true,
+                    "quota": {
+                        "max_number": 24000,
+                        "interval_type": "day"
+                    },
+                    "rate": 1000
+                },
+                "data_segment": {
+                    "segment_query": { "type": "country" },
+                    "hidden_types": [],
+                    "field_masks": []
+                },
+                "legal_context": []
+            }
+        }
+    },
+    {
+        "slug": "all-heritage-sites",
+        "properties": {
+            "name": "All World Heritage Sites",
+            "description": "All landmarks or areas with legal protection by an international convention as defined by UNESCO",
+            "policy": {
+                "access_control": {
+                    "enabled": true,
+                    "quota": {
+                        "max_number": 24000,
+                        "interval_type": "day"
+                    },
+                    "rate": 1000
+                },
+                "data_segment": {
+                    "segment_query": { "type": "heritage-site" },
+                    "hidden_types": [],
+                    "field_masks": []
+                },
+                "legal_context": []
+            }
+        }
+    },
+    {
         "slug": "european-union",
         "properties": {
             "name": "The European Union",
