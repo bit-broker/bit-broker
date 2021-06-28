@@ -1,10 +1,11 @@
 #!/bin/bash
 
+ABS_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 function error
 {
     printf "\033[0;31m  » $1\033[0m\n"
 }
-
 
 function info
 {
@@ -44,11 +45,11 @@ function logs
 function start
 {
     info "starting services..."
-    npm start bbk-coordinator     --prefix ../../services/coordinator > bbk-coordinator.out  2>&1 &
-    npm start bbk-contributor     --prefix ../../services/contributor > bbk-contributor.out  2>&1 &
-    npm start bbk-consumer        --prefix ../../services/consumer    > bbk-consumer.out     2>&1 &
-    npm run rate bbk-rate-limit   --prefix ../stubs                   > bbk-rate-limit.out   2>&1 &
-    npm run auth bbk-auth-service --prefix ../stubs                   > bbk-auth-service.out 2>&1 &
+    npm start bbk-coordinator     --prefix "$ABS_PATH/../../services/coordinator" > bbk-coordinator.out  2>&1 &
+    npm start bbk-contributor     --prefix "$ABS_PATH/../../services/contributor" > bbk-contributor.out  2>&1 &
+    npm start bbk-consumer        --prefix "$ABS_PATH/../../services/consumer"    > bbk-consumer.out     2>&1 &
+    npm run rate bbk-rate-limit   --prefix "$ABS_PATH/../stubs"                   > bbk-rate-limit.out   2>&1 &
+    npm run auth bbk-auth-service --prefix "$ABS_PATH/../stubs"                   > bbk-auth-service.out 2>&1 &
     sleep 1
 }
 
@@ -62,7 +63,7 @@ function stop
 function wipe
 {
     info "wiping the database..."
-    psql -U postgres -a -f ../../database/schema.sql > /dev/null
+    psql -U postgres -a -f "$ABS_PATH/../../database/schema.sql" > /dev/null
 }
 
 echo
