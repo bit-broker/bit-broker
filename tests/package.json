@@ -6,7 +6,8 @@
   "scripts": {
     "test": "node all.js",
     "start": "node all.js",
-    "seed": "mocha seed.js"
+    "seed": "mocha seed.js",
+    "end2end": "mocha end2end.js"
   },
   "author": "Cisco",
   "license": "UNLICENSED",
