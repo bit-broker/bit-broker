@@ -92,7 +92,7 @@ services:
   bbk-rate-limit:
     build:
       context: ../../..
-      dockerfile: ./bit-broker/build/rate-limit/Dockerfile
+      dockerfile: ./bit-broker/development/ancillary-services/rate-limit/Dockerfile
     container_name: bbk-rate-limit
     image: bbk-rate-limit
     depends_on:
@@ -123,7 +123,7 @@ services:
   bbk-auth-service:
     build:
       context: ../../..
-      dockerfile: ./bit-broker/build/auth-service/Dockerfile
+      dockerfile: ./bit-broker/development/ancillary-services/auth-service/Dockerfile
     container_name: bbk-auth-service
     image: bbk-auth-service
     ports:
