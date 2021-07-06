@@ -18,7 +18,7 @@
                     "hidden_types": [],
                     "field_masks": []
                 },
-                "legal_context": []
+                "legal_context": [{ "type": "attribution", "text": "Data is supplied by Wikipedia", "link": "https://en.wikipedia.org/" }]
             }
         }
     },
