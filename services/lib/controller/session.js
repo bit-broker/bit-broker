@@ -83,7 +83,9 @@ module.exports = class Session {
         errors = errors.concat(model.validate.id(cid));
         errors = errors.concat(model.validate.id(sid));
         errors = errors.concat(model.validate.action(action));
-        // TODO errors = errors.concat(model.validate.records(records));
+
+        if (action === 'upsert') errors = errors.concat(model.validate.records_upsert(records));
+        if (action === 'delete') errors = errors.concat(model.validate.records_delete(records));
 
         if (errors.length) {
             throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
