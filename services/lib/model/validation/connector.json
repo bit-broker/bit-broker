@@ -12,7 +12,7 @@
         },
         "webhook": {
             "type": ["string", "null"],
-            "maxLength": 1024,
+            "maxLength": 256,
             "format": "uri",
             "pattern": "^https?://.*$"
         }

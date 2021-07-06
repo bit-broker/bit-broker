@@ -5,8 +5,17 @@
         "record": {
             "type": "object",
             "properties": {
-                "id": { "type": "string" },
-                "name": { "type": "string" },
+                "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256
+                },
+                "name":
+                {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256
+                },
                 "entity": { "type": "object" },
                 "instance": { "type": "object "}
             },

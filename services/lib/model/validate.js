@@ -98,8 +98,8 @@ module.exports = class Validate {
     access(properties) { return this.scheme(properties, 'access'); }
     connector(properties) { return this.scheme(properties, 'connector'); }
     policy(properties) { return this.scheme(properties, 'policy'); }
-    records_delete(properties) { return this.scheme(properties, 'records#/delete'); }
-    records_upsert(properties) { return this.scheme(properties, 'records#/upsert'); }
+    records_delete(properties) { return this.scheme(properties, 'records#/delete', 'records'); }
+    records_upsert(properties) { return this.scheme(properties, 'records#/upsert', 'records'); }
     user(properties) { return this.scheme(properties, 'user'); }
     entity(properties) {
         let errors = this.scheme(properties, 'entity');
