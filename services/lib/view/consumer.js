@@ -35,18 +35,19 @@ module.exports = class Consumer extends View {
 
     // --- an entity type
 
-    static entity(item) {
+    static entity(item, legal) {
         return {
             id: item.entity_slug,
             url: this.rest(process.env.CONSUMER_BASE, 'entity', item.entity_slug),
             name: item.entity_properties.name,
-            description: item.entity_properties.description
+            description: item.entity_properties.description,
+            legal: legal
         };
     }
 
     // --- a list of entity types
 
-    static entities(items) {
+    static entities(items, legal) {
         let doc = [];
 
         for (let i = 0; i < items.length; i++) {
@@ -58,7 +59,7 @@ module.exports = class Consumer extends View {
 
     // --- an entity instance
 
-    static instance(item, full = true) {
+    static instance(item, legal, full = true) {
         let doc = {
             id: item.public_id,
             url: this.rest(process.env.CONSUMER_BASE, 'entity', item.entity_slug, item.public_id),
@@ -70,16 +71,18 @@ module.exports = class Consumer extends View {
             doc = Object.assign(doc, { entity: item.record.entity });
         }
 
+        doc = Object.assign(doc, { legal: legal });
+
         return doc;
     }
 
     // --- a list of entity instances
 
-    static instances(items) {
+    static instances(items, legal) {
         let doc = [];
 
         for (let i = 0; i < items.length; i++) {
-            doc.push(this.instance(items[i], false));
+            doc.push(this.instance(items[i], legal, false));
         }
 
         return doc;
