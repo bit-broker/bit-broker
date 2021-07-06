@@ -39,17 +39,21 @@ function status
 
 function logs
 {
-    tail -f bbk-coordinator.out bbk-contributor.out bbk-consumer.out bbk-rate-limit.out bbk-auth-service.out
+    tail -f "$ABS_PATH/bbk-coordinator.out" \
+            "$ABS_PATH/bbk-contributor.out" \
+            "$ABS_PATH/bbk-consumer.out"    \
+            "$ABS_PATH/bbk-rate-limit.out"  \
+            "$ABS_PATH/bbk-auth-service.out"
 }
 
 function start
 {
     info "starting services..."
-    npm start bbk-coordinator     --prefix "$ABS_PATH/../../services/coordinator" > bbk-coordinator.out  2>&1 &
-    npm start bbk-contributor     --prefix "$ABS_PATH/../../services/contributor" > bbk-contributor.out  2>&1 &
-    npm start bbk-consumer        --prefix "$ABS_PATH/../../services/consumer"    > bbk-consumer.out     2>&1 &
-    npm run rate bbk-rate-limit   --prefix "$ABS_PATH/../stubs"                   > bbk-rate-limit.out   2>&1 &
-    npm run auth bbk-auth-service --prefix "$ABS_PATH/../stubs"                   > bbk-auth-service.out 2>&1 &
+    npm start bbk-coordinator     --prefix "$ABS_PATH/../../services/coordinator" > "$ABS_PATH/bbk-coordinator.out"  2>&1 &
+    npm start bbk-contributor     --prefix "$ABS_PATH/../../services/contributor" > "$ABS_PATH/bbk-contributor.out"  2>&1 &
+    npm start bbk-consumer        --prefix "$ABS_PATH/../../services/consumer"    > "$ABS_PATH/bbk-consumer.out"     2>&1 &
+    npm run rate bbk-rate-limit   --prefix "$ABS_PATH/../stubs"                   > "$ABS_PATH/bbk-rate-limit.out"   2>&1 &
+    npm run auth bbk-auth-service --prefix "$ABS_PATH/../stubs"                   > "$ABS_PATH/bbk-auth-service.out" 2>&1 &
     sleep 1
 }
 
