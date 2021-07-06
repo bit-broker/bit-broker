@@ -1,0 +1,35 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "bbk://records",
+    "definitions": {
+        "record": {
+            "type": "object",
+            "properties": {
+                "id": { "type": "string" },
+                "name": { "type": "string" },
+                "entity": { "type": "object" },
+                "instance": { "type": "object "}
+            },
+            "required": ["id", "name", "entity"]
+        }
+    },
+    "upsert": {
+        "type": "array",
+        "items": { "$ref": "#/definitions/record" },
+        "minItems": 0,
+        "maxItems": 100,
+        "uniqueItems": false
+    },
+    "delete": {
+        "type": "array",
+        "items": { "type": "object",
+            "properties": {
+                "id": { "type": "string" }
+            },
+            "required": ["id"]
+        },
+        "minItems": 0,
+        "maxItems": 100,
+        "uniqueItems": false
+    }
+}

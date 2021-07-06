@@ -31,7 +31,7 @@ const fs = require('fs');
 
 // --- scheme list
 
-const SCHEMES = [ 'id', 'slug', 'name', 'description', 'entity', 'connector', 'session', 'policy', 'user', 'access' ]; // we name them here, rather than just iterate the directory
+const SCHEMES = [ 'id', 'slug', 'name', 'description', 'entity', 'connector', 'session', 'policy', 'user', 'access', 'paging', 'records' ]; // we name them here, rather than just iterate the directory
 
 // --- validate class (exported)
 
@@ -50,14 +50,21 @@ module.exports = class Validate {
     // --- is the given string valid json
 
     is_valid_json(string) {
-        let valid = false;  // assume the worst
+        let valid = true;
 
-        try {
-            JSON.parse(string);
-            valid = true;
-        } catch (err) {
-            valid = false;
-        }
+        try { JSON.parse(string) }
+        catch (error) { valid = false }
+
+        return valid;
+    }
+
+    // --- is the given schems is valid json-schema
+
+    is_valid_json_schema(schema) {
+        let valid = true;
+
+        try { this.schema.validate({}, schema) }
+        catch (error) { valid = false }
 
         return valid;
     }
@@ -75,70 +82,33 @@ module.exports = class Validate {
         return msgs;
     }
 
-    // --- validates an id
+    // --- item validators
 
-    id(item) {
-        return this.scheme(item, 'id', 'id');
-    }
+    action(item) { return this.scheme(item, 'session#/action', 'action'); }
+    commit(item) { return this.scheme(item, 'session#/commit', 'commit'); }
+    id(item) { return this.scheme(item, 'id', 'id'); }
+    limit(item) {return this.scheme(item, 'paging#/limit', 'limit'); }
+    mode(item) { return this.scheme(item, 'session#/mode', 'mode'); }
+    name(item) { return this.scheme(item, 'name', 'name'); }
+    offset(item) { return this.scheme(item, 'paging#/offset', 'offset'); }
+    slug(item) { return this.scheme(item, 'slug', 'slug'); }
 
-    // --- validates a slug
+    // --- complex property validators
 
-    slug(item) {
-        return this.scheme(item, 'slug', 'slug');
-    }
-
-    // --- validates a name
-
-    name(item) {
-        return this.scheme(item, 'name', 'name');
-    }
-
-    // --- validates entity properties
-
+    access(properties) { return this.scheme(properties, 'access'); }
+    connector(properties) { return this.scheme(properties, 'connector'); }
+    policy(properties) { return this.scheme(properties, 'policy'); }
+    records_delete(properties) { return this.scheme(properties, 'records#/delete'); }
+    records_upsert(properties) { return this.scheme(properties, 'records#/upsert'); }
+    user(properties) { return this.scheme(properties, 'user'); }
     entity(properties) {
-        return this.scheme(properties, 'entity');
-    }
+        let errors = this.scheme(properties, 'entity');
 
-    // --- validates connector properties
+        if (!this.is_valid_json_schema(properties.schema)) {
+             errors.push(locales.__('error.entity-invalid-schema'));
+        }
 
-    connector(properties) {
-        return this.scheme(properties, 'connector');
-    }
-
-    // --- validates policy properties
-
-    policy(properties) {
-        return this.scheme(properties, 'policy');
-    }
-
-    // --- validates a user
-
-    user(properties) {
-        return this.scheme(properties, 'user');
-    }
-
-    // --- validates a user access
-
-    access(properties) {
-        return this.scheme(properties, 'access');
-    }
-
-    // --- validates a session mode
-
-    mode(item) {
-        return this.scheme(item, 'session#/mode', 'mode');
-    }
-
-    // --- validates a session action
-
-    action(item) {
-        return this.scheme(item, 'session#/action', 'action');
-    }
-
-    // --- validates a session commit
-
-    commit(item) {
-        return this.scheme(item, 'session#/commit', 'commit');
+        return errors;
     }
 
     // --- validates a data segment query
