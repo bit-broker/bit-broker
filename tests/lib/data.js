@@ -125,7 +125,9 @@ const DATA = {
         FORMAT: 'not match pattern',
         TYPE: 'is not of a type',
         INVALID: 'is not valid',
-        ENUM: 'is not one of enum values'
+        ENUM: 'is not one of enum values',
+        JSON: 'unexpected token',
+        REQUIRED: 'requires property'
     },
 
     CACHE: {
@@ -185,6 +187,11 @@ const DATA = {
           ['foo', 'www.', '.com', 'http/:foo.com', 'http:// www.foo.com'],  // uri non conform
           ['ftp://foo.org', 'www.foo.org', 'foo.org', 'http:www.foo.com', 'http:/'] // regex non match
         ]
+    },
+
+    RECORDS: {
+        MAXIMUM: 100,
+        ITEM_MAXIMUM: 256
     },
 
     PROSE: 'lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum',

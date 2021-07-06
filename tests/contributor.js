@@ -221,7 +221,7 @@ describe('Contributor Tests', function() {
 
         let entity = DATA.pick(DATA.SLUG.VALID);
         let connector = DATA.pick(DATA.SLUG.VALID);
-        let record = { entity: {} };  // mandatory to have this node, even if empty
+        let record = DATA.record(1);
         let session = {};
 
         before(() => {
@@ -271,9 +271,10 @@ describe('Contributor Tests', function() {
 
         let entity = DATA.pick(DATA.SLUG.VALID);
         let connector = DATA.pick(DATA.SLUG.VALID);
-        let properties1 = {...DATA.some_info(), schema: { type: 'integer', maximum: 100, minimum: 0 } };
-        let properties2 = {...properties1, schema: { type: 'object', properties: { value: { type: 'string', enum: ['apple', 'banana', 'cantaloupe']}}, required: ['value']}};
-        let record = { entity: {} };  // mandatory to have this node, even if empty
+        let properties = DATA.some_info()
+        let record = DATA.record(1);
+        let schema1 = { type: 'object', properties: { value: { type: 'integer', maximum: 100, minimum: 0 }}};
+        let schema2 = { type: 'object', properties: { value: { type: 'string', enum: ['apple', 'banana', 'cantaloupe'] }}, required: ['value'] };
         let session = {};
 
         before(() => {
@@ -285,7 +286,7 @@ describe('Contributor Tests', function() {
         });
 
         it('can create the housing entity', () => {
-            return Crud.add(URLs.entity(entity), properties1, URLs.entity(entity));
+            return Crud.add(URLs.entity(entity), { ...properties, schema: schema1 }, URLs.entity(entity));
         });
 
         it('can create the housing connector', () => {
@@ -296,12 +297,112 @@ describe('Contributor Tests', function() {
             return Session.open(entity, connector, 'stream', (info => session = info));
         });
 
-        it('can post data to a session', () => {
-            return Session.action(session.cid, session.sid, 'upsert', [{ ...record, id: '123', name: 'alice' }, { ...record, id: '456', name: 'bob' }]);
+        it('can upsert an empty dataset to a session', () => {
+            return Session.action(session.cid, session.sid, 'upsert', []);
         });
 
-        it('can post delete data to a session', () => {
-            return Session.action(session.cid, session.sid, 'delete', ['789']);
+        it('cannot upsert non-json dataset to a session', () => {
+            let tests = [];
+
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', null, [{ position: DATA.ERRORS.JSON }]));
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', "", [{ position: DATA.ERRORS.JSON }]));
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', "lorem", [{ position: DATA.ERRORS.JSON }]));
+
+            return Promise.all(tests);
+        });
+
+        it('cannot upsert non-array dataset to a session', () => {
+            let tests = [];
+
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', undefined, [{ records: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', {}, [{ records: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', record, [{ records: DATA.ERRORS.TYPE }]));
+
+            return Promise.all(tests);
+        });
+
+        it('cannot upsert more than max records to a session', () => {
+            return Session.bad(session.cid, session.sid, 'upsert', Array(DATA.RECORDS.MAXIMUM + 1).fill(record), [{ records: DATA.ERRORS.MAX }]);
+        });
+
+        it('cannot upsert records with missing properties to a session', () => {
+            let tests = [];
+
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ }], [{ id: DATA.ERRORS.REQUIRED }, { name: DATA.ERRORS.REQUIRED }, { entity: DATA.ERRORS.REQUIRED }]));
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ id: "1" }], [{ name: DATA.ERRORS.REQUIRED }, { entity: DATA.ERRORS.REQUIRED }]));
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ id: "1", name: "alice" }], [{ entity: DATA.ERRORS.REQUIRED }]));
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ id: undefined, name: undefined, entity: undefined}], [{ id: DATA.ERRORS.REQUIRED }, { name: DATA.ERRORS.REQUIRED }, { entity: DATA.ERRORS.REQUIRED }]));
+
+            return Promise.all(tests);
+        });
+
+        it('cannot upsert records with invalid properties to a session', () => {
+            let tests = [];
+
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, id: 123}], [{ id: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, id: null}], [{ id: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, id: []}], [{ id: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, id: ""}], [{ id: DATA.ERRORS.MIN }]));
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, id: DATA.text(DATA.RECORDS.ITEM_MAXIMUM + 1)}], [{ id: DATA.ERRORS.MAX }]));
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, name: 123}], [{ name: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, name: null}], [{ name: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, name: []}], [{ name: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, name: ""}], [{ name: DATA.ERRORS.MIN }]));
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, name: DATA.text(DATA.RECORDS.ITEM_MAXIMUM + 1)}], [{ name: DATA.ERRORS.MAX }]));
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, entity: 123}], [{ entity: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, entity: null}], [{ entity: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, entity: []}], [{ entity: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, entity: ""}], [{ entity: DATA.ERRORS.TYPE }]));
+
+            return Promise.all(tests);
+        });
+
+        it('can delete an empty dataset to a session', () => {
+            return Session.action(session.cid, session.sid, 'delete', []);
+        });
+
+        it('cannot delete non-json dataset to a session', () => {
+            let tests = [];
+
+            tests.push(Session.bad(session.cid, session.sid, 'delete', null, [{ position: DATA.ERRORS.JSON }]));
+            tests.push(Session.bad(session.cid, session.sid, 'delete', "", [{ position: DATA.ERRORS.JSON }]));
+            tests.push(Session.bad(session.cid, session.sid, 'delete', "lorem", [{ position: DATA.ERRORS.JSON }]));
+
+            return Promise.all(tests);
+        });
+
+        it('cannot delete non-array dataset to a session', () => {
+            let tests = [];
+
+            tests.push(Session.bad(session.cid, session.sid, 'delete', undefined, [{ records: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad(session.cid, session.sid, 'delete', {}, [{ records: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad(session.cid, session.sid, 'delete', record, [{ records: DATA.ERRORS.TYPE }]));
+
+            return Promise.all(tests);
+        });
+
+        it('cannot delete more than max records to a session', () => {
+            return Session.bad(session.cid, session.sid, 'delete', Array(DATA.RECORDS.MAXIMUM + 1).fill('1'), [{ records: DATA.ERRORS.MAX }]);
+        });
+
+        it('cannot delete records with invalid properties to a session', () => {
+            let tests = [];
+
+            tests.push(Session.bad(session.cid, session.sid, 'delete', [123], [{ records: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad(session.cid, session.sid, 'delete', [null], [{ records: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad(session.cid, session.sid, 'delete', [undefined], [{ records: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad(session.cid, session.sid, 'delete', [{}], [{ records: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad(session.cid, session.sid, 'delete', [[]], [{ records: DATA.ERRORS.TYPE }]));
+
+            return Promise.all(tests);
+        });
+
+        it('can post valid entity data to a session', () => {
+//            return Session.action(session.cid, session.sid, 'upsert', [{ ...record, entity: { value: 50 } }]);
+        });
+
+        it('cannot post invalid entity data to a session', () => {
+//            return Session.action(session.cid, session.sid, 'upsert', [{ ...record, id: '123', name: 'alice' }, { ...record, id: '456', name: 'bob' }]);
         });
 
         it('can close the original session', () => {
@@ -309,19 +410,19 @@ describe('Contributor Tests', function() {
         });
 
         it('can update the housing entity', () => {
-            return Crud.update(URLs.entity(entity), properties2);
+            return Crud.update(URLs.entity(entity),  { ...properties, schema: schema2 });
         });
 
         it('can now open a session', () => {
             return Session.open(entity, connector, 'stream', (info => session = info));
         });
 
-        it('can post data to a session', () => {
-            return Session.action(session.cid, session.sid, 'upsert', [{ ...record, id: '123', name: 'alice' }, { ...record, id: '456', name: 'bob' }]);
+        it('can post valid entity data to a session', () => {
+//            return Session.action(session.cid, session.sid, 'upsert', [{ ...record, id: '123', name: 'alice' }, { ...record, id: '456', name: 'bob' }]);
         });
 
-        it('can post delete data to a session', () => {
-            return Session.action(session.cid, session.sid, 'delete', ['789']);
+        it('cannot post invalid entity data to a session', () => {
+//            return Session.action(session.cid, session.sid, 'upsert', [{ ...record, id: '123', name: 'alice' }, { ...record, id: '456', name: 'bob' }]);
         });
 
         it('can close the original session', () => {

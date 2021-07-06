@@ -33,7 +33,7 @@ const expect = chakram.expect;
 
 // --- constants
 
-const DATA_PAGE_SIZE = 50; // number of records in a singel data upsert
+const DATA_PAGE_SIZE = 100; // number of records in a singel data upsert
 
 // --- session test class (exported)
 
@@ -72,12 +72,12 @@ module.exports = class Session {
 
     // --- actions an data operation within an open session
 
-    static action(cid, sid, action, data) {
+    static action(cid, sid, action, data, page = DATA_PAGE_SIZE) {
         let actions = Promise.resolve();
 
-        for (let i = 0 ; i < data.length ; i += DATA_PAGE_SIZE) {
+        for (let i = 0 ; i < data.length ; i += page) {
             actions = actions.then(() => {
-                return chakram.post(URLs.session_action(cid, sid, action), data.slice(i, i + DATA_PAGE_SIZE))
+                return chakram.post(URLs.session_action(cid, sid, action), data.slice(i, i + page))
                 .then(response => {
                     expect(response.body).to.be.undefined;
                     expect(response).to.have.status(HTTP.NO_CONTENT);
@@ -87,6 +87,23 @@ module.exports = class Session {
         };
 
         return actions;
+    }
+
+    // --- test for a known bad sessions action
+
+    static bad(cid, sid, action, data, errors) {
+        return chakram.post(URLs.session_action(cid, sid, action), data)
+        .then(response => {
+            expect(response.body).to.be.a('string');
+            for (let i = 0; i < errors.length; i++) {
+                for (let j in errors[i]) {
+                    expect(response.body.toLowerCase()).to.contain(j);
+                    expect(response.body.toLowerCase()).to.contain(errors[i][j]);
+                }
+            }
+            expect(response).to.have.status(HTTP.BAD_REQUEST);
+            return chakram.wait();
+        });
     }
 
     // --- closes an existing sesson on the given connector
