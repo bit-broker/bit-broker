@@ -221,6 +221,7 @@ describe('Contributor Tests', function() {
 
         let entity = DATA.pick(DATA.SLUG.VALID);
         let connector = DATA.pick(DATA.SLUG.VALID);
+        let record = { entity: {} };  // mandatory to have this node, even if empty
         let session = {};
 
         before(() => {
@@ -244,15 +245,83 @@ describe('Contributor Tests', function() {
         });
 
         it('can post data to a session', () => {
-            return Session.action(session.cid, session.sid, 'upsert', [{ id: '123', name: 'alice' }, { id: '456', name: 'bob' }]);
+            return Session.action(session.cid, session.sid, 'upsert', [{ ...record, id: '123', name: 'alice' }, { ...record, id: '456', name: 'bob' }]);
         });
 
         it('can post new and updated data to a session', () => {
-            return Session.action(session.cid, session.sid, 'upsert', [{ id: '123', name: 'carol' }, { id: '456', name: 'dave' }, { id: '789', name: 'eve' }]);
+            return Session.action(session.cid, session.sid, 'upsert', [{ ...record, id: '123', name: 'carol' }, { ...record, id: '456', name: 'dave' }, { ...record, id: '789', name: 'eve' }]);
         });
 
-        it('can post new and updated data to a session', () => {
-            return Session.action(session.cid, session.sid, 'delete', [{ id: '789' }]);
+        it('can post delete data to a session', () => {
+            return Session.action(session.cid, session.sid, 'delete', ['789']);
+        });
+
+        it('can close the original session', () => {
+            return Session.close(session.cid, session.sid, true);
+        });
+
+        it('can delete the housing entity', () => {
+            return Crud.delete(URLs.entity(entity))
+        });
+    });
+
+    // --- session basic record validation tests
+
+    describe('session basic record validation tests', () => {
+
+        let entity = DATA.pick(DATA.SLUG.VALID);
+        let connector = DATA.pick(DATA.SLUG.VALID);
+        let properties1 = {...DATA.some_info(), schema: { type: 'integer', maximum: 100, minimum: 0 } };
+        let properties2 = {...properties1, schema: { type: 'object', properties: { value: { type: 'string', enum: ['apple', 'banana', 'cantaloupe']}}, required: ['value']}};
+        let record = { entity: {} };  // mandatory to have this node, even if empty
+        let session = {};
+
+        before(() => {
+            return Shared.empty();
+        });
+
+        after(() => {
+            return Shared.empty();
+        });
+
+        it('can create the housing entity', () => {
+            return Crud.add(URLs.entity(entity), properties1, URLs.entity(entity));
+        });
+
+        it('can create the housing connector', () => {
+            return Crud.add(URLs.connector(entity, connector), DATA.some_info(), URLs.connector(entity, connector));
+        });
+
+        it('can now open a session', () => {
+            return Session.open(entity, connector, 'stream', (info => session = info));
+        });
+
+        it('can post data to a session', () => {
+            return Session.action(session.cid, session.sid, 'upsert', [{ ...record, id: '123', name: 'alice' }, { ...record, id: '456', name: 'bob' }]);
+        });
+
+        it('can post delete data to a session', () => {
+            return Session.action(session.cid, session.sid, 'delete', ['789']);
+        });
+
+        it('can close the original session', () => {
+            return Session.close(session.cid, session.sid, true);
+        });
+
+        it('can update the housing entity', () => {
+            return Crud.update(URLs.entity(entity), properties2);
+        });
+
+        it('can now open a session', () => {
+            return Session.open(entity, connector, 'stream', (info => session = info));
+        });
+
+        it('can post data to a session', () => {
+            return Session.action(session.cid, session.sid, 'upsert', [{ ...record, id: '123', name: 'alice' }, { ...record, id: '456', name: 'bob' }]);
+        });
+
+        it('can post delete data to a session', () => {
+            return Session.action(session.cid, session.sid, 'delete', ['789']);
         });
 
         it('can close the original session', () => {

@@ -132,7 +132,7 @@ module.exports = class Script {
                         return this._op_submit('upsert', DATA.records(params));
 
                     case 'delete':
-                        return this._op_submit('delete', DATA.records(params)); // DATA.keys(DATA.records(params)));
+                        return this._op_submit('delete', DATA.keys(DATA.records(params)));
 
                     case 'close':
                         return this._op_close(params.shift());

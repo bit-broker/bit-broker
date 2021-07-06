@@ -37,6 +37,11 @@
 const Permit = require('./permit.js');
 const Catalog = require('./catalog.js');
 
+// --- constants
+
+const ACTION_UPSERT = 'upsert';
+const ACTION_DELETE = 'delete';
+
 // --- operation class (exported)
 
 module.exports = class Operation {
@@ -62,7 +67,12 @@ module.exports = class Operation {
 
         for (let i = 0; i < records.length; i++) {
             let record = records[i];
-            record.type = this.connector.entity_slug;
+
+            if (action === ACTION_UPSERT) {
+                record.type = this.connector.entity_slug;
+            } else {
+                record = { id: record };  // for delete we convert the string to a json as the db field must be a json object
+            }
 
             values.push({
                 session_id: this.id,
@@ -93,7 +103,7 @@ module.exports = class Operation {
 
                 step = step.then(() => { // chain the operations in *strict order* and hence never in parrallel
 
-                    if (items[i].action === 'upsert') {
+                    if (items[i].action === ACTION_UPSERT) {
                         return catalog.upsert({
                             connector_id: this.connector.id,
                             public_id: Permit.public_key(this.connector.contribution_id, items[i].record.id),

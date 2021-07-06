@@ -22,12 +22,7 @@
     },
     "delete": {
         "type": "array",
-        "items": { "type": "object",
-            "properties": {
-                "id": { "type": "string" }
-            },
-            "required": ["id"]
-        },
+        "items": { "type": "string" },
         "minItems": 0,
         "maxItems": 100,
         "uniqueItems": false
