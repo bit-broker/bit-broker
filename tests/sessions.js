@@ -792,8 +792,8 @@ describe('Connector Session Tests', function() {
     it('Performing random mix tests - expect a delay here...', () => { return true; });
 
     it('Random mix', () => {
-        const COUNT_STEPS = 128;
-        const COUNT_RECORDS = 16;
+        const COUNT_STEPS = 64;
+        const COUNT_ITEMS = 16;  // stay within the action data page size of 100
 
         let steps = [];
 
@@ -801,9 +801,9 @@ describe('Connector Session Tests', function() {
             let params1 = [];
             let params2 = [];
 
-            for (let j = 0; j < COUNT_RECORDS; j++) {
-                params1.push(DATA.anindex());
-                params2.push(DATA.anindex());
+            for (let j = 0; j < COUNT_ITEMS; j++) {
+                params1.push(DATA.any_index());
+                params2.push(DATA.any_index());
             }
 
             steps.push('open ' + (DATA.flip() ? 'stream' : (DATA.flip() ? 'accrue' : 'replace')));

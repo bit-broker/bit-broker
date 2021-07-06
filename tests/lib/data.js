@@ -103,7 +103,7 @@ const DATA = {
         return records;
     },
 
-    anindex: function() {
+    any_index: function() {
         let items = DATA.items();
         return Math.floor(Math.random() * items.length);
     },
