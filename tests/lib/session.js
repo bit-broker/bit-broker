@@ -31,10 +31,6 @@ const URLs = require('./urls.js');
 const chakram = require('chakram');
 const expect = chakram.expect;
 
-// --- constants
-
-const DATA_PAGE_SIZE = 100; // number of records in a singel data upsert
-
 // --- session test class (exported)
 
 module.exports = class Session {
@@ -72,7 +68,7 @@ module.exports = class Session {
 
     // --- actions an data operation within an open session
 
-    static action(cid, sid, action, data, page = DATA_PAGE_SIZE) {
+    static action(cid, sid, action, data, page = DATA.RECORDS.MAXIMUM) {
         let actions = Promise.resolve();
 
         for (let i = 0 ; i < data.length ; i += page) {
