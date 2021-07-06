@@ -37,7 +37,10 @@ const log = require('../logger.js').Logger;
 // --- constants - not .env configurable
 
 const POLICY_HEADER = 'x-bb-policy';
-const NO_POLICY_SEGMENT = {}; // the segment to use when USE_POLICY is false in .env - normally just {}
+const NULL_POLICY = { // the policy to use when USE_POLICY is false in .env
+    data_segment: { segment_query: {}, hidden_types: [], field_masks: [] },
+    legal_context: []
+};
 
 // --- timeseries class (embedded)
 
@@ -81,10 +84,10 @@ module.exports = class Consumer {
 
             .then(item => {
                 if (!item) throw failure(HTTP.FORBIDDEN);
-                return item.data_segment.segment_query;
+                return item;
             })
         } else {
-            return Promise.resolve(NO_POLICY_SEGMENT);
+            return Promise.resolve(NULL_POLICY);
         }
     }
 
@@ -102,12 +105,12 @@ module.exports = class Consumer {
 
         Consumer.with_policy(req.header(POLICY_HEADER))
 
-        .then(segment => {
-            return model.catalog.query(segment, JSON.parse(q));
-        })
+        .then(policy => {
+            return model.catalog.query(policy.data_segment.segment_query, JSON.parse(q))
 
-        .then(items => {
-            res.json(view.consumer.instances(items));
+            .then(items => {
+                res.json(view.consumer.instances(items, policy.legal_context));
+            })
         })
 
         .catch(error => next(error));
@@ -119,12 +122,12 @@ module.exports = class Consumer {
 
         Consumer.with_policy(req.header(POLICY_HEADER))
 
-        .then(segment => {
-            return model.catalog.types(segment);
-        })
+        .then(policy => {
+            return model.catalog.types(policy.data_segment.segment_query)
 
-        .then(items => {
-            res.json(view.consumer.entities(items)); // can be empty
+            .then(items => {
+                res.json(view.consumer.entities(items, policy.legal_context)); // can be empty
+            })
         })
 
         .catch(error => next(error));
@@ -134,21 +137,23 @@ module.exports = class Consumer {
 
     list(req, res, next) {
         let type = req.params.type.toLowerCase();
-
+        let limit = req.params.limit || 50;
+        let offset = req.params.offset || 0;
+        
         Consumer.with_policy(req.header(POLICY_HEADER))
 
-        .then(segment => {
-            return model.catalog.types(segment) // TODO: Calling this first is a heavy price to pay for returning HTTP/404 vs []
+        .then(policy => {
+            return model.catalog.types(policy.data_segment.segment_query) // TODO: Calling this first is a heavy price to pay for returning HTTP/404 vs []
 
             .then(types => {
                 let slugs = types.map(t => t.entity_slug);
           //      if (!slugs.includes(type)) throw failure(HTTP.NOT_FOUND);  // the entity type is either not present or not in policy
 
-                return model.catalog.list(segment, type);
-            })
+                return model.catalog.list(policy.data_segment.segment_query, type)
 
-            .then(items => {
-                res.json(view.consumer.instances(items)); // can be empty
+                .then(items => {
+                    res.json(view.consumer.instances(items, policy.legal_context)); // can be empty
+                })
             })
         })
 
@@ -163,13 +168,13 @@ module.exports = class Consumer {
 
         Consumer.with_policy(req.header(POLICY_HEADER))
 
-        .then(segment => {
-            return model.catalog.find(segment, type, id);
-        })
+        .then(policy => {
+            return model.catalog.find(policy.data_segment.segment_query, type, id)
 
-        .then(item => {
-            if (!item) throw failure(HTTP.NOT_FOUND);
-            res.json(view.consumer.instance(item));
+            .then(item => {
+                if (!item) throw failure(HTTP.NOT_FOUND);
+                res.json(view.consumer.instance(item, policy.legal_context));
+            })
         })
 
         .catch(error => next(error));
