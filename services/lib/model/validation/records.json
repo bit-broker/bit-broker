@@ -17,7 +17,7 @@
                     "maxLength": 256
                 },
                 "entity": { "type": "object" },
-                "instance": { "type": "object "}
+                "instance": { "type": "object" }
             },
             "required": ["id", "name", "entity"]
         }

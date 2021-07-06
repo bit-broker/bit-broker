@@ -97,6 +97,18 @@ module.exports = class Session {
             if (!session) throw failure(HTTP.NOT_FOUND);
             if (session.id != sid) throw failure(HTTP.UNAUTHORIZED);
 
+            if (action === 'upsert') {
+                let scheme = session.connector.entity_properties.schema;
+
+                if (Object.keys(scheme).length) {
+                    errors = model.validate.records_entity(records, scheme);
+
+                    if (errors.length) {
+                        throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
+                    }
+                }
+            }
+
             return session.process(action, records);
         })
 

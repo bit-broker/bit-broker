@@ -59,6 +59,7 @@ module.exports = class Connector {
             'connector.slug',
             'connector.properties',
             'entity.slug as entity_slug',
+            'entity.properties as entity_properties',
             'connector.contribution_id',
             'connector.contribution_key_id',
             'connector.session_id',

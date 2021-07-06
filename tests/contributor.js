@@ -275,6 +275,7 @@ describe('Contributor Tests', function() {
         let record = DATA.record(1);
         let schema1 = { type: 'object', properties: { value: { type: 'integer', maximum: 100, minimum: 0 }}};
         let schema2 = { type: 'object', properties: { value: { type: 'string', enum: ['apple', 'banana', 'cantaloupe'] }}, required: ['value'] };
+        let schema3 = { type: 'foobar' };  // invalid json schema
         let session = {};
 
         before(() => {
@@ -398,18 +399,32 @@ describe('Contributor Tests', function() {
         });
 
         it('can post valid entity data to a session', () => {
-//            return Session.action(session.cid, session.sid, 'upsert', [{ ...record, entity: { value: 50 } }]);
+            let tests = [];
+
+            tests.push(Session.action(session.cid, session.sid, 'upsert', [{ ...record, entity: { value: 0 } }]));
+            tests.push(Session.action(session.cid, session.sid, 'upsert', [{ ...record, entity: { value: 50 } }]));
+            tests.push(Session.action(session.cid, session.sid, 'upsert', [{ ...record, entity: { value: 100 } }]));
+
+            return Promise.all(tests);
         });
 
         it('cannot post invalid entity data to a session', () => {
-//            return Session.action(session.cid, session.sid, 'upsert', [{ ...record, id: '123', name: 'alice' }, { ...record, id: '456', name: 'bob' }]);
+            let tests = [];
+
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, entity: { value: -1 } }], [{ records: DATA.ERRORS.SMALL }]));
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, entity: { value: 101 } }], [{ records: DATA.ERRORS.BIG }]));
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, entity: { value: 0.5 } }], [{ records: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, entity: { value: [] } }], [{ records: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, entity: { value: "" } }], [{ records: DATA.ERRORS.TYPE }]));
+
+            return Promise.all(tests);
         });
 
         it('can close the original session', () => {
             return Session.close(session.cid, session.sid, true);
         });
 
-        it('can update the housing entity', () => {
+        it('can update the housing entity with a new entity schema', () => {
             return Crud.update(URLs.entity(entity),  { ...properties, schema: schema2 });
         });
 
@@ -418,11 +433,54 @@ describe('Contributor Tests', function() {
         });
 
         it('can post valid entity data to a session', () => {
-//            return Session.action(session.cid, session.sid, 'upsert', [{ ...record, id: '123', name: 'alice' }, { ...record, id: '456', name: 'bob' }]);
+            let tests = [];
+
+            tests.push(Session.action(session.cid, session.sid, 'upsert', [{ ...record, entity: { value: "apple" } }]));
+            tests.push(Session.action(session.cid, session.sid, 'upsert', [{ ...record, entity: { value: "banana" } }]));
+            tests.push(Session.action(session.cid, session.sid, 'upsert', [{ ...record, entity: { value: "cantaloupe" } }]));
+
+            return Promise.all(tests);
         });
 
         it('cannot post invalid entity data to a session', () => {
-//            return Session.action(session.cid, session.sid, 'upsert', [{ ...record, id: '123', name: 'alice' }, { ...record, id: '456', name: 'bob' }]);
+            let tests = [];
+
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, entity: { value: "melon" } }], [{ records: DATA.ERRORS.ENUM }]));
+            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, entity: {} }], [{ records: DATA.ERRORS.REQUIRED }]));
+
+            return Promise.all(tests);
+        });
+
+        it('can close the original session', () => {
+            return Session.close(session.cid, session.sid, true);
+        });
+
+        it('can update the housing entity with an invalid entity schema', () => {
+            return Crud.update(URLs.entity(entity),  { ...properties, schema: schema3 });
+        });
+
+        it('can now open a session', () => {
+            return Session.open(entity, connector, 'stream', (info => session = info));
+        });
+
+        it('can post any entity data to a session', () => {
+            return Session.action(session.cid, session.sid, 'upsert', [{ ...record, id: '123', name: 'carol' }, { ...record, id: '456', name: 'dave' }, { ...record, id: '789', name: 'eve' }]);
+        });
+
+        it('can close the original session', () => {
+            return Session.close(session.cid, session.sid, true);
+        });
+
+        it('can update the housing entity with an empty entity schema', () => {
+            return Crud.update(URLs.entity(entity),  { ...properties, schema: {} });
+        });
+
+        it('can now open a session', () => {
+            return Session.open(entity, connector, 'stream', (info => session = info));
+        });
+
+        it('can post any entity data to a session', () => {
+            return Session.action(session.cid, session.sid, 'upsert', [{ ...record, id: '123', name: 'carol' }, { ...record, id: '456', name: 'dave' }, { ...record, id: '789', name: 'eve' }]);
         });
 
         it('can close the original session', () => {

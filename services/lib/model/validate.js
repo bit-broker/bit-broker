@@ -71,8 +71,12 @@ module.exports = class Validate {
 
     // --- checks a document against a schema and gathers human readable error messages
 
-    scheme(instance, scheme, name = '') {
-        let errs = this.schema.validate(instance, { "$ref": `bbk://${ scheme }` }).errors;
+    scheme(instance, scheme, name = '', bbk = true) {
+        if (bbk) {
+            scheme = { "$ref": `bbk://${ scheme }` }; // standard bbk scheme reference
+        }
+
+        let errs = this.schema.validate(instance, scheme).errors;
         let msgs = [];
 
         for (let i = 0; i < errs.length; i++) {
@@ -98,8 +102,6 @@ module.exports = class Validate {
     access(properties) { return this.scheme(properties, 'access'); }
     connector(properties) { return this.scheme(properties, 'connector'); }
     policy(properties) { return this.scheme(properties, 'policy'); }
-    records_delete(properties) { return this.scheme(properties, 'records#/delete', 'records'); }
-    records_upsert(properties) { return this.scheme(properties, 'records#/upsert', 'records'); }
     user(properties) { return this.scheme(properties, 'user'); }
     entity(properties) {
         let errors = this.scheme(properties, 'entity');
@@ -109,6 +111,15 @@ module.exports = class Validate {
         }
 
         return errors;
+    }
+
+    // --- record validators
+
+    records_delete(records) { return this.scheme(records, 'records#/delete', 'records'); }
+    records_upsert(records) { return this.scheme(records, 'records#/upsert', 'records'); }
+    records_entity(records, scheme) {
+        scheme = { type: "array", items: { type: "object", properties: { entity: scheme }}};  // scheme applies to all entity properties of all records in the array
+        return this.scheme(records, scheme, 'records', false);
     }
 
     // --- validates a data segment query
