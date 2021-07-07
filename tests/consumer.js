@@ -30,6 +30,7 @@ const HTTP = require('http-status-codes');
 const DATA = require('./lib/data.js');
 const Shared = require('./lib/shared.js');  // include first for dotenv
 const URLs = require('./lib/urls.js');
+const Crud = require('./lib/crud.js');
 const Seeder = require('./lib/seeder.js');
 const chakram = require('chakram');
 const expect = chakram.expect;
@@ -51,35 +52,6 @@ describe('Consumer Tests', function() {
     after(() => {
         return Shared.after_all(false);
     });
-
-    // --- tests a catalog query
-
-    function catalog(test) {
-
-        test.except = test.except || [];
-        test.policy = test.policy || DATA.POLICY.ALLAREA.ID;
-
-        return chakram.get(URLs.consumer_catalog(test.query), { headers: { 'x-bb-policy': test.policy }})
-
-        .then(response => {
-            expect(response.body).to.be.an('array');
-            let items = response.body.map(i => i.name);
-
-            for (let i = 0; i < test.yields.length; i++) {
-                if (!test.except.includes(test.yields[i])) {
-                    expect(items).to.include(test.yields[i]);
-                }
-            }
-
-            for (let i = 0; i < test.except.length; i++) {
-                expect(items).to.not.include(test.except[i]);
-            }
-
-            expect(items.length).to.be.eq(test.yields.length - test.except.length);
-
-            return chakram.wait();
-        });
-    }
 
     // --- start up tests
 
@@ -119,9 +91,142 @@ describe('Consumer Tests', function() {
         });
     });
 
+/*
+
+TODO
+    api.router.get ('/entity', controller.consumer.types);
+    api.router.get ('/entity/:type', controller.consumer.list);
+    api.router.get ('/entity/:type/:id', controller.consumer.get);
+
+// -- entity api test
+// -- invalid query json tests
+*/
+
     // --- the test cases
 
-    describe('query tests', function() {
+    describe('entity api tests', function() {
+
+        // --- test data
+
+        let entities = Seeder.entities;
+        let policy = Seeder.policies.find(i => i.slug === DATA.POLICY.ALLAREA.ID);
+        let records = {};
+
+        // --- tests a base entity record
+
+        function entity_base(type, record, original) {
+            expect(record.id).to.be.a('string');
+            expect(record.id).to.match(new RegExp(DATA.PUBLIC_ID.REGEX));
+            expect(record.id.length).to.be.eq(DATA.PUBLIC_ID.SIZE);
+            expect(record.url).to.be.eq(URLs.consumer_entity(type, record.id));
+            expect(record.type).to.be.eq(type);
+            expect(record.name).to.be.eq(original.name);
+
+            if (policy.properties.policy.legal_context) {
+                expect(record.legal).to.deep.equal(policy.properties.policy.legal_context);
+            } else {
+                expect(record.legal).to.be.an('array');
+                expect(record.legal.length).to.be.eq(0);
+            }
+        }
+
+        // --- test a full entity record
+
+        function entity_full(type, record, original) {
+            entity_base(type, record, original);
+            expect(record.entity).to.deep.equal(original.entity);
+
+            if (original.instance) {
+                expect(record.instance).to.deep.equal(original.instance);
+            } else {
+                expect(record.instance).to.be.undefined;
+            }
+        }
+
+        // --- tests an entity list
+
+        function entity_list(type) {
+            records[type] = Seeder.records(type);
+
+            return Crud.get(URLs.consumer_entity(type), (body) => {
+                expect(body).to.be.an('array');
+
+                for (let i = 0; i < body.length; i++) {
+                    let record = body[i];
+                    let original = records[type].find(i => i.name === record.name);
+
+                    expect(original).to.be.an('object');
+                    entity_base(type, record, original);
+
+                    original.public_id = record.id;
+                }
+
+                expect(body.length).to.be.eq(records[type].length);
+
+                return chakram.wait();
+            });
+        }
+
+        // --- tests an entity item
+
+        function entity_item(type, id) {
+            return Crud.get(URLs.consumer_entity(type, id), (body) => {
+                expect(body).to.be.an('object');
+
+                let record = body;
+                let original = records[type].find(i => i.name === record.name);
+
+                expect(original).to.be.an('object');
+                entity_full(type, record, original);
+
+                return chakram.wait();
+            });
+        }
+
+        // -- the entity api tests start here
+
+        it('can set the policy header', () => {
+            Crud.headers({ 'x-bb-policy': policy.slug }); // we are not testing policy visibility here - that happens in end2end. Here we just test the api is working and returning he right document.
+            return true;
+        });
+
+        it('the entity types are all present', () => {
+            return Crud.verify_all(URLs.consumer_entity(), entities.map(i => {
+                return {
+                    id: i.slug,
+                    url: URLs.consumer_entity(i.slug),
+                    name: i.properties.name,
+                    description: i.properties.description
+                }
+            }));
+        });
+
+        it('the entity instances are all present in the entity list', () => {
+            let tests = [];
+
+            for (let i = 0 ; i < entities.length ; i++) {
+                tests.push(entity_list(entities[i].slug));
+            }
+
+            return Promise.all(tests);
+        });
+
+        it('the entity instances are all present individually', () => {
+            let tests = [];
+
+            for (let i = 0 ; i < entities.length ; i++) {
+                let type = entities[i].slug;
+
+                for (let j = 0 ; j < records[type].length ; j++) {
+                    tests.push(entity_item(type, records[type][j].public_id));
+                }
+            }
+
+            return Promise.all(tests);
+        });
+    });
+
+    describe('catalog api tests', function() {
 
         // --- test data
 
@@ -129,7 +234,33 @@ describe('Consumer Tests', function() {
         const GEOGRAPHY = Seeder.records('geography');
         const POPULATION = Seeder.records('country').reduce((m, i) => { m[i.id] = i.entity.population; return m; }, {});
 
-        // -- the query tests start here
+        // --- tests a catalog query
+
+        function catalog(test) {
+            Crud.headers({ 'x-bb-policy': test.policy || DATA.POLICY.ALLAREA.ID })
+            Crud.get(URLs.consumer_catalog(test.query), (body) => {
+                expect(body).to.be.an('array');
+
+                let items = body.map(i => i.name);
+                test.except = test.except || [];
+
+                for (let i = 0; i < test.yields.length; i++) {
+                    if (!test.except.includes(test.yields[i])) {
+                        expect(items).to.include(test.yields[i]);
+                    }
+                }
+
+                for (let i = 0; i < test.except.length; i++) {
+                    expect(items).to.not.include(test.except[i]);
+                }
+
+                expect(items.length).to.be.eq(test.yields.length - test.except.length);
+
+                return chakram.wait();
+            });
+        }
+
+        // -- the catalog api tests start here
 
         it('0 » nul » empty query', () => {
             return catalog({

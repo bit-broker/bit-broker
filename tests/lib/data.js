@@ -151,6 +151,11 @@ const DATA = {
         UNKNOWN: '6b50b0c0-7df3-40d5-8a5f-51cd0141a084',
     },
 
+    PUBLIC_ID: { // sha256
+        SIZE: 64,
+        REGEX: "^[a-z0-9]+$",
+    },
+
     KEY: { // jwt
         REGEX: "^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$",
     },
