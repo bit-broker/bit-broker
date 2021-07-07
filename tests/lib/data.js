@@ -127,7 +127,8 @@ const DATA = {
         INVALID: 'is not valid',
         ENUM: 'is not one of enum values',
         JSON: 'unexpected token',
-        REQUIRED: 'requires property'
+        REQUIRED: 'requires property',
+        ADDITIONAL: 'not allowed to have the additional property'
     },
 
     CACHE: {

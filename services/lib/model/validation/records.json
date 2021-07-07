@@ -19,7 +19,8 @@
                 "entity": { "type": "object" },
                 "instance": { "type": "object" }
             },
-            "required": ["id", "name", "entity"]
+            "required": ["id", "name", "entity"],
+            "additionalProperties": false
         }
     },
     "upsert": {

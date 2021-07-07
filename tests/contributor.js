@@ -340,8 +340,8 @@ describe('Contributor Tests', function() {
         it('cannot upsert records with additional properties to a session', () => {
             let tests = [];
 
-//            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ ...record, foo: 1 }], [{ records: DATA.ERRORS.ADDITIONAL }]));
-//            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ ...record, bar: { foo: 1 }}], [{ records: DATA.ERRORS.ADDITIONAL }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ ...record, foo: 1 }], [{ records: DATA.ERRORS.ADDITIONAL }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ ...record, bar: { foo: 1 }}], [{ records: DATA.ERRORS.ADDITIONAL }]));
 
             return Promise.all(tests);
         });
