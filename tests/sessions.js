@@ -682,6 +682,30 @@ describe('Connector Session Tests', function() {
         ]);
     });
 
+    it('- DUPLICATE RECORD TESTS --------------------------', () => { return true; });
+
+    it('OS > UM+1 > CT', () => {
+        return script.run([
+            'open stream',
+            'upsert 1,2,2,2,3',
+            'present 1,2,3',
+            'close true',
+            'present 1,2,3',
+        ]);
+    });
+
+    it('OS > UM > DM+1 > CT', () => {
+        return script.run([
+            'open stream',
+            'upsert 1,2,3',
+            'present 1,2,3',
+            'delete 1,1,2,2',
+            'close true',
+            'absent 1, 2',
+            'present 3',
+        ]);
+    });
+
     it('- MIXED SESSION TESTS -----------------------------', () => { return true; });
 
     it('OS > U1 > CT > OA > CT', () => {
