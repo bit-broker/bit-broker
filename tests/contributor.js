@@ -305,9 +305,9 @@ describe('Contributor Tests', function() {
         it('cannot upsert non-json dataset to a session', () => {
             let tests = [];
 
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', null, [{ position: DATA.ERRORS.JSON }]));
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', "", [{ position: DATA.ERRORS.JSON }]));
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', "lorem", [{ position: DATA.ERRORS.JSON }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', null, [{ position: DATA.ERRORS.JSON }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', "", [{ position: DATA.ERRORS.JSON }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', "lorem", [{ position: DATA.ERRORS.JSON }]));
 
             return Promise.all(tests);
         });
@@ -315,24 +315,33 @@ describe('Contributor Tests', function() {
         it('cannot upsert non-array dataset to a session', () => {
             let tests = [];
 
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', undefined, [{ records: DATA.ERRORS.TYPE }]));
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', {}, [{ records: DATA.ERRORS.TYPE }]));
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', record, [{ records: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', undefined, [{ records: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', {}, [{ records: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', record, [{ records: DATA.ERRORS.TYPE }]));
 
             return Promise.all(tests);
         });
 
         it('cannot upsert more than max records to a session', () => {
-            return Session.bad(session.cid, session.sid, 'upsert', Array(DATA.RECORDS.MAXIMUM + 1).fill(record), [{ records: DATA.ERRORS.MAX }]);
+            return Session.bad_request(session.cid, session.sid, 'upsert', Array(DATA.RECORDS.MAXIMUM + 1).fill(record), [{ records: DATA.ERRORS.MAX }]);
         });
 
         it('cannot upsert records with missing properties to a session', () => {
             let tests = [];
 
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ }], [{ id: DATA.ERRORS.REQUIRED }, { name: DATA.ERRORS.REQUIRED }, { entity: DATA.ERRORS.REQUIRED }]));
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ id: "1" }], [{ name: DATA.ERRORS.REQUIRED }, { entity: DATA.ERRORS.REQUIRED }]));
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ id: "1", name: "alice" }], [{ entity: DATA.ERRORS.REQUIRED }]));
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ id: undefined, name: undefined, entity: undefined}], [{ id: DATA.ERRORS.REQUIRED }, { name: DATA.ERRORS.REQUIRED }, { entity: DATA.ERRORS.REQUIRED }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ }], [{ id: DATA.ERRORS.REQUIRED }, { name: DATA.ERRORS.REQUIRED }, { entity: DATA.ERRORS.REQUIRED }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ id: "1" }], [{ name: DATA.ERRORS.REQUIRED }, { entity: DATA.ERRORS.REQUIRED }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ id: "1", name: "alice" }], [{ entity: DATA.ERRORS.REQUIRED }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ id: undefined, name: undefined, entity: undefined}], [{ id: DATA.ERRORS.REQUIRED }, { name: DATA.ERRORS.REQUIRED }, { entity: DATA.ERRORS.REQUIRED }]));
+
+            return Promise.all(tests);
+        });
+
+        it('cannot upsert records with additional properties to a session', () => {
+            let tests = [];
+
+//            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ ...record, foo: 1 }], [{ records: DATA.ERRORS.ADDITIONAL }]));
+//            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ ...record, bar: { foo: 1 }}], [{ records: DATA.ERRORS.ADDITIONAL }]));
 
             return Promise.all(tests);
         });
@@ -340,20 +349,20 @@ describe('Contributor Tests', function() {
         it('cannot upsert records with invalid properties to a session', () => {
             let tests = [];
 
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, id: 123}], [{ id: DATA.ERRORS.TYPE }]));
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, id: null}], [{ id: DATA.ERRORS.TYPE }]));
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, id: []}], [{ id: DATA.ERRORS.TYPE }]));
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, id: ""}], [{ id: DATA.ERRORS.MIN }]));
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, id: DATA.text(DATA.RECORDS.ITEM_MAXIMUM + 1)}], [{ id: DATA.ERRORS.MAX }]));
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, name: 123}], [{ name: DATA.ERRORS.TYPE }]));
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, name: null}], [{ name: DATA.ERRORS.TYPE }]));
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, name: []}], [{ name: DATA.ERRORS.TYPE }]));
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, name: ""}], [{ name: DATA.ERRORS.MIN }]));
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, name: DATA.text(DATA.RECORDS.ITEM_MAXIMUM + 1)}], [{ name: DATA.ERRORS.MAX }]));
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, entity: 123}], [{ entity: DATA.ERRORS.TYPE }]));
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, entity: null}], [{ entity: DATA.ERRORS.TYPE }]));
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, entity: []}], [{ entity: DATA.ERRORS.TYPE }]));
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, entity: ""}], [{ entity: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ ...record, id: 123}], [{ id: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ ...record, id: null}], [{ id: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ ...record, id: []}], [{ id: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ ...record, id: ""}], [{ id: DATA.ERRORS.MIN }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ ...record, id: DATA.text(DATA.RECORDS.ITEM_MAXIMUM + 1)}], [{ id: DATA.ERRORS.MAX }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ ...record, name: 123}], [{ name: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ ...record, name: null}], [{ name: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ ...record, name: []}], [{ name: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ ...record, name: ""}], [{ name: DATA.ERRORS.MIN }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ ...record, name: DATA.text(DATA.RECORDS.ITEM_MAXIMUM + 1)}], [{ name: DATA.ERRORS.MAX }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ ...record, entity: 123}], [{ entity: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ ...record, entity: null}], [{ entity: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ ...record, entity: []}], [{ entity: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ ...record, entity: ""}], [{ entity: DATA.ERRORS.TYPE }]));
 
             return Promise.all(tests);
         });
@@ -365,9 +374,9 @@ describe('Contributor Tests', function() {
         it('cannot delete non-json dataset to a session', () => {
             let tests = [];
 
-            tests.push(Session.bad(session.cid, session.sid, 'delete', null, [{ position: DATA.ERRORS.JSON }]));
-            tests.push(Session.bad(session.cid, session.sid, 'delete', "", [{ position: DATA.ERRORS.JSON }]));
-            tests.push(Session.bad(session.cid, session.sid, 'delete', "lorem", [{ position: DATA.ERRORS.JSON }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'delete', null, [{ position: DATA.ERRORS.JSON }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'delete', "", [{ position: DATA.ERRORS.JSON }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'delete', "lorem", [{ position: DATA.ERRORS.JSON }]));
 
             return Promise.all(tests);
         });
@@ -375,25 +384,25 @@ describe('Contributor Tests', function() {
         it('cannot delete non-array dataset to a session', () => {
             let tests = [];
 
-            tests.push(Session.bad(session.cid, session.sid, 'delete', undefined, [{ records: DATA.ERRORS.TYPE }]));
-            tests.push(Session.bad(session.cid, session.sid, 'delete', {}, [{ records: DATA.ERRORS.TYPE }]));
-            tests.push(Session.bad(session.cid, session.sid, 'delete', record, [{ records: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'delete', undefined, [{ records: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'delete', {}, [{ records: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'delete', record, [{ records: DATA.ERRORS.TYPE }]));
 
             return Promise.all(tests);
         });
 
         it('cannot delete more than max records to a session', () => {
-            return Session.bad(session.cid, session.sid, 'delete', Array(DATA.RECORDS.MAXIMUM + 1).fill('1'), [{ records: DATA.ERRORS.MAX }]);
+            return Session.bad_request(session.cid, session.sid, 'delete', Array(DATA.RECORDS.MAXIMUM + 1).fill('1'), [{ records: DATA.ERRORS.MAX }]);
         });
 
         it('cannot delete records with invalid properties to a session', () => {
             let tests = [];
 
-            tests.push(Session.bad(session.cid, session.sid, 'delete', [123], [{ records: DATA.ERRORS.TYPE }]));
-            tests.push(Session.bad(session.cid, session.sid, 'delete', [null], [{ records: DATA.ERRORS.TYPE }]));
-            tests.push(Session.bad(session.cid, session.sid, 'delete', [undefined], [{ records: DATA.ERRORS.TYPE }]));
-            tests.push(Session.bad(session.cid, session.sid, 'delete', [{}], [{ records: DATA.ERRORS.TYPE }]));
-            tests.push(Session.bad(session.cid, session.sid, 'delete', [[]], [{ records: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'delete', [123], [{ records: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'delete', [null], [{ records: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'delete', [undefined], [{ records: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'delete', [{}], [{ records: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'delete', [[]], [{ records: DATA.ERRORS.TYPE }]));
 
             return Promise.all(tests);
         });
@@ -411,11 +420,11 @@ describe('Contributor Tests', function() {
         it('cannot post invalid entity data to a session', () => {
             let tests = [];
 
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, entity: { value: -1 } }], [{ records: DATA.ERRORS.SMALL }]));
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, entity: { value: 101 } }], [{ records: DATA.ERRORS.BIG }]));
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, entity: { value: 0.5 } }], [{ records: DATA.ERRORS.TYPE }]));
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, entity: { value: [] } }], [{ records: DATA.ERRORS.TYPE }]));
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, entity: { value: "" } }], [{ records: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ ...record, entity: { value: -1 } }], [{ records: DATA.ERRORS.SMALL }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ ...record, entity: { value: 101 } }], [{ records: DATA.ERRORS.BIG }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ ...record, entity: { value: 0.5 } }], [{ records: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ ...record, entity: { value: [] } }], [{ records: DATA.ERRORS.TYPE }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ ...record, entity: { value: "" } }], [{ records: DATA.ERRORS.TYPE }]));
 
             return Promise.all(tests);
         });
@@ -445,8 +454,8 @@ describe('Contributor Tests', function() {
         it('cannot post invalid entity data to a session', () => {
             let tests = [];
 
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, entity: { value: "melon" } }], [{ records: DATA.ERRORS.ENUM }]));
-            tests.push(Session.bad(session.cid, session.sid, 'upsert', [{ ...record, entity: {} }], [{ records: DATA.ERRORS.REQUIRED }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ ...record, entity: { value: "melon" } }], [{ records: DATA.ERRORS.ENUM }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [{ ...record, entity: {} }], [{ records: DATA.ERRORS.REQUIRED }]));
 
             return Promise.all(tests);
         });

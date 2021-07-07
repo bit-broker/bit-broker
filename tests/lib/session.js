@@ -87,7 +87,7 @@ module.exports = class Session {
 
     // --- test for a known bad sessions action
 
-    static bad(cid, sid, action, data, errors) {
+    static bad_request(cid, sid, action, data, errors) {
         return chakram.post(URLs.session_action(cid, sid, action), data)
         .then(response => {
             expect(response.body).to.be.a('string');
