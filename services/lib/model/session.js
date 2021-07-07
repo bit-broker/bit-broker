@@ -34,6 +34,7 @@
 
 // --- dependancies
 
+const CONST = require('../constants.js');
 const Permit = require('./permit.js');
 const Operation = require('./operation.js');
 
@@ -87,13 +88,13 @@ module.exports = class Session {
 
     process(action, records) {
         return this.operations.insert(action, records)
-        .then(result => this.mode === 'stream' ? this.operations.commit(true) : Promise.resolve(result)); // streaming sessions auto commit true on each action
+        .then(result => this.mode === CONST.SESSION.MODE.STREAM ? this.operations.commit(true) : Promise.resolve(result)); // streaming sessions auto commit true on each action
     }
 
     // --- closes an open session
 
     close(commit) {
-        return this.operations.commit(commit, this.mode === 'replace')
+        return this.operations.commit(commit, this.mode === CONST.SESSION.MODE.REPLACE)
         .then(result => this.write(null, null));
     }
 }

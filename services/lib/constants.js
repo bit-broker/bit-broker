@@ -43,5 +43,19 @@ module.exports = {
     },
     REDIS: {
       TIMEOUT: 2000
+    },
+    ROLE: {
+        COORDINATOR: 'coordinator',
+        CONTRIBUTOR: 'contributor',
+        CONSUMER: 'consumer'
+    },
+    SESSION: {
+        COMMIT: 'true',
+        MODE: {
+           STREAM: 'stream',
+           REPLACE: 'replace',
+           ACCRUE: 'accrue'
+        },
+        ROLLBACK: 'false'
     }
 }

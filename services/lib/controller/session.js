@@ -143,7 +143,7 @@ module.exports = class Session {
             if (!session) throw failure(HTTP.NOT_FOUND);
             if (session.id != sid) throw failure(HTTP.UNAUTHORIZED);
 
-            return session.close(commit === 'true'); // converts to a boolean
+            return session.close(commit === CONST.SESSION.COMMIT); 
         })
 
         .then(() => {

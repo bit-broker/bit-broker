@@ -28,6 +28,7 @@
 // --- dependancies
 
 const HTTP = require('http-status-codes');
+const CONST = require('../constants.js');
 const failure = require('http-errors');
 const locales = require('../locales.js');
 const model = require('../model/index.js');
@@ -93,15 +94,15 @@ module.exports = class Access {
         let check = null;
 
         switch (role) {
-            case 'coordinator':
+            case CONST.ROLE.COORDINATOR:
                 check = Promise.resolve(context === null ? '' : locales.__('error.access-invalid-context', context));
             break;
 
-            case 'contributor':
+            case CONST.ROLE.CONTRIBUTOR:
                 check = Promise.resolve(locales.__('error.access-invalid-role', role));
             break;
 
-            case 'consumer':
+            case CONST.ROLE.CONSUMER:
                 check = model.policy.find(context).then (item => item ? '' : locales.__('error.access-invalid-context', context));
             break;
 
