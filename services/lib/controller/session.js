@@ -28,6 +28,7 @@
 // --- dependancies
 
 const HTTP = require('http-status-codes');
+const CONST = require('../constants.js');
 const failure = require('http-errors');
 const model = require('../model/index.js');
 const view = require('../view/index.js');
@@ -84,8 +85,8 @@ module.exports = class Session {
         errors = errors.concat(model.validate.id(sid));
         errors = errors.concat(model.validate.action(action));
 
-        if (action === 'upsert') errors = errors.concat(model.validate.records_upsert(records));
-        if (action === 'delete') errors = errors.concat(model.validate.records_delete(records));
+        if (action === CONST.ACTION.UPSERT) errors = errors.concat(model.validate.records_upsert(records));
+        if (action === CONST.ACTION.DELETE) errors = errors.concat(model.validate.records_delete(records));
 
         if (errors.length) {
             throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
@@ -97,7 +98,7 @@ module.exports = class Session {
             if (!session) throw failure(HTTP.NOT_FOUND);
             if (session.id != sid) throw failure(HTTP.UNAUTHORIZED);
 
-            if (action === 'upsert') {
+            if (action === CONST.ACTION.UPSERT) {
                 let scheme = session.connector.entity_properties.schema;
 
                 if (Object.keys(scheme).length) {

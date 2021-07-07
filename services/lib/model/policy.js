@@ -31,14 +31,10 @@
 
 // --- dependancies
 
+const CONST = require('../constants.js');
 const fetch = require('node-fetch');
 const cloneDeep = require('clone-deep');
 const log = require('../logger.js').Logger;
-const FETCH = require('./fetch.js');
-
-// --- constants - not .env configurable
-
-const POLICY_CACHE_KEY_PREFIX = 'BBK_DSP_ID_' ;
 
 // --- policy class (exported)
 
@@ -98,8 +94,8 @@ module.exports = class Policy {
             .then(() => fetch(Policy.rate_limiter(slug), {
                 method: 'PUT',
                 body: JSON.stringify(values.properties.policy.access_control),
-                headers: FETCH.HEADERS,
-                timeout: FETCH.TIMEOUT
+                headers: CONST.FETCH.HEADERS,
+                timeout: CONST.FETCH.TIMEOUT
             }))
             .then(result => result.rowCount > 0);
         });
@@ -117,8 +113,8 @@ module.exports = class Policy {
             .then(() => fetch(Policy.rate_limiter(slug), {
                 method: 'PUT',
                 body: JSON.stringify(values.properties.policy.access_control),
-                headers: FETCH.HEADERS,
-                timeout: FETCH.TIMEOUT
+                headers: CONST.FETCH.HEADERS,
+                timeout: CONST.FETCH.TIMEOUT
             }))
             .then(result => result.rowCount > 0);
         });
@@ -135,8 +131,8 @@ module.exports = class Policy {
             .delete()
             .then(() => fetch(Policy.rate_limiter(slug), {
                 method: 'DELETE',
-                headers: FETCH.HEADERS,
-                timeout: FETCH.TIMEOUT
+                headers: CONST.FETCH.HEADERS,
+                timeout: CONST.FETCH.TIMEOUT
             }))
             .then(result => result.rowCount > 0);
         });
@@ -146,7 +142,7 @@ module.exports = class Policy {
 
     cacheRead(slug) {
         return new Promise((resolve, reject) => {
-            let key = POLICY_CACHE_KEY_PREFIX + slug;
+            let key = CONST.POLICY.CACHE_PREFIX + slug;
             this.cache.get(key)
             .then(response => {
                 if (response === null) {
@@ -190,7 +186,7 @@ module.exports = class Policy {
             delete cachedPolicy.access_control;
         }
         return new Promise((resolve, reject) => {
-            this.cache.set(POLICY_CACHE_KEY_PREFIX + slug, JSON.stringify(cachedPolicy))
+            this.cache.set(CONST.POLICY.CACHE_PREFIX + slug, JSON.stringify(cachedPolicy))
             .then(result => {
                 if (result !== 'OK') {
                     log.error('cache write error', result)
@@ -208,7 +204,7 @@ module.exports = class Policy {
 
     cacheClear(slug) {
         return new Promise((resolve, reject) => {
-            this.cache.del(POLICY_CACHE_KEY_PREFIX + slug)
+            this.cache.del(CONST.POLICY.CACHE_PREFIX + slug)
             .then(result => {
                 if (result !== 1) {
                     log.error('cache del error', result)

@@ -25,6 +25,7 @@
 
 // --- dependancies
 
+const CONST = require('../constants.js');
 const Knex = require('knex');
 const Entity = require('./entity.js');
 const Connector = require('./connector.js');
@@ -35,14 +36,10 @@ const Validate = require('./validate.js');
 const Redis = require("ioredis");
 const log = require('../logger.js').Logger;
 
-// --- constants - not .env configurable
-
-const REDIS_TIMEOUT = 2000;
-
 // --- running contexts
 
 var db = new Knex({ client: 'pg', connection: process.env.APP_DATABASE }); // TODO: should we fix the client version here?
-var redis = new Redis(process.env.POLICY_CACHE, { commandTimeout: REDIS_TIMEOUT });
+var redis = new Redis(process.env.POLICY_CACHE, { commandTimeout: CONST.REDIS.TIMEOUT });
 
 // --- redis event logging
 

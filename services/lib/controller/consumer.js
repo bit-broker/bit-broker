@@ -28,19 +28,12 @@
 // --- dependancies
 
 const HTTP = require('http-status-codes');
+const CONST = require('../constants.js');
 const Status = require('../status.js');
 const failure = require('http-errors');
 const model = require('../model/index.js');
 const view = require('../view/index.js');
 const log = require('../logger.js').Logger;
-
-// --- constants - not .env configurable
-
-const POLICY_HEADER = 'x-bb-policy';
-const NULL_POLICY = { // the policy to use when USE_POLICY is false in .env
-    data_segment: { segment_query: {}, hidden_types: [], field_masks: [] },
-    legal_context: []
-};
 
 // --- timeseries class (embedded)
 
@@ -87,7 +80,7 @@ module.exports = class Consumer {
                 return item;
             })
         } else {
-            return Promise.resolve(NULL_POLICY);
+            return Promise.resolve(CONST.POLICY.EMPTY);
         }
     }
 
@@ -103,7 +96,7 @@ module.exports = class Consumer {
             throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
         }
 
-        Consumer.with_policy(req.header(POLICY_HEADER))
+        Consumer.with_policy(req.header(CONST.POLICY.HEADER))
 
         .then(policy => {
             return model.catalog.query(policy.data_segment.segment_query, JSON.parse(q))
@@ -120,7 +113,7 @@ module.exports = class Consumer {
 
     types(req, res, next) {
 
-        Consumer.with_policy(req.header(POLICY_HEADER))
+        Consumer.with_policy(req.header(CONST.POLICY.HEADER))
 
         .then(policy => {
             return model.catalog.types(policy.data_segment.segment_query)
@@ -139,8 +132,8 @@ module.exports = class Consumer {
         let type = req.params.type.toLowerCase();
         let limit = req.params.limit || 50;
         let offset = req.params.offset || 0;
-        
-        Consumer.with_policy(req.header(POLICY_HEADER))
+
+        Consumer.with_policy(req.header(CONST.POLICY.HEADER))
 
         .then(policy => {
             return model.catalog.types(policy.data_segment.segment_query) // TODO: Calling this first is a heavy price to pay for returning HTTP/404 vs []
@@ -166,7 +159,7 @@ module.exports = class Consumer {
         let type = req.params.type.toLowerCase();
         let id = req.params.id.toLowerCase();
 
-        Consumer.with_policy(req.header(POLICY_HEADER))
+        Consumer.with_policy(req.header(CONST.POLICY.HEADER))
 
         .then(policy => {
             return model.catalog.find(policy.data_segment.segment_query, type, id)

@@ -16,7 +16,7 @@
 
   ----------------------------------------------------------------------------
 
-  System level constants used by anyone utilising node-fetch
+  Non configurable, system level constants
 
 */
 
@@ -25,9 +25,23 @@
 // --- constants - not externally configurable
 
 module.exports = {
-    HEADERS: {
-        'Accept': 'application/json, text/plain',
-        'Content-Type': 'application/json'
+    ACTION: {
+        UPSERT: 'upsert',
+        DELETE: 'delete'
     },
-    TIMEOUT: 2000
+    FETCH: {
+        HEADERS: {
+            'Accept': 'application/json, text/plain',
+            'Content-Type': 'application/json'
+        },
+        TIMEOUT: 2000
+    },
+    POLICY: {
+        CACHE_PREFIX: 'BBK_DSP_ID_',
+        HEADER: 'x-bb-policy',
+        EMPTY: { data_segment: { segment_query: {}, hidden_types: [], field_masks: [] }, legal_context: [] } // the policy to use when USE_POLICY is false in .en
+    },
+    REDIS: {
+      TIMEOUT: 2000
+    }
 }

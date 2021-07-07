@@ -25,9 +25,9 @@
 
 // --- dependancies
 
+const CONST = require('../constants.js');
 const crypto = require('crypto');
 const fetch = require('node-fetch');
-const FETCH = require('./fetch.js');
 
 // --- session class (exported)
 
@@ -57,8 +57,8 @@ module.exports = class Permit {
         return fetch(process.env.AUTH_SERVICE + '/token', {
             method: 'POST',
             body: JSON.stringify({ scope: scope, aud: audience }),
-            headers: FETCH.HEADERS,
-            timeout: FETCH.TIMEOUT
+            headers: CONST.FETCH.HEADERS,
+            timeout: CONST.FETCH.TIMEOUT
         })
         .then(res => res.json());
     }
