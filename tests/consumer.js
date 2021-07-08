@@ -91,17 +91,6 @@ describe('Consumer Tests', function() {
         });
     });
 
-/*
-
-TODO
-    api.router.get ('/entity', controller.consumer.types);
-    api.router.get ('/entity/:type', controller.consumer.list);
-    api.router.get ('/entity/:type/:id', controller.consumer.get);
-
-// -- entity api test
-// -- invalid query json tests
-*/
-
     // --- the test cases
 
     describe('entity api tests', function() {
@@ -233,12 +222,13 @@ TODO
         const THE_WORLD = Seeder.records('country').map(i => i.name);
         const GEOGRAPHY = Seeder.records('geography');
         const POPULATION = Seeder.records('country').reduce((m, i) => { m[i.id] = i.entity.population; return m; }, {});
+        const CALLING_CODE = Seeder.records('country').reduce((m, i) => { m[i.id] = i.entity.calling_code; return m; }, {});
 
         // --- tests a catalog query
 
         function catalog(test) {
             Crud.headers({ 'x-bb-policy': test.policy || DATA.POLICY.ALLAREA.ID })
-            Crud.get(URLs.consumer_catalog(test.query), (body) => {
+            return Crud.get(URLs.consumer_catalog(test.query), (body) => {
                 expect(body).to.be.an('array');
 
                 let items = body.map(i => i.name);
@@ -262,77 +252,105 @@ TODO
 
         // -- the catalog api tests start here
 
-        it('0 » nul » empty query', () => {
+        it('invalid query', () => {
+            return catalog({
+                query: { foo: 'bar' },
+                yields: []
+            });
+        });
+
+        it('nul » empty query » 0', () => {
             return catalog({
                 query: {},
                 yields: []
             });
         });
 
-        it('1 » str » implicit equal', () => {
+        it('str » implicit equal » 1', () => {
             return catalog({
                 query: { 'type': 'country', 'name': 'United Kingdom' },
                 yields: ['United Kingdom']
             });
         });
 
-        it('0 » str » implicit equal', () => {
+        it('str » implicit equal » 0', () => {
             return catalog({
                 query: { 'type': 'country', 'name': 'Atlantis' },
                 yields: []
             });
         });
 
-        it('M » str » implicit equal'); // TODO
+        it('str » implicit equal » M', () => {
+            return catalog({
+                query: { 'type': 'country', 'entity.continent': 'Oceania' },
+                yields: ['Australia', 'Fiji', 'Federated States of Micronesia', 'Kiribati', 'Marshall Islands', 'Nauru', 'Palestine', 'New Zealand', 'Palau', 'Papua New Guinea', 'Tuvalu', 'Samoa', 'Solomon Islands', 'Tonga', 'Vanuatu']
+            });
+        });
 
-        it('1 » num » implicit equal', () => {
+        it('num » implicit equal » 1', () => {
             return catalog({
                 query: { 'type': 'country', 'entity.population': POPULATION.GB },
                 yields: ['United Kingdom']
             });
         });
 
-        it('0 » num » implicit equal', () => {
+        it('num » implicit equal » 0', () => {
             return catalog({
                 query: { 'entity.population': 0 },
                 yields: []
             });
         });
 
-        it('M » num » implicit equal'); // TODO
-
-        it('1 » str » $eq', () => {
+        it('num » implicit equal » M', () => {
             return catalog({
-                query: { 'type': 'country', 'entity.capital': { '$eq': 'London' } },
+                query: { 'entity.calling_code': CALLING_CODE.US },
+                yields: ['United States', 'Canada']
+            });
+        });
+
+        it('str » $eq » 1', () => {
+            return catalog({
+                query: { 'type': 'country', 'name': {'$eq': 'United Kingdom' }},
                 yields: ['United Kingdom']
             });
         });
 
-        it('0 » str » $eq', () => {
+        it('str » $eq » 0', () => {
             return catalog({
-                query: { 'type': 'country', 'entity.capital': { '$eq': 'Babylon' } },
+                query: { 'type': 'country', 'name': {'$eq': 'Atlantis' }},
                 yields: []
             });
         });
 
-        it('M » str » $eq'); // TODO
-
-        it('1 » num » $eq', () => {
+        it('str » $eq » M', () => {
             return catalog({
-                query: { 'type': 'country', 'entity.population': { '$eq': POPULATION.GB } },
+                query: { 'type': 'country', 'entity.continent': {'$eq': 'Oceania' }},
+                yields: ['Australia', 'Fiji', 'Federated States of Micronesia', 'Kiribati', 'Marshall Islands', 'Nauru', 'Palestine', 'New Zealand', 'Palau', 'Papua New Guinea', 'Tuvalu', 'Samoa', 'Solomon Islands', 'Tonga', 'Vanuatu']
+            });
+        });
+
+        it('num » $eq » 1', () => {
+            return catalog({
+                query: { 'type': 'country', 'entity.population': {'$eq': POPULATION.GB }},
                 yields: ['United Kingdom']
             });
         });
 
-        it('M » str » $ne', () => {
+        it('num » $eq » 0', () => {
             return catalog({
-                query: { 'type': 'country', 'entity.capital': { '$ne': 'London' } },
-                yields: THE_WORLD,
-                except: ['United Kingdom']
+                query: { 'entity.population': {'$eq': 0 }},
+                yields: []
             });
         });
 
-        it('M » num » $ne', () => {
+        it('num » $eq » M', () => {
+            return catalog({
+                query: { 'entity.calling_code': {'$eq': CALLING_CODE.US }},
+                yields: ['United States', 'Canada']
+            });
+        });
+
+        it('str » $ne', () => {
             return catalog({
                 query: { 'type': 'country', 'entity.population': { '$ne': POPULATION.GB } },
                 yields: THE_WORLD,
@@ -340,63 +358,71 @@ TODO
             });
         });
 
-        it('M » num » $lt', () => {
+        it('num » $ne', () => {
+            return catalog({
+                query: { 'type': 'country', 'entity.calling_code': { '$ne': CALLING_CODE.US } },
+                yields: THE_WORLD,
+                except: ['United States', 'Canada']
+            });
+        });
+
+        it('num » $lt', () => {
             return catalog({
                 query: { 'type': 'country', 'entity.population': { '$lt': POPULATION.LI } },
                 yields: ['Nauru', 'Palau', 'San Marino', 'Tuvalu', 'Vatican City']
             });
         });
 
-        it('M » num » $lte', () => {
+        it('num » $lte', () => {
             return catalog({
                 query: { 'type': 'country', 'entity.population': { '$lte': POPULATION.LI } },
                 yields: ['Liechtenstein', 'Nauru', 'Palau', 'San Marino', 'Tuvalu', 'Vatican City']
             });
         });
 
-        it('M » num » $gt', () => {
+        it('num » $gt', () => {
             return catalog({
                 query: { 'type': 'country', 'entity.population': { '$gt': POPULATION.IN } },
                 yields: ['China']
             });
         });
 
-        it('M » num » $gte', () => {
+        it('num » $gte', () => {
             return catalog({
                 query: { 'entity.population': { '$gte': POPULATION.IN } },
                 yields: ['China', 'India']
             });
         });
 
-        it('M » str » $lt', () => {
+        it('str » $lt', () => {
             return catalog({
                 query: { 'type': 'country', 'name': { '$lt': 'Argentina' } },
                 yields: ['Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda']
             });
         });
 
-        it('M » str » $lt', () => {
+        it('str » $lte', () => {
             return catalog({
                 query: { 'type': 'country', 'name': { '$lte': 'Argentina' } },
                 yields: ['Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda', 'Argentina']
             });
         });
 
-        it('0 » str » $in', () => {
+        it('str » $in » 0', () => {
             return catalog({
                 query: { 'type': 'country', 'name': { '$in': ['Atlantis', 'Sparta'] } },
                 yields: []
             });
         });
 
-        it('M » str » $in', () => {
+        it('str » $in » M', () => {
             return catalog({
                 query: { 'type': 'country', 'name': { '$in': ['United Kingdom', 'Atlantis', 'India', 'France'] } },
                 yields: ['United Kingdom', 'India', 'France']
             });
         });
 
-        it('M » str » $nin', () => {
+        it('str » $nin » M', () => {
             return catalog({
                 query: { 'type': 'country', 'name': { '$nin': ['United Kingdom', 'Atlantis', 'India', 'France'] } },
                 yields: THE_WORLD,
@@ -404,21 +430,84 @@ TODO
             });
         });
 
-        it('M » str » $and', () => {
+        it('num » $in', () => {
+            return catalog({
+                query: { 'type': 'country', 'entity.calling_code': { '$in': [CALLING_CODE.US, CALLING_CODE.GB] } },
+                yields: ['United Kingdom', 'United States', 'Canada']
+            });
+        });
+
+        it('num » $nin', () => {
+            return catalog({
+                query: { 'type': 'country', 'entity.calling_code': { '$nin': [CALLING_CODE.US, CALLING_CODE.GB] } },
+                yields: THE_WORLD,
+                except: ['United Kingdom', 'United States', 'Canada']
+            });
+        });
+
+        it('str » $contains » 0', () => {
+            return catalog({
+                query: { 'type': 'country', 'entity.languages': { '$contains': 'Klingon' }},
+                yields: []
+            });
+        });
+
+/*
+
+        TODO: Issue #
+
+        it('str » $contains » M', () => {
+            return catalog({
+                query: { 'type': 'country', 'entity.languages': { '$contains': 'Japanese' }},
+                yields: THE_WORLD,
+                except: ['Japan', 'United States', 'Brazil']
+            });
+        });
+
+        it('num » $contains » M', () => {
+            return catalog({
+                query: { 'type': 'country', 'entity.location.coordinates': { '$contains': GEOGRAPHY.BIG_BEN.coordinates[1] }},
+                yields: ['United Kingdom']
+            });
+        });
+*/
+
+        it('str » regex', () => {
+            return catalog({
+                query: { 'type': 'country', 'name': { '$regex': 'United .*', '$options': 'i' } },
+                yields: ['United Kingdom', 'United States', 'United Arab Emirates']
+            });
+        });
+
+        it('geo » $near', () => {
+            return catalog({
+                query: { 'type': 'country', 'entity.location': { '$near': { '$geometry': GEOGRAPHY.BIG_BEN, '$min': 0, '$max': 750000 } } },
+                yields: ['United Kingdom', 'Ireland', 'Netherlands']
+            });
+        });
+
+        it('geo » $within', () => {
+            return catalog({
+                query: { 'type': 'country', 'entity.location': { '$within': { '$geometry': GEOGRAPHY.BRITISH_ISLES } } },
+                yields: ['United Kingdom', 'Ireland']
+            });
+        });
+
+        it('str » $and', () => {
             return catalog({
                 query: { 'type': 'country', '$and': [{ 'name': 'United Kingdom' }, { 'entity.population': POPULATION.GB }] },
                 yields: ['United Kingdom']
             });
         });
 
-        it('M » str » $or', () => {
+        it('str » $or', () => {
             return catalog({
                 query: { 'type': 'country', '$or': [{ 'name': 'United Kingdom' }, { 'entity.population': POPULATION.IN }] },
                 yields: ['United Kingdom', 'India']
             });
         });
 
-        it('M » str » $not', () => {
+        it('str » $not', () => {
             return catalog({
                 query: { 'type': 'country', '$not': { 'name': 'United Kingdom' } },
                 yields: THE_WORLD,
@@ -426,7 +515,7 @@ TODO
             });
         });
 
-        it('M » str » $not', () => {
+        it('str » $not', () => {
             return catalog({
                 query: { 'type': 'country', '$nor': [{ 'name': 'United Kingdom' }, { 'entity.population': POPULATION.IN }] },
                 yields: THE_WORLD,
@@ -434,56 +523,18 @@ TODO
             });
         });
 
-        it('M » str » regex', () => {
+        it('mix » $and', () => {
             return catalog({
-                query: { 'type': 'country', 'name': { '$regex': 'United .*', '$options': 'i' } },
-                yields: ['United Kingdom', 'United States', 'United Arab Emirates']
-            });
-        });
-
-        it('1 » obj » implicit match', () => {
-        /*    return catalog({  TODO
-                query: { 'enity.location': GEOGRAPHY.GB },
+                query: { 'type': 'country', '$and': [{ 'name': 'United Kingdom' }, { 'entity.calling_code': CALLING_CODE.GB }] },
                 yields: ['United Kingdom']
-            });*/
-        });
-
-        it('M » geo » $near', () => {
-            return catalog({
-                query: { 'type': 'country', 'entity.location': { '$near': { '$geometry': GEOGRAPHY.BIG_BEN, '$min': 0, '$max': 750000 } } },
-                yields: ['United Kingdom', 'Ireland', 'Netherlands']
             });
         });
 
-        it('M » geo » $within', () => {
+        it('mix » $or', () => {
             return catalog({
-                query: { 'type': 'country', 'entity.location': { '$within': { '$geometry': GEOGRAPHY.BRITISH_ISLES } } },
-                yields: ['United Kingdom', 'Ireland']
+                query: { 'type': 'country', '$or': [{ 'name': 'United Kingdom' }, { 'entity.calling_code': CALLING_CODE.IN }] },
+                yields: ['United Kingdom', 'India']
             });
         });
-
-/*        it('M » geo » error type', () => {
-            return catalog({
-                query: 'FOO',
-                yields: []
-            });
-        });
-
-        it('M » geo » error type', () => {
-            return catalog({
-                query: [],
-                yields: []
-            });
-        });
-
-        it('M » geo » error invalid', () => {
-            return catalog({
-                query: { 'type': 'country', '$or': 'FOO' },
-                yields: []
-            });
-        });
-
-        $contains
-         */
     });
 });
