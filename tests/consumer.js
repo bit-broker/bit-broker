@@ -201,17 +201,17 @@ describe('Consumer Tests', function() {
         });
 
         it('the entity instances are all present individually', () => {
-            let tests = [];
+            let test = Promise.resolve();
 
             for (let i = 0 ; i < entities.length ; i++) {
                 let type = entities[i].slug;
 
                 for (let j = 0 ; j < records[type].length ; j++) {
-                    tests.push(entity_item(type, records[type][j].public_id));
+                    test = test.then(() => entity_item(type, records[type][j].public_id));
                 }
             }
 
-            return Promise.all(tests);
+            return test;
         });
     });
 
@@ -454,7 +454,7 @@ describe('Consumer Tests', function() {
 
 /*
 
-        TODO: Issue #
+        TODO: Issue #62
 
         it('str » $contains » M', () => {
             return catalog({
