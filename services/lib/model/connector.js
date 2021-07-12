@@ -103,7 +103,7 @@ module.exports = class Connector {
     // --- inserts a new connector on the instance entity type
 
     insert(slug, values) {
-        return Permit.access_token('contributor', this.entity.slug)
+        return Permit.generate_token('contributor', this.entity.slug)
 
         .then (token => {
             values.slug = slug;

@@ -100,8 +100,10 @@ class Shared {
         return chakram.get(server)
         .then(response => {
             expect(response.body).to.be.an('object');
+            expect(response.body.now).to.be.a('string');
             expect(response.body.now).to.match(new RegExp(DATA.DATE.REGEX));
             expect(response.body.name).to.be.equal(name);
+            expect(response.body.version).to.be.a('string');
             expect(response.body.version).to.match(new RegExp(DATA.VERSION.REGEX));
             expect(response.body.status).to.be.equal(DATA.STATUS);
             return chakram.wait();

@@ -68,11 +68,11 @@ module.exports = class Crud {
 
     // --- updates a resource
 
-    static update(url, body) {
+    static update(url, body, checker) {
         return chakram.put(url, body)
         .then(response => {
-            expect(response.body).to.be.undefined;
-            expect(response).to.have.status(HTTP.NO_CONTENT);
+            expect(response.response.statusCode).to.be.oneOf(OK_CODES);
+            if (checker) checker(response.body);
             return chakram.wait();
         });
     }
@@ -140,7 +140,7 @@ module.exports = class Crud {
         });
     }
 
-    // --- post  a resource
+    // --- post a resource
 
     static post(url, body, checker) {
         return chakram.post(url, body)

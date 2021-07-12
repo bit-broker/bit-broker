@@ -128,7 +128,8 @@ const DATA = {
         ENUM: 'is not one of enum values',
         JSON: 'unexpected token',
         REQUIRED: 'requires property',
-        ADDITIONAL: 'not allowed to have the additional property'
+        ADDITIONAL: 'not allowed to have the additional property',
+        MATCH: 'do not match'
     },
 
     CACHE: {
@@ -157,7 +158,7 @@ const DATA = {
     },
 
     KEY: { // jwt
-        REGEX: "^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$",
+        REGEX: "^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]+$",
     },
 
     SLUG: {

@@ -78,6 +78,7 @@ describe('User Access Tests', function() {
         let aid1 = null;
         let aid2 = null;
         let aid3 = null;
+        let token = null;
         let user1 = { name: DATA.name(), email: DATA.pluck(DATA.EMAIL.VALID) };  // pluck to ensure different emails
         let user2 = { name: DATA.name(), email: DATA.pick(DATA.EMAIL.VALID) };
         let values1 = { role: 'coordinator' };
@@ -132,7 +133,9 @@ describe('User Access Tests', function() {
 
         it('can ask for a coordinator token for first user', () => {
             return Crud.add(URLs.access(uid1), values1, URLs.access(uid1, aid1), (body) => {
+                expect(body).to.be.a('string');
                 expect(body).to.match(new RegExp(DATA.KEY.REGEX));
+                token = body;
             });
         });
 
@@ -149,6 +152,7 @@ describe('User Access Tests', function() {
         it('the date is present when addressed directly', () => {
             return Crud.get(URLs.access(uid1, aid1), (body) => {
                 expect(body).to.be.an('object');
+                expect(body.created).to.be.a('string');
                 expect(body.created).to.match(new RegExp(DATA.DATE.REGEX));
             });
         });
@@ -157,13 +161,22 @@ describe('User Access Tests', function() {
             return Crud.duplicate(URLs.access(uid1), values1);
         });
 
-        it('cannot update a token', () => {
-            return Crud.not_found(URLs.access(uid1, aid1), values1, chakram.post);
+        it('can update to get a new token', () => {
+            return Crud.update(URLs.access(uid1, aid1), values1, (body) =>
+            {
+                expect(body).to.be.a('string');
+                expect(body).to.match(new RegExp(DATA.KEY.REGEX));
+                expect(body).to.not.be.eq(token);
+                token = body;
+            });
         });
 
         it('can ask for a coordinator token for second user', () => {
             return Crud.add(URLs.access(uid2), values1, URLs.access(uid2, aid2), (body) => {
+                expect(body).to.be.a('string');
                 expect(body).to.match(new RegExp(DATA.KEY.REGEX));
+                expect(body).to.not.be.eq(token);
+                token = body;
             });
         });
 
@@ -179,7 +192,10 @@ describe('User Access Tests', function() {
 
         it('can ask for a consumer token for first user', () => {
             return Crud.add(URLs.access(uid1), values2, URLs.access(uid1, aid3), (body) => {
+                expect(body).to.be.a('string');
                 expect(body).to.match(new RegExp(DATA.KEY.REGEX));
+                expect(body).to.not.be.eq(token);
+                token = body;
             });
         });
 
@@ -192,6 +208,16 @@ describe('User Access Tests', function() {
 
         it('it is present when addressed directly', () => {
             return Crud.verify(URLs.access(uid1, aid3), { ...values2, id: aid3, url: URLs.access(uid1, aid3) });
+        });
+
+        it('can update one consumer access to get a new token', () => {
+            return Crud.update(URLs.access(uid1, aid3), values2, (body) =>
+            {
+                expect(body).to.be.a('string');
+                expect(body).to.match(new RegExp(DATA.KEY.REGEX));
+                expect(body).to.not.be.eq(token);
+                token = body;
+            });
         });
 
         it('cannot get access for wrong user', () => {
@@ -255,6 +281,7 @@ describe('User Access Tests', function() {
 
         function get_key(values) { // gets a key
             return Crud.add(access, values, URLs.access(uid, ++aid), (body) => {
+                expect(body).to.be.a('string');
                 expect(body).to.match(new RegExp(DATA.KEY.REGEX));
             });
         }
@@ -339,8 +366,18 @@ describe('User Access Tests', function() {
 
         it('allows asking for contributor keys with various valid contexts', () => {
             return Promise.resolve()
-            .then(() => get_key({ ...consumer, context: DATA.POLICY.ALLAREA.ID }))
-            .then(() => get_key({ ...consumer, context: DATA.POLICY.EXAMPLE.ID }));
+            .then(() => get_del_key({ ...consumer, context: DATA.POLICY.ALLAREA.ID }))
+            .then(() => get_del_key({ ...consumer, context: DATA.POLICY.EXAMPLE.ID }));
+        });
+
+        it('disallows asking for refresh key with different values', () => {
+            return Crud.add(access, { ...consumer, context: DATA.POLICY.ALLAREA.ID }, URLs.access(uid, ++aid), (body) => {
+                expect(body).to.be.a('string');
+                expect(body).to.match(new RegExp(DATA.KEY.REGEX));
+            })
+            .then(() => Crud.bad_request(URLs.access(uid, aid), [{ access: DATA.ERRORS.MATCH }], { ...coordinator, context: DATA.POLICY.ALLAREA.ID }, chakram.put))
+            .then(() => Crud.bad_request(URLs.access(uid, aid), [{ access: DATA.ERRORS.MATCH }], { ...coordinator, context: DATA.POLICY.EXAMPLE.ID }, chakram.put))
+            .then(() => Crud.bad_request(URLs.access(uid, aid), [{ access: DATA.ERRORS.MATCH }], { ...consumer, context: DATA.POLICY.EXAMPLE.ID }, chakram.put));
         });
 
         it('can delete the second policy', () => {

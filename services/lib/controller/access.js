@@ -161,6 +161,41 @@ module.exports = class Access {
         .catch(error => next(error));
     }
 
+    // --- updates an access by generating a fresh token
+
+    update(req, res, next) {
+        log.info('coordinator', 'user', req.params.uid, 'access', req.params.aid, 'update');
+
+        let uid = req.params.uid.toLowerCase();
+        let aid = req.params.aid.toLowerCase();
+        let properties = Access.properties(req.body);
+
+        model.user.access(uid)
+
+        .then(accesses => {
+            if (!accesses) throw failure(HTTP.NOT_FOUND);
+            return accesses.find(aid)
+
+            .then(item => {
+                if (!item) throw failure(HTTP.NOT_FOUND);
+
+                if (item.role !== properties.role ||
+                    item.context !== properties.context) {
+                    throw failure(HTTP.BAD_REQUEST, locales.__('error.access-details-not-matched'));
+                }
+
+                return accesses.update(item);
+            })
+        })
+
+        .then(result => {
+            log.info('coordinator', 'user', uid, 'access', aid, 'update', 'complete');
+            res.status(HTTP.OK).send(result.token);
+        })
+
+        .catch(error => next(error));
+    }
+
     // --- deletes an access type
 
     delete(req, res, next) {

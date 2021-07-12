@@ -26,6 +26,10 @@ api.router.post('/token', (req, res) => {
     res.json({ jti, token });
 });
 
+api.router.delete('/token', (req, res) => {
+    res.send();
+});
+
 // --- start the server
 
 api.listen();

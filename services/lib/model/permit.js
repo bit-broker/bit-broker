@@ -53,7 +53,7 @@ module.exports = class Permit {
 
     // --- obtains an access token and a JTI from the auth-service
 
-    static access_token(scope, audience) {
+    static generate_token(scope, audience) {
         return fetch(process.env.AUTH_SERVICE + '/token', {
             method: 'POST',
             body: JSON.stringify({ scope: scope, aud: audience }),
@@ -61,5 +61,16 @@ module.exports = class Permit {
             timeout: CONST.FETCH.TIMEOUT
         })
         .then(res => res.json());
+    }
+
+    // --- revokes a list of jtis and hence their assocaited access tokens
+
+    static revoke_token(jtis) {
+        return fetch(process.env.AUTH_SERVICE + '/token', {
+            method: 'DELETE',
+            body: JSON.stringify(jtis),
+            headers: CONST.FETCH.HEADERS,
+            timeout: CONST.FETCH.TIMEOUT
+        });
     }
 }
