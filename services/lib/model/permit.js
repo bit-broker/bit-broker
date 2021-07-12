@@ -51,7 +51,7 @@ module.exports = class Permit {
         return crypto.createHash('sha256').update(`${connector_id}:${vendor_id}`).digest('hex');
     }
 
-    // --- obtains an access token and a JTI from the auth-service
+    // --- obtains an access token and a key_id from the auth-service
 
     static generate_token(scope, audience) {
         return fetch(process.env.AUTH_SERVICE + '/token', {
@@ -63,12 +63,12 @@ module.exports = class Permit {
         .then(res => res.json());
     }
 
-    // --- revokes a list of jtis and hence their assocaited access tokens
+    // --- revokes a list of key_ids and hence their assocaited access tokens
 
-    static revoke_token(jtis) {
+    static revoke_token(key_ids) {
         return fetch(process.env.AUTH_SERVICE + '/token', {
             method: 'DELETE',
-            body: JSON.stringify(jtis),
+            body: JSON.stringify(key_ids),
             headers: CONST.FETCH.HEADERS,
             timeout: CONST.FETCH.TIMEOUT
         });

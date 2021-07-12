@@ -12,6 +12,7 @@ require('dotenv').config({ path: `${ PATH_CFG }/.env` });
 // --- dependancies
 
 const Server = require(`${ PATH_LIB }/server.js`);
+const log = require(`${ PATH_LIB }/logger.js`).Logger;
 const crypto = require('crypto')
 
 // --- running contexts
@@ -21,12 +22,21 @@ var api = new Server('dummy auth service', process.env.AUTH_SERVICE);
 // --- dummy endpoints
 
 api.router.post('/token', (req, res) => {
+    log.info('request', 'scope', req.body.scope, 'audience', req.body.aud);
+
     let jti = crypto.randomUUID();
     let token = `${ crypto.randomUUID() }.${ crypto.randomUUID() }.${ crypto.randomUUID() }`;
     res.json({ jti, token });
 });
 
 api.router.delete('/token', (req, res) => {
+    let jtis = req.body;
+    log.info ('revoke', 'list', jtis.length);
+
+    for (let i = 0 ; i < jtis.length ; i++) {
+        log.info ('revoke', jtis[i]);
+    }
+
     res.send();
 });
 

@@ -105,7 +105,7 @@ module.exports = class Access {
     // --- generates a fresh access token for the given context
 
     update(values) {
-        return Permit.revoke_token([values.jti])
+        return Permit.revoke_token([values.key_id])
         .then (() => Permit.generate_token(values.role, values.context))
         .then (token => {
             return this.find(values.id).update({ key_id: token.jti }).returning('id')
