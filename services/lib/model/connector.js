@@ -123,7 +123,7 @@ module.exports = class Connector {
         return this.write.where({ slug }).update(values).then(result => result.rowCount > 0);
     }
 
-    // --- deletes a connector on the instance entity type
+    // --- deletes a connector on the instance entity type - NO need to delete associated connector keys, as they will not work now anyway
 
     delete(slug) {
         return this.write.where({ slug }).delete().then(result => result.rowCount > 0);

@@ -89,7 +89,7 @@ module.exports = class Entity {
         return this.find(slug).update(values).then(result => result.rowCount > 0);
     }
 
-    // --- deletes an existing entity type
+    // --- deletes an existing entity type - NO need to delete associated connector keys, as they will not work now anyway
 
     delete(slug) {
         return this.find(slug).delete().then(result => result.rowCount > 0);

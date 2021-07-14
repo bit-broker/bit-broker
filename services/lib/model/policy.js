@@ -107,7 +107,7 @@ module.exports = class Policy {
         });
     }
 
-    // --- deletes an existing policy
+    // --- deletes an existing policy - NO need to delete associated consumer keys, as they will not work now anyway
 
     delete(slug) {
         return this.db.transaction((trx) => {
