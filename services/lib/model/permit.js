@@ -65,7 +65,7 @@ module.exports = class Permit {
 
     // --- revokes a list of key_ids and hence their assocaited access tokens
 
-    static revoke_token(key_ids) {
+    static revoke_tokens(key_ids) {
         return fetch(process.env.AUTH_SERVICE + '/token', {
             method: 'DELETE',
             body: JSON.stringify(key_ids),

@@ -45,7 +45,7 @@ module.exports = class Access {
 
     // --- class constructor
 
-    constructor(db, user) {
+    constructor(db, user = null) {
         this.db = db;
         this.user = user;
     }
@@ -64,10 +64,16 @@ module.exports = class Access {
         ];
     }
 
+    // --- table read context
+
+    get read() {
+        return this.db('access').select(this.COLUMNS);
+    }
+
     // --- table rows by user context
 
     get rows() {
-        return this.db('access').select(this.COLUMNS).where({ user_id: this.user.id });
+        return this.read.where({ user_id: this.user.id });
     }
 
     // --- all accesss on the instance user
@@ -105,7 +111,7 @@ module.exports = class Access {
     // --- generates a fresh access token for the given context
 
     update(values) {
-        return Permit.revoke_token([values.key_id])
+        return Permit.revoke_tokens([values.key_id])
         .then (() => Permit.generate_token(values.role, values.context))
         .then (token => {
             return this.find(values.id).update({ key_id: token.jti }).returning('id')
@@ -115,7 +121,24 @@ module.exports = class Access {
 
     // --- deletes an access on the instance user type
 
-    delete(id) {
-        return this.find(id).delete().then(result => result.rowCount > 0);
+    delete(id, item) {
+        return Permit.revoke_tokens([item.key_id])
+        .then (() => this.find(id).delete().then(result => result.rowCount > 0));
+    }
+
+    // --- revokes all keys for a given user id
+
+    revoke_by_user(user_id) {
+        return this.read.where({ user_id })
+        .then(items => items.map(i => i.key_id))
+        .then(keys => keys.length ? Permit.revoke_tokens(keys) : Promise.resolve());
+    }
+
+    // --- revokes all keys for a given context
+
+    revoke_by_context(context) {
+        return this.read.where({ context })
+        .then(items => items.map(i => i.key_id))
+        .then(keys => keys.length ? Permit.revoke_tokens(keys) : Promise.resolve());
     }
 }

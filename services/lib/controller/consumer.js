@@ -76,7 +76,7 @@ module.exports = class Consumer {
             return model.policy.cacheRead(slug || '') // empty string is not a valid policy slug
 
             .then(item => {
-                if (!item) throw failure(HTTP.FORBIDDEN);
+                if (!item) throw failure(HTTP.UNAUTHORIZED);
                 return item;
             })
         } else {

@@ -38,7 +38,7 @@ const Access = require('./access.js');
 
 // --- user class (exported)
 
-module.exports = class user {
+module.exports = class User {
 
     // --- class constructor
 
@@ -97,7 +97,8 @@ module.exports = class user {
     // --- deletes an existing user
 
     delete(id) {
-        return this.find(id).delete().then(result => result.rowCount > 0);
+        return new Access(this.db).revoke_by_user(id)
+        .then (() => this.find(id).delete().then(result => result.rowCount > 0));
     }
 
     // --- gets the access sub-model

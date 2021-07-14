@@ -212,7 +212,7 @@ module.exports = class Access {
 
             .then(item => {
                 if (!item) throw failure(HTTP.NOT_FOUND);
-                return accesses.delete(aid);
+                return accesses.delete(aid, item);
             });
         })
 

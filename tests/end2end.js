@@ -37,6 +37,7 @@ const expect = chakram.expect;
 
 const LOCAL = process.env.TESTS_LOCAL_MODE || false; // tests on a local environment not a full k8s deployment
 const PAGE = 50; // number of records in a singel data upsert
+const SKIPPED = 'skipped';
 
 // --- the test cases
 
@@ -78,7 +79,7 @@ describe('End-to-End Tests', function() {
     // --- helpers to check expected server access
 
     function server_accessible(access, url) {
-        return access ? Crud.get(url) : (LOCAL ? Promise.resolve() : Crud.not_found(url));
+        return access ? Crud.get(url) : (LOCAL ? Promise.resolve(SKIPPED) : Crud.not_found(url));
     }
 
     function server_access(coordinator, contributor, consumer) {
@@ -93,7 +94,7 @@ describe('End-to-End Tests', function() {
         tests.push (server_accessible (consumer, URLs.consumer_entity()));
         tests.push (server_accessible (consumer, URLs.consumer_catalog()));
 
-        return Promise.all(tests);
+        return Promise.all(tests).then (results => results.includes(SKIPPED));
     }
 
     // --- helpers to check expected instances for a given policy
@@ -104,8 +105,10 @@ describe('End-to-End Tests', function() {
     }
 
     function expectations(policy) {
-        return Crud.add(URLs.access(consumer.uid), { role: 'consumer', context: policy }, undefined, (token) => headers(token, policy))
-
+        return Crud.add(URLs.access(consumer.uid), { role: 'consumer', context: policy }, undefined, (token, location) => {
+            headers(token, policy);
+            consumer.aid = parseInt(location.match(/\d+$/).shift());
+        })
         .then(() => {
             let tests = [];
             let entities = [];
@@ -139,9 +142,8 @@ describe('End-to-End Tests', function() {
                 }
             }
 
-            // --- check entity types
-
-            tests.push (Crud.verify_all(URLs.consumer_entity(), entities));
+            tests.push (Crud.verify_all(URLs.consumer_entity(), entities)); // check entity types
+            tests.push (Crud.delete(URLs.access(consumer.uid, consumer.aid))); // remove the key
 
             return Promise.all(tests);
         });
@@ -158,7 +160,7 @@ describe('End-to-End Tests', function() {
     });
 
     it('the server access rules are met (coor: true, cont: false, cons: false)', function () {
-        return server_access(true, false, false);
+        return server_access(true, false, false).then (skipped => skipped ? this.skip() : true);
     });
 
     it('there are no entities present', function () {
@@ -190,7 +192,7 @@ describe('End-to-End Tests', function() {
     });
 
     it('the server access rules are still met (coor: true, cont: false, cons: false)', function () {
-        return server_access(true, false, false);
+        return server_access(true, false, false).then (skipped => skipped ? this.skip() : true);
     });
 
     it('create the country entity', function () {
@@ -209,7 +211,7 @@ describe('End-to-End Tests', function() {
     });
 
     it('the server access rules are met (coor: false, cont: true, cons: false)', function () {
-        return server_access(false, true, false);
+        return server_access(false, true, false).then (skipped => skipped ? this.skip() : true);
     });
 
     it('open a stream session on country', function () {
@@ -308,7 +310,7 @@ describe('End-to-End Tests', function() {
     });
 
     it('the server access rules are still met (coor: false, cont: false, cons: true)', function () {
-        return server_access(false, false, true);
+        return server_access(false, false, true).then (skipped => skipped ? this.skip() : true);
     });
 
     it('delete the consumer key', function () {
@@ -333,5 +335,148 @@ describe('End-to-End Tests', function() {
 
     it('expectations met for policy "british-isles"', function () {
         return expectations('british-isles');
+    });
+
+    it('there are no keys presents for the consumer user', function () {
+        return Crud.verify_all(URLs.access(consumer.uid), []);
+    });
+
+    it('generate and switch to a consumer key on "access-all-areas"', function () {
+        return Crud.add(URLs.access(consumer.uid), { role: 'consumer', context: 'access-all-areas' }, undefined, (token, location) => {
+            consumer.token = token;
+            consumer.aid = parseInt(location.match(/\d+$/).shift());
+            headers(consumer.token, 'access-all-areas');
+        });
+    });
+
+    it('check consumer api is accessible', function () {
+        return Crud.get(URLs.consumer_catalog());
+    });
+
+    it('refresh consumer key on "access-all-areas"', function () {
+        return Crud.update(URLs.access(consumer.uid, consumer.aid), { role: 'consumer', context: 'access-all-areas' }, (token) =>
+        {
+            consumer.token = token;
+        });
+    });
+
+    it('check consumer api is not accessible with old key', function () {
+        return LOCAL ? this.skip() : Crud.not_found(URLs.consumer_catalog());
+    });
+
+    it('switch to new key', function () {
+        headers(consumer.token, 'access-all-areas');
+    });
+
+    it('check consumer api is accessible', function () {
+        return Crud.get(URLs.consumer_catalog());
+    });
+
+    it('delete consumer api key on "access-all-areas"', function () {
+        return Crud.delete(URLs.access(consumer.uid, consumer.aid));
+    });
+
+    it('check consumer api is not accessible with deleted key', function () {
+        return LOCAL ? this.skip() : Crud.not_found(URLs.consumer_catalog());
+    });
+
+    it('generate and switch to a new consumer key on "access-all-areas"', function () {
+        return Crud.add(URLs.access(consumer.uid), { role: 'consumer', context: 'access-all-areas' }, undefined, (token, location) => {
+            consumer.token = token;
+            consumer.aid = parseInt(location.match(/\d+$/).shift());
+            headers(consumer.token, 'access-all-areas');
+        });
+    });
+
+    it('check consumer api is accessible', function () {
+        return Crud.get(URLs.consumer_catalog());
+    });
+
+    it('delete the "access-all-areas" policy"', function () {
+        return Crud.delete(URLs.policy('access-all-areas'));
+    });
+
+    it('check consumer api is not accessible on the deleted policy', function () {
+        return Crud.unauthorized(URLs.consumer_catalog());
+    });
+
+    it('generate and switch to a consumer key on "all-countries"', function () {
+        return Crud.add(URLs.access(consumer.uid), { role: 'consumer', context: 'all-countries' }, undefined, (token, location) => {
+            consumer.token = token;
+            consumer.aid = parseInt(location.match(/\d+$/).shift());
+            headers(consumer.token, 'all-countries');
+        });
+    });
+
+    it('check consumer api is accessible', function () {
+        return Crud.get(URLs.consumer_catalog());
+    });
+
+    it('delete the consumer user', function () {
+        return Crud.delete(URLs.user(consumer.uid));
+    });
+
+    it('check consumer api is not accessible for a deleted user', function () {
+        return LOCAL ? this.skip() : Crud.not_found(URLs.consumer_catalog());
+    });
+
+    it('switch to country connector key', function () {
+        headers(country.connectors[0].token);
+    });
+
+    it('check can open stream session on country', function () {
+        return Crud.get(URLs.session_open(country.connectors[0].id));
+    });
+
+    it('delete the country connector', function () {
+        return Crud.delete(URLs.connector(country.slug, country.connectors[0].slug));
+    });
+
+    it('check can no longer open stream session on country', function () {
+        return Crud.not_found(URLs.session_open(country.connectors[0].id));
+    });
+
+    it('switch to heritage-site connector key', function () {
+        headers(site.connectors[0].token);
+    });
+
+    it('check can open stream session on heritage-site', function () {
+        return Crud.get(URLs.session_open(site.connectors[0].id));
+    });
+
+    it('delete the heritage-site entity', function () {
+        return Crud.delete(URLs.entity(site.slug));
+    });
+
+    it('check can no longer open stream session on heritage-site', function () {
+        return Crud.not_found(URLs.session_open(site.connectors[0].id));
+    });
+
+    it('delete the coordinator user', function () {
+        return Crud.delete(URLs.user(coordinator.uid));
+    });
+
+    it('check coordinator api is not accessible for deleted user', function () {
+        return LOCAL ? this.skip() : Crud.not_found(URLs.entity());
+    });
+
+    it('switch to the bootstrap key', function () {
+        headers(process.env.TESTS_BOOTSTRAP_KEY);
+    });
+
+    it('delete the country entity', function () {
+        return Crud.delete(URLs.entity(country.slug));
+    });
+
+    it('delete the remaining policiesS', function () {
+        let act = [];
+
+        act.push(Crud.get(URLs.policy(), (list) => {
+            for (let i = 0 ; i < list.length ; i++) {
+                act.push(Crud.delete(URLs.policy(list[i].id)));
+            }
+        }));
+
+        return Promise.all(act);
     });
 });
