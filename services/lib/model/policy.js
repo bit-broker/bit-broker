@@ -47,10 +47,15 @@ module.exports = class Policy {
         this.cache = cache;
     }
 
-    // --- returns the rate limit url for a given slug
+    // --- calls the external rate limiter
 
-    static rate_limiter(slug) {
-        return `${ process.env.RATE_SERVICE }/${ slug }/config`;
+    rate_limiter(slug, method, body) {
+        return fetch(`${ process.env.RATE_SERVICE }/${ slug }/config`, {
+            method: method,
+            body: body,
+            headers: CONST.FETCH.HEADERS,
+            timeout: CONST.FETCH.TIMEOUT
+        });
     }
 
     // --- select column list
@@ -87,54 +92,27 @@ module.exports = class Policy {
     insert(slug, values) {
         values.slug = slug;
 
-        return this.db.transaction(function(trx) {
-            return trx
-            .insert(values)
-            .into('policy')
-            .then(() => fetch(Policy.rate_limiter(slug), {
-                method: 'PUT',
-                body: JSON.stringify(values.properties.policy.access_control),
-                headers: CONST.FETCH.HEADERS,
-                timeout: CONST.FETCH.TIMEOUT
-            }))
-            .then(result => result.rowCount > 0);
+        return this.db.transaction((trx) => {
+            return this.rows.transacting(trx).insert(values)
+            .then(() => this.rate_limiter(slug, 'PUT', values.properties.policy.access_control));
         });
     }
 
     // --- updates an existing policy
 
     update(slug, values) {
-        return this.db.transaction(function(trx) {
-            return trx
-            .select('*')
-            .from('policy')
-            .where({ slug }).first()
-            .update(values)
-            .then(() => fetch(Policy.rate_limiter(slug), {
-                method: 'PUT',
-                body: JSON.stringify(values.properties.policy.access_control),
-                headers: CONST.FETCH.HEADERS,
-                timeout: CONST.FETCH.TIMEOUT
-            }))
-            .then(result => result.rowCount > 0);
+        return this.db.transaction((trx) => {
+            return this.find(slug).transacting(trx).update(values)
+            .then(() => this.rate_limiter(slug, 'PUT', values.properties.policy.access_control));
         });
     }
 
     // --- deletes an existing policy
 
     delete(slug) {
-        return this.db.transaction(function(trx) {
-            return trx
-            .select('*')
-            .from('policy')
-            .where({ slug }).first()
-            .delete()
-            .then(() => fetch(Policy.rate_limiter(slug), {
-                method: 'DELETE',
-                headers: CONST.FETCH.HEADERS,
-                timeout: CONST.FETCH.TIMEOUT
-            }))
-            .then(result => result.rowCount > 0);
+        return this.db.transaction((trx) => {
+            return this.find(slug).transacting(trx).delete()
+            .then(() => this.rate_limiter(slug, 'DELETE'));
         });
     }
 
