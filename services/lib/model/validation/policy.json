@@ -57,10 +57,18 @@
                     },
                     "required": []
                 },
-                "rate": {}
+                "rate": {},
+                "temporary": {
+                    "type": "boolean"
+                },
+                "lifetime": {
+                    "type": "string"
+                }
             },
             "required": [
-                "enabled"
+                "enabled",
+                "temporary",
+                "lifetime"
             ]
         },
         "legal_context_obj": {

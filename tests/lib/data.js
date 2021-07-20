@@ -191,8 +191,8 @@ const DATA = {
     WEBHOOK: {
         VALID: ['http://www.foo.com/', 'http://www.example.com/foo/bar', 'http://foo.com/bar', 'https://foo.com/bar1/bar2', 'https://www.foo.org/?bar=catflap', 'https://www.foo.org:8000', 'https://www.foo.org:8000/?bar=catflap', 'http://localhost:8000'],
         INVALID: [
-          ['foo', 'www.', '.com', 'http/:foo.com', 'http:// www.foo.com'],  // uri non conform
-          ['ftp://foo.org', 'www.foo.org', 'foo.org', 'http:www.foo.com', 'http:/'] // regex non match
+            ['foo', 'www.', '.com', 'http/:foo.com', 'http:// www.foo.com'], // uri non conform
+            ['ftp://foo.org', 'www.foo.org', 'foo.org', 'http:www.foo.com', 'http:/'] // regex non match
         ]
     },
 
@@ -216,7 +216,9 @@ const DATA = {
                             "max_number": 24000,
                             "interval_type": "day"
                         },
-                        "rate": 1000
+                        "rate": 1000,
+                        "temporary": false,
+                        "lifetime": "P1M"
                     },
                     "data_segment": {
                         "segment_query": {},
@@ -234,12 +236,14 @@ const DATA = {
                 "description": "Access is restricted to countries only",
                 "policy": {
                     "access_control": {
-                       "enabled": true,
-                       "quota": {
-                           "max_number": 24000,
-                           "interval_type": "day"
-                       },
-                       "rate": 1000
+                        "enabled": true,
+                        "quota": {
+                            "max_number": 24000,
+                            "interval_type": "day"
+                        },
+                        "rate": 1000,
+                        "temporary": true,
+                        "lifetime": "P1W"
                     },
                     "data_segment": {
                         "segment_query": { "type": "country" },
@@ -262,7 +266,9 @@ const DATA = {
                             "max_number": 24000,
                             "interval_type": "day"
                         },
-                        "rate": 1000
+                        "rate": 1000,
+                        "temporary": true,
+                        "lifetime": "P1W"
                     },
                     "data_segment": {
                         "segment_query": { "type": "movie" },
@@ -272,7 +278,7 @@ const DATA = {
                     "legal_context": [{ "type": "invalid_type", "text": "test attribution", "link": "https://bit-broker.io" }]
                 }
             }
-         }
+        }
     }
 };
 

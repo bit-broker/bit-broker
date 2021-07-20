@@ -1,5 +1,4 @@
-[
-    {
+[{
         "slug": "access-all-areas",
         "properties": {
             "name": "Access All Areas",
@@ -11,14 +10,20 @@
                         "max_number": 24000,
                         "interval_type": "day"
                     },
-                    "rate": 1000
+                    "rate": 1000,
+                    "temporary": false,
+                    "lifetime": "P1M"
                 },
                 "data_segment": {
                     "segment_query": {},
                     "hidden_types": [],
                     "field_masks": []
                 },
-                "legal_context": [{ "type": "attribution", "text": "Data is supplied by Wikipedia", "link": "https://en.wikipedia.org/" }]
+                "legal_context": [{
+                    "type": "attribution",
+                    "text": "Data is supplied by Wikipedia",
+                    "link": "https://en.wikipedia.org/"
+                }]
             }
         }
     },
@@ -34,10 +39,14 @@
                         "max_number": 24000,
                         "interval_type": "day"
                     },
-                    "rate": 1000
+                    "rate": 1000,
+                    "temporary": true,
+                    "lifetime": "P1W"
                 },
                 "data_segment": {
-                    "segment_query": { "type": "country" },
+                    "segment_query": {
+                        "type": "country"
+                    },
                     "hidden_types": [],
                     "field_masks": []
                 },
@@ -57,10 +66,14 @@
                         "max_number": 24000,
                         "interval_type": "day"
                     },
-                    "rate": 1000
+                    "rate": 1000,
+                    "temporary": true,
+                    "lifetime": "P1W"
                 },
                 "data_segment": {
-                    "segment_query": { "type": "heritage-site" },
+                    "segment_query": {
+                        "type": "heritage-site"
+                    },
                     "hidden_types": [],
                     "field_masks": []
                 },
@@ -80,14 +93,53 @@
                         "max_number": 24000,
                         "interval_type": "day"
                     },
-                    "rate": 1000
+                    "rate": 1000,
+                    "temporary": true,
+                    "lifetime": "P1W"
                 },
                 "data_segment": {
-                    "segment_query": { "type": "country", "entity.code": { "$in": ["AT", "BE", "BG", "CY", "CZ", "DE", "DK", "EE", "FI", "FR", "GR", "HR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI", "ES", "SE"] }},
+                    "segment_query": {
+                        "type": "country",
+                        "entity.code": {
+                            "$in": [
+                                "AT",
+                                "BE",
+                                "BG",
+                                "CY",
+                                "CZ",
+                                "DE",
+                                "DK",
+                                "EE",
+                                "FI",
+                                "FR",
+                                "GR",
+                                "HR",
+                                "HU",
+                                "IE",
+                                "IT",
+                                "LV",
+                                "LT",
+                                "LU",
+                                "MT",
+                                "NL",
+                                "PL",
+                                "PT",
+                                "RO",
+                                "SK",
+                                "SI",
+                                "ES",
+                                "SE"
+                            ]
+                        }
+                    },
                     "hidden_types": [],
                     "field_masks": []
                 },
-                "legal_context": [{ "type": "attribution", "text": "Data is supplied by The European Union", "link": "https://europa.eu/european-union/index_en" }]
+                "legal_context": [{
+                    "type": "attribution",
+                    "text": "Data is supplied by The European Union",
+                    "link": "https://europa.eu/european-union/index_en"
+                }]
             }
         }
     },
@@ -103,14 +155,25 @@
                         "max_number": 24000,
                         "interval_type": "day"
                     },
-                    "rate": 1000
+                    "rate": 1000,
+                    "temporary": true,
+                    "lifetime": "P1W"
                 },
                 "data_segment": {
-                    "segment_query": { "type": "country", "entity.population": { "$gt": 1000000000 }},
+                    "segment_query": {
+                        "type": "country",
+                        "entity.population": {
+                            "$gt": 1000000000
+                        }
+                    },
                     "hidden_types": [],
                     "field_masks": []
                 },
-                "legal_context": [{ "type": "attribution", "text": "Data is supplied by Wikipedia", "link": "https://en.wikipedia.org/" }]
+                "legal_context": [{
+                    "type": "attribution",
+                    "text": "Data is supplied by Wikipedia",
+                    "link": "https://en.wikipedia.org/"
+                }]
             }
         }
     },
@@ -126,14 +189,23 @@
                         "max_number": 24000,
                         "interval_type": "day"
                     },
-                    "rate": 1000
+                    "rate": 1000,
+                    "temporary": true,
+                    "lifetime": "P1W"
                 },
                 "data_segment": {
-                    "segment_query": { "type": "country", "entity.continent": "North America" },
+                    "segment_query": {
+                        "type": "country",
+                        "entity.continent": "North America"
+                    },
                     "hidden_types": [],
                     "field_masks": []
                 },
-                "legal_context": [{ "type": "attribution", "text": "Data is supplied by Wikipedia", "link": "https://en.wikipedia.org/" }]
+                "legal_context": [{
+                    "type": "attribution",
+                    "text": "Data is supplied by Wikipedia",
+                    "link": "https://en.wikipedia.org/"
+                }]
             }
         }
     },
@@ -149,14 +221,52 @@
                         "max_number": 24000,
                         "interval_type": "day"
                     },
-                    "rate": 1000
+                    "rate": 1000,
+                    "temporary": true,
+                    "lifetime": "P1W"
                 },
                 "data_segment": {
-                    "segment_query": { "entity.location": { "$within": { "$geometry": { "type": "Polygon","coordinates": [[[-12.386341,59.062341],[-12.386341,49.952269],[2.500282,49.952269],[2.500282,59.062341],[-12.386341,59.062341]]]}}}},
+                    "segment_query": {
+                        "entity.location": {
+                            "$within": {
+                                "$geometry": {
+                                    "type": "Polygon",
+                                    "coordinates": [
+                                        [
+                                            [
+                                                -12.386341,
+                                                59.062341
+                                            ],
+                                            [
+                                                -12.386341,
+                                                49.952269
+                                            ],
+                                            [
+                                                2.500282,
+                                                49.952269
+                                            ],
+                                            [
+                                                2.500282,
+                                                59.062341
+                                            ],
+                                            [
+                                                -12.386341,
+                                                59.062341
+                                            ]
+                                        ]
+                                    ]
+                                }
+                            }
+                        }
+                    },
                     "hidden_types": [],
                     "field_masks": []
                 },
-                "legal_context": [{ "type": "attribution", "text": "Data is supplied by Wikipedia", "link": "https://en.wikipedia.org/" }]
+                "legal_context": [{
+                    "type": "attribution",
+                    "text": "Data is supplied by Wikipedia",
+                    "link": "https://en.wikipedia.org/"
+                }]
             }
         }
     }
