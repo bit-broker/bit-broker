@@ -2,41 +2,26 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "bbk://policy",
     "definitions": {
-        "policy_obj": {
+        "_policy": {
             "type": "object",
             "properties": {
                 "access_control": {
-                    "$ref": "#/definitions/access_control_obj"
+                    "$ref": "#/definitions/_access_control"
                 },
                 "data_segment": {
-                    "segment_query": {
-                        "type": "object"
-                    },
-                    "hidden_types": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "field_masks": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    }
+                    "$ref": "#/definitions/_data_segment"
                 },
                 "legal_context": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/legal_context_obj"
-                    }
+                    "$ref": "#/definitions/_legal_context"
                 }
             },
             "required": [
-                "access_control"
+                "access_control",
+                "data_segment",
+                "legal_context"
             ]
         },
-        "access_control_obj": {
+        "_access_control": {
             "type": "object",
             "properties": {
                 "enabled": {
@@ -63,7 +48,36 @@
                 "enabled"
             ]
         },
-        "legal_context_obj": {
+        "_data_segment": {
+            "type": "object",
+            "properties": {
+                "segment_query": {
+                    "type": "object"
+                },
+                "hidden_types": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "field_masks": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "required": [
+                "segment_query"
+            ]
+        },
+        "_legal_context": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/_legal_item"
+            }
+        },
+        "_legal_item": {
             "type": "object",
             "properties": {
                 "type": {
@@ -105,7 +119,7 @@
             "$ref": "bbk://description"
         },
         "policy": {
-            "$ref": "#/definitions/policy_obj"
+            "$ref": "#/definitions/_policy"
         }
     },
     "required": [

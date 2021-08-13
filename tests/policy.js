@@ -201,6 +201,24 @@ describe('Policy Tests', function() {
             return Crud.bad_request(url(DATA.POLICY.INVALID.ID), [{ legal_context: DATA.ERRORS.ENUM }], DATA.POLICY.INVALID.DETAIL, chakram.put);
         });
 
+        it('cannot update a policy without a data segment', () => {
+            let policy = JSON.parse(JSON.stringify(DATA.POLICY.ALLAREA.DETAIL));
+            delete policy.policy.data_segment;
+            return Crud.bad_request(url(DATA.POLICY.INVALID.ID), [{ data_segment: DATA.ERRORS.REQUIRED }], policy, chakram.put);
+        });
+
+        it('cannot update a policy without a segment query', () => {
+            let policy = JSON.parse(JSON.stringify(DATA.POLICY.ALLAREA.DETAIL));
+            delete policy.policy.data_segment.segment_query;
+            return Crud.bad_request(url(DATA.POLICY.INVALID.ID), [{ segment_query: DATA.ERRORS.REQUIRED }], policy, chakram.put);
+        });
+
+        it('cannot update a policy without a legal context', () => {
+            let policy = JSON.parse(JSON.stringify(DATA.POLICY.ALLAREA.DETAIL));
+            delete policy.policy.legal_context;
+            return Crud.bad_request(url(DATA.POLICY.INVALID.ID), [{ legal_context: DATA.ERRORS.REQUIRED }], policy, chakram.put);
+        });
+
         it('can delete the first policy', () => {
             return Crud.delete(url(DATA.POLICY.ALLAREA.ID));
         });
