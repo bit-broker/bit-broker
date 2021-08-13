@@ -15,7 +15,6 @@
                 },
                 "data_segment": {
                     "segment_query": {},
-                    "hidden_types": [],
                     "field_masks": []
                 },
                 "legal_context": [{ "type": "attribution", "text": "Data is supplied by Wikipedia", "link": "https://en.wikipedia.org/" }]
@@ -38,7 +37,6 @@
                 },
                 "data_segment": {
                     "segment_query": { "type": "country" },
-                    "hidden_types": [],
                     "field_masks": []
                 },
                 "legal_context": []
@@ -61,7 +59,6 @@
                 },
                 "data_segment": {
                     "segment_query": { "type": "heritage-site" },
-                    "hidden_types": [],
                     "field_masks": []
                 },
                 "legal_context": []
@@ -84,7 +81,6 @@
                 },
                 "data_segment": {
                     "segment_query": { "type": "country", "entity.code": { "$in": ["AT", "BE", "BG", "CY", "CZ", "DE", "DK", "EE", "FI", "FR", "GR", "HR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI", "ES", "SE"] }},
-                    "hidden_types": [],
                     "field_masks": []
                 },
                 "legal_context": [{ "type": "attribution", "text": "Data is supplied by The European Union", "link": "https://europa.eu/european-union/index_en" }]
@@ -107,7 +103,6 @@
                 },
                 "data_segment": {
                     "segment_query": { "type": "country", "entity.population": { "$gt": 1000000000 }},
-                    "hidden_types": [],
                     "field_masks": []
                 },
                 "legal_context": [{ "type": "attribution", "text": "Data is supplied by Wikipedia", "link": "https://en.wikipedia.org/" }]
@@ -130,7 +125,6 @@
                 },
                 "data_segment": {
                     "segment_query": { "type": "country", "entity.continent": "North America" },
-                    "hidden_types": [],
                     "field_masks": []
                 },
                 "legal_context": [{ "type": "attribution", "text": "Data is supplied by Wikipedia", "link": "https://en.wikipedia.org/" }]
@@ -153,7 +147,6 @@
                 },
                 "data_segment": {
                     "segment_query": { "entity.location": { "$within": { "$geometry": { "type": "Polygon","coordinates": [[[-12.386341,59.062341],[-12.386341,49.952269],[2.500282,49.952269],[2.500282,59.062341],[-12.386341,59.062341]]]}}}},
-                    "hidden_types": [],
                     "field_masks": []
                 },
                 "legal_context": [{ "type": "attribution", "text": "Data is supplied by Wikipedia", "link": "https://en.wikipedia.org/" }]

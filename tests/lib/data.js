@@ -220,7 +220,6 @@ const DATA = {
                     },
                     "data_segment": {
                         "segment_query": {},
-                        "hidden_types": [],
                         "field_masks": []
                     },
                     "legal_context": [{ "type": "attribution", "text": "test attribution", "link": "https://bit-broker.io" }]
@@ -243,7 +242,6 @@ const DATA = {
                     },
                     "data_segment": {
                         "segment_query": { "type": "country" },
-                        "hidden_types": [],
                         "field_masks": ["movie.rating"]
                     },
                     "legal_context": [{ "type": "attribution", "text": "test attribution", "link": "https://bit-broker.io" }]
@@ -266,7 +264,6 @@ const DATA = {
                     },
                     "data_segment": {
                         "segment_query": { "type": "movie" },
-                        "hidden_types": [],
                         "field_masks": ["movie.rating"]
                     },
                     "legal_context": [{ "type": "invalid_type", "text": "test attribution", "link": "https://bit-broker.io" }]

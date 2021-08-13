@@ -54,12 +54,6 @@
                 "segment_query": {
                     "type": "object"
                 },
-                "hidden_types": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
                 "field_masks": {
                     "type": "array",
                     "items": {
