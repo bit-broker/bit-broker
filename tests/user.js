@@ -77,6 +77,7 @@ describe('User Tests', function() {
         let id2 = null;
         let user1 = null; // will be filled in during the first test
         let user2 = null;
+        let admin = { id: 1, url: URLs.user(1), name: 'admin' };
         let values1 = { name: DATA.name(), email: DATA.pluck(DATA.EMAIL.VALID) };  // pluck to ensure different emails
         let values2 = { name: DATA.name(), email: DATA.pluck(DATA.EMAIL.VALID) };
         let update1 = { name: DATA.name() };
@@ -110,6 +111,7 @@ describe('User Tests', function() {
 
         it('it is present in the user list', () => {
             return Crud.verify_all(all, [
+                admin,
                 { id: id1, url: user1, name: values1.name, email: values1.email }
             ]);
         });
@@ -128,6 +130,7 @@ describe('User Tests', function() {
 
         it('new values are present in the user list', () => {
             return Crud.verify_all(all, [
+                admin,
                 { id: id1, url: user1, name: update1.name, email: values1.email }
             ]);
         });
@@ -146,6 +149,7 @@ describe('User Tests', function() {
 
         it('both are present in the user list', () => {
             return Crud.verify_all(all, [
+                admin,
                 { id: id1, url: user1, name: update1.name, email: values1.email },
                 { id: id2, url: user2, name: values2.name, email: values2.email }
             ]);
@@ -157,6 +161,7 @@ describe('User Tests', function() {
 
         it('it is gone from the user list', () => {
             return Crud.verify_all(all, [
+                admin,
                 { id: id2, url: user2, name: values2.name, email: values2.email }
             ]);
         });
@@ -169,8 +174,8 @@ describe('User Tests', function() {
             return Crud.delete(user2);
         });
 
-        it('the user list is empty', () => {
-            return Crud.verify_all(all, []);
+        it('the user list is empty, except for the admin user', () => {
+            return Crud.verify_all(all, [admin]);
         });
     });
 

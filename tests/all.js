@@ -42,6 +42,7 @@ mocha.addFile('./consumer.js');
 mocha.addFile('./policy.js');
 mocha.addFile('./user.js');
 mocha.addFile('./access.js');
+mocha.addFile('./end2end.js');
 
 // --- run the tests
 

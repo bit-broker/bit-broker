@@ -50,7 +50,7 @@ class Shared {
 
     nuke() {
         return this.db('entity').delete()  // will auto cascade to connectors, catalog, etc
-        .then(() => this.db('users').delete())
+        .then(() => this.db('users').whereNot('id', 1).delete())  // not including the admin user
         .then(() => this.db('policy').delete());
     }
 
@@ -112,11 +112,11 @@ class Shared {
 
     // --- checks there is nothing present at the rest resource point
 
-    nowt(url) {
+    nowt(url, count = 0) {
         return chakram.get(url)
         .then(response => {
             expect(response.body).to.be.an('array');
-            expect(response.body.length).to.be.eq(0);
+            expect(response.body.length).to.be.eq(count);
             expect(response).to.have.status(HTTP.OK);
             return chakram.wait();
         });
@@ -126,7 +126,7 @@ class Shared {
 
     empty() {
         return this.nowt(URLs.entity())
-        .then(() => this.nowt(URLs.user()))
+        .then(() => this.nowt(URLs.user(), 1))
         .then(() => this.nowt(URLs.policy()));
     }
 }

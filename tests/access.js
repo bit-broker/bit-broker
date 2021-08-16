@@ -79,6 +79,7 @@ describe('User Access Tests', function() {
         let aid2 = null;
         let aid3 = null;
         let token = null;
+        let admin = { id: 1, url: URLs.user(1), name: 'admin' };
         let user1 = { name: DATA.name(), email: DATA.pluck(DATA.EMAIL.VALID) };  // pluck to ensure different emails
         let user2 = { name: DATA.name(), email: DATA.pick(DATA.EMAIL.VALID) };
         let values1 = { role: 'coordinator' };
@@ -108,8 +109,8 @@ describe('User Access Tests', function() {
             });
         });
 
-        it('no users are present', () => {
-            return Crud.verify_all(all, []);
+        it('only the admin user is present', () => {
+            return Crud.verify_all(all, [admin]);
         });
 
         it('can add the first housing user', () => {
@@ -122,6 +123,7 @@ describe('User Access Tests', function() {
 
         it('they are both present in the user list', () => {
             return Crud.verify_all(all, [
+                admin,
                 { ...user1, id: uid1, url: URLs.user(uid1) },
                 { ...user2, id: uid2, url: URLs.user(uid2) }
             ]);
