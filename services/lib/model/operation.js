@@ -60,9 +60,14 @@ module.exports = class Operation {
 
     insert(action, records) {
         let values = [];
+        let keys = {};
 
         for (let i = 0; i < records.length; i++) {
             let record = records[i];
+            let vendor_key = action === CONST.ACTION.UPSERT ? record.id : record;
+            let public_key = Permit.public_key(this.connector.contribution_id, vendor_key);
+            
+            keys[vendor_key] = public_key;
 
             if (action === CONST.ACTION.UPSERT) {
                 record.type = this.connector.entity_slug;
@@ -72,12 +77,14 @@ module.exports = class Operation {
 
             values.push({
                 session_id: this.id,
+                public_id: public_key,
                 action: action,
                 record: record
             });
         }
 
-        return values.length ? this.rows.insert(values).then(result => result.rowCount > 0) : Promise.resolve(true);
+        let write = values.length ? this.rows.insert(values).then(result => result.rowCount > 0) : Promise.resolve(true);
+        return write.then (() => keys);
     }
 
     // --- deletes operations associated with the given session
@@ -102,7 +109,7 @@ module.exports = class Operation {
                     if (items[i].action === CONST.ACTION.UPSERT) {
                         return catalog.upsert({
                             connector_id: this.connector.id,
-                            public_id: Permit.public_key(this.connector.contribution_id, items[i].record.id),
+                            public_id: items[i].public_id,
                             vendor_id: items[i].record.id,
                             record: items[i].record
                         });

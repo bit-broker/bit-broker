@@ -113,8 +113,8 @@ module.exports = class Session {
             return session.process(action, records);
         })
 
-        .then(() => {
-            res.status(HTTP.NO_CONTENT).send(); // TODO: Some return doc here?
+        .then(keys => {
+            res.status(HTTP.OK).send(keys);
         })
 
         .catch(error => next(error));
@@ -143,11 +143,11 @@ module.exports = class Session {
             if (!session) throw failure(HTTP.NOT_FOUND);
             if (session.id != sid) throw failure(HTTP.UNAUTHORIZED);
 
-            return session.close(commit === CONST.SESSION.COMMIT); 
+            return session.close(commit === CONST.SESSION.COMMIT);
         })
 
         .then(() => {
-            res.status(HTTP.OK).send();  // TODO: Some report here
+            res.status(HTTP.OK).send();
         })
 
         .catch(error => next(error));

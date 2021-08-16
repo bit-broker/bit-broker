@@ -88,7 +88,11 @@ module.exports = class Session {
 
     process(action, records) {
         return this.operations.insert(action, records)
-        .then(result => this.mode === CONST.SESSION.MODE.STREAM ? this.operations.commit(true) : Promise.resolve(result)); // streaming sessions auto commit true on each action
+        .then(keys =>
+        {
+            let commit = this.mode === CONST.SESSION.MODE.STREAM ? this.operations.commit(true) : Promise.resolve(); // streaming sessions auto commit true on each action
+            return commit.then (() => keys);
+        });
     }
 
     // --- closes an open session

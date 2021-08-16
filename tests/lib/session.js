@@ -72,11 +72,20 @@ module.exports = class Session {
         let actions = Promise.resolve();
 
         for (let i = 0 ; i < data.length ; i += page) {
+            let start = i;
+            let end = Math.min(i + page, data.length);
+
             actions = actions.then(() => {
-                return chakram.post(URLs.session_action(cid, sid, action), data.slice(i, i + page))
+                return chakram.post(URLs.session_action(cid, sid, action), data.slice(start, end))
                 .then(response => {
-                    expect(response.body).to.be.undefined;
-                    expect(response).to.have.status(HTTP.NO_CONTENT);
+                    expect(response.body).to.be.an('object');
+                    for (let j = start; j < end; j++) {
+                        let key = action === 'upsert' ? data[j].id : data[j];
+                        expect(response.body[key]).to.a('string');
+                        expect(response.body[key]).to.match(new RegExp(DATA.PUBLIC_ID.REGEX));
+                        expect(response.body[key].length).to.be.eq(DATA.PUBLIC_ID.SIZE);
+                    }
+                    expect(response).to.have.status(HTTP.OK);
                     return chakram.wait();
                 });
             });

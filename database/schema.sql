@@ -134,6 +134,7 @@ CREATE TABLE operation
 (
     id SERIAL PRIMARY KEY,
     session_id CHAR(36) NOT NULL REFERENCES connector (session_id) ON DELETE CASCADE,
+    public_id CHAR(64) NOT NULL,
     action OPERATION_ACTIONS NOT NULL,
     record JSONB NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
