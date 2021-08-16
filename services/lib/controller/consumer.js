@@ -166,7 +166,7 @@ module.exports = class Consumer {
 
             .then(item => {
                 if (!item) throw failure(HTTP.NOT_FOUND);
-                res.json(view.consumer.instance(item, policy.legal_context));
+                res.json(view.consumer.instance(item, policy.legal_context, policy.data_segment.field_masks));
             })
         })
 

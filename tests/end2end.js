@@ -149,6 +149,71 @@ describe('End-to-End Tests', function() {
         });
     }
 
+    // --- helper to check expected properties in the context of field masks
+
+    function masking (policy, entity, before, masks, after) {
+        let act = [];
+        headers(consumer.token, policy);
+
+        return Crud.get(URLs.consumer_entity(entity), (list) => {
+            for (let i = 0 ; i < list.length ; i++) {
+                act.push(Crud.get(list[i].url, (item) => {
+                    expect(item).to.be.an('object');
+                    expect(item).to.have.property('entity');
+
+                    for (let i = 0 ; i < before.length ; i++) {
+                        let parts = before[i].split('.');
+                        expect(item).to.have.property(parts[0]);
+                        expect(item[parts[0]]).to.have.property(parts[1]);
+                    }
+                }));
+            }
+        })
+
+        .then(() => Promise.all(act))
+
+        .then(() => {
+            headers(coordinator.token);
+            let properties = Seeder.policies.find(p => p.slug == policy).properties;
+            properties.policy.data_segment.field_masks = masks;
+            return Crud.update(URLs.policy(policy), properties);
+        })
+
+        .then(() => {
+            act = [];
+            headers(consumer.token, policy);
+
+            return Crud.get(URLs.consumer_entity(entity), (list) => {
+                for (let i = 0 ; i < list.length ; i++) {
+                    act.push(Crud.get(list[i].url, (item) => {
+                        expect(item).to.be.an('object');
+                        expect(item).to.have.property('entity');
+
+                        for (let i = 0 ; i < before.length ; i++) {
+                            let parts = before[i].split('.');
+                            expect(item).to.have.property(parts[0]);
+
+                            if (after.includes(before[i])) {
+                                expect(item[parts[0]]).to.have.property(parts[1]);
+                            } else {
+                                expect(item[parts[0]]).to.not.have.property(parts[1]);
+                            }
+                        }
+                    }));
+                }
+            });
+        })
+
+        .then(() => Promise.all(act))
+
+        .then(() => {
+            headers(coordinator.token);
+            let properties = Seeder.policies.find(p => p.slug == policy).properties;
+            properties.policy.data_segment.field_masks = [];
+            return Crud.update(URLs.policy(policy), properties);
+        });
+    }
+
     // --- the tests themselves
 
     it('tests are in production mode', function () {
@@ -302,15 +367,20 @@ describe('End-to-End Tests', function() {
         return Crud.add(URLs.access(consumer.uid), { role: 'consumer', context: 'access-all-areas' }, undefined, (token, location) => {
             consumer.token = token;
             consumer.aid = parseInt(location.match(/\d+$/).shift());
+            consumer.policy = 'access-all-areas';
         });
     });
 
     it('switch to the consumer key', function () {
-        headers(consumer.token, 'access-all-areas');
+        headers(consumer.token, consumer.policy);
     });
 
     it('the server access rules are still met (coor: false, cont: false, cons: true)', function () {
         return server_access(false, false, true).then (skipped => skipped ? this.skip() : true);
+    });
+
+    it('switch to the coordinator key', function () {
+        headers(coordinator.token);
     });
 
     it('delete the consumer key', function () {
@@ -336,6 +406,29 @@ describe('End-to-End Tests', function() {
     it('expectations met for policy "british-isles"', function () {
         return expectations('british-isles');
     });
+
+    it('there are no keys presents for the consumer user', function () {
+        return Crud.verify_all(URLs.access(consumer.uid), []);
+    });
+
+    it('generate a consumer key on "british-isles"', function () {
+        return Crud.add(URLs.access(consumer.uid), { role: 'consumer', context: 'british-isles' }, undefined, (token, location) => {
+            consumer.token = token;
+            consumer.aid = parseInt(location.match(/\d+$/).shift());
+            consumer.policy = 'british-isles';
+        });
+    });
+
+    it('check data items are field masked correctly', function () {
+        return masking(consumer.policy, country.slug,
+                      ['entity.area', 'entity.currency', 'entity.capital', 'entity.languages', 'instance.independence'],
+                      ['country.entity.currency', 'country.entity.languages', 'country.instance.independence'],
+                      ['entity.area', 'entity.capital']);
+    });
+
+    it('delete consumer api key on "british-isles"', function () {
+        return Crud.delete(URLs.access(consumer.uid, consumer.aid));
+    })
 
     it('there are no keys presents for the consumer user', function () {
         return Crud.verify_all(URLs.access(consumer.uid), []);
@@ -468,15 +561,15 @@ describe('End-to-End Tests', function() {
         return Crud.delete(URLs.entity(country.slug));
     });
 
-    it('delete the remaining policiesS', function () {
+    it('delete the remaining policies', function () {
         let act = [];
 
-        act.push(Crud.get(URLs.policy(), (list) => {
+        return Crud.get(URLs.policy(), (list) => {
             for (let i = 0 ; i < list.length ; i++) {
                 act.push(Crud.delete(URLs.policy(list[i].id)));
             }
-        }));
+        })
 
-        return Promise.all(act);
+        .then (() => Promise.all(act));
     });
 });

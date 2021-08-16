@@ -57,9 +57,29 @@ module.exports = class Consumer extends View {
         return doc;
     }
 
+    // --- unpacks a field mask into consistent parts - entity.section.field
+
+    static unpack(mask) {
+        let details = { valid: false };
+        let parts = mask.trim().split('.');
+
+        if (parts.length === 3) {
+            let entity = parts.shift();
+            let section = parts.shift();
+            let field = parts.shift();
+
+            if (entity.length && (section === 'entity' || section === 'instance') && field.length)
+            {
+                details = { entity, section, field, valid: true };
+            }
+        }
+
+        return details;
+    }
+
     // --- an entity instance
 
-    static instance(item, legal, full = true) {
+    static instance(item, legal, masks, full = true) {
         let doc = {
             id: item.public_id,
             url: this.rest(process.env.CONSUMER_BASE, 'entity', item.entity_slug, item.public_id),
@@ -69,13 +89,23 @@ module.exports = class Consumer extends View {
 
         if (full) {
             doc = Object.assign(doc, { entity: item.record.entity });
+            doc = Object.assign(doc, { instance: item.record.instance || {} })
 
-            if (item.record.instance) {
-                doc = Object.assign(doc, { instance: item.record.instance });
+            masks = masks || [];
+
+            for (let i = 0 ; i < masks.length ; i++) {  // remove the policy masked fields
+                let details = this.unpack(masks[i]);
+
+                if (details.valid &&
+                    doc.type === details.entity && // matched entity type
+                    doc.hasOwnProperty(details.section) && // matched section - entity or instance
+                    doc[details.section].hasOwnProperty(details.field)) { // matched field
+                        delete doc[details.section][details.field];  // we hit a match for a field mask
+                }
             }
         }
 
-        doc = Object.assign(doc, { legal: legal });
+        doc = Object.assign(doc, { legal: legal });  // adds the legal context
 
         return doc;
     }
@@ -86,7 +116,7 @@ module.exports = class Consumer extends View {
         let doc = [];
 
         for (let i = 0; i < items.length; i++) {
-            doc.push(this.instance(items[i], legal, false));
+            doc.push(this.instance(items[i], legal, undefined, false));
         }
 
         return doc;

@@ -124,12 +124,7 @@ describe('Consumer Tests', function() {
         function entity_full(type, record, original) {
             entity_base(type, record, original);
             expect(record.entity).to.deep.equal(original.entity);
-
-            if (original.instance) {
-                expect(record.instance).to.deep.equal(original.instance);
-            } else {
-                expect(record.instance).to.be.undefined;
-            }
+            expect(record.instance).to.deep.equal(original.instance || {});
         }
 
         // --- tests an entity list
