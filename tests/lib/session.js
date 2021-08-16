@@ -127,7 +127,7 @@ module.exports = class Session {
     static records(entity, connector, records, mode, action, commit) {
         let session = {};
         return Session.open(entity, connector, mode, (info => session = info))
-        .then(() => { return Session.action(session.cid, session.sid, action, records) })
-        .then(() => { return Session.close(session.cid, session.sid, commit); });
+        .then(() => Session.action(session.cid, session.sid, action, records))
+        .then(() => Session.close(session.cid, session.sid, commit));
     }
 }
