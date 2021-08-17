@@ -72,7 +72,7 @@ module.exports = class Query {
         let keys = query.matchAll(/"\$(\w+)"/g);  // all actionable keys of the form "$xxx"
 
         for (let key of keys) {
-            if (!ALLOWED.includes(key[1])) { // 1 == the regex matching group
+            if (!ALLOWED.includes(key[1])) { // 1 = the regex matching group
                 scoped = false;
                 break
             }

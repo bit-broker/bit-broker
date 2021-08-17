@@ -90,7 +90,7 @@ module.exports = class Catalog {
 
     query(segment, query) {
         let subset = Query.process(query).where;
-        if (subset === 'TRUE') subset = 'FALSE';  // by convention, no query == no records on bare catalog calls
+        if (subset === 'TRUE') subset = 'FALSE';  // by convention, no query = no records on bare catalog calls
         return this.rows(segment).whereRaw(subset);
     }
 
