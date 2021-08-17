@@ -813,9 +813,9 @@ describe('Connector Session Tests', function() {
         ]);
     });
 
-    it('Performing random mix tests - expect a delay here...', () => { return true; });
+    it('performing random mix tests - expect a delay here...', () => { return true; });
 
-    it('Random mix', () => {
+    it('random mix', () => {
         const COUNT_STEPS = 64;
         const COUNT_ITEMS = 16;  // stay within the action data page size of 100
 
