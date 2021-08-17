@@ -34,6 +34,10 @@ const fs = require('fs');
 
 module.exports = class Seeder {
 
+    // --- static variables
+
+    static cids = {};
+
     // --- returns entity seed data
 
     static get entities() {
@@ -78,16 +82,34 @@ module.exports = class Seeder {
         let steps = [];
         let entities = Seeder.entities;
 
+        this.cids = {};
+
         for (let i = 0; i < entities.length; i++) {
             let entity = entities[i];
 
             for (let j = 0; j < entity.connectors.length; j++) {
                 let connector = entity.connectors[j];
-                steps.push(Crud.add(URLs.connector(entity.slug, connector.slug), connector.properties));
+                steps.push(Crud.add(URLs.connector(entity.slug, connector.slug), connector.properties, null, result => {
+                    this.cids[`${ entity.slug }/${ connector.slug }`] = `${ entity.slug }/${ result.id }`;
+                }));
             }
         }
 
         return Promise.all(steps);
+    }
+
+    // --- maps bbk links by adding in the contributor id - only for top level strings on the entity object
+
+    static map_bbk_links(records) {
+        for (let i = 0 ; i < records.length ; i++) {
+            for (let j in records[i].entity) {
+                if (typeof records[i].entity[j] === 'string') {
+                    for (let k in this.cids) {
+                        records[i].entity[j] = records[i].entity[j].replace(`bbk://${ k }`, `bbk://${ this.cids[k] }`);
+                    }
+                }
+            }
+        }
     }
 
     // --- adds all the seed data
@@ -102,6 +124,8 @@ module.exports = class Seeder {
             for (let j = 0; j < entity.connectors.length; j++) {
                 let connector = entity.connectors[j];
                 let records = Seeder.records(entity.slug);
+
+                this.map_bbk_links(records);
                 steps.push(Session.records(entity.slug, connector.slug, records, 'stream', 'upsert', true));
             }
         }

@@ -17,7 +17,7 @@
   ----------------------------------------------------------------------------
 
   View base class
-  
+
   Formats the output for all bit-brokers services in order to ensure there is
   consistency in representation.
 
@@ -25,13 +25,49 @@
 
 'use strict'; // code assumes ECMAScript 6
 
+// --- dependancies
+
+const Permit = require('../model/permit.js');
+
 // --- view class (exported)
 
 module.exports = class View {
+
+    // --- static constants
+
+    static REGEX_BBK = new RegExp("^[bB][bB][kK]://([a-z0-9][a-z0-9-]+)/([a-z0-9][a-z0-9-]+)/([^/]+)$", 'g');  // matches a bbk link
 
     // --- returns a restful url
 
     static rest(...resources) {
         return resources.join('/');
+    }
+
+    // --- iterates every value within an object recursively, calling the specified callback
+
+    static each_value(object, cb) {
+        if (object) {
+            for (var key in object) {
+                if (typeof object[key] === 'object') {
+                    this.each_value(object[key], cb);
+                } else {
+                    object[key] = cb(object[key]);
+                }
+            }
+        }
+    }
+
+    // --- maps bbk links to public urls - used in conjunction with the each_value function
+
+    static map_bbk_links(item) {
+        if (typeof item === 'string') {
+            let match = View.REGEX_BBK.exec(item);
+
+            if (match) {
+                item = View.rest(process.env.CONSUMER_BASE, 'entity', match[1], Permit.public_key(match[2], match[3]));
+            }
+        }
+
+        return item;
     }
 }

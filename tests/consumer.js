@@ -119,12 +119,32 @@ describe('Consumer Tests', function() {
             }
         }
 
+        // --- tests each property of an object
+
+        function entity_each(record, original) {
+            let bbk = [];
+
+            for (let i in original) {
+                if (typeof original[i] === 'string' && original[i].startsWith('bbk://')) {
+                    bbk.push({ bbk: original[i], url: record[i] });  // deferred for later testing
+                } else {
+                    expect(record[i]).to.deep.equal(original[i]);
+                }
+            }
+
+            return bbk;
+        }
+
         // --- test a full entity record
 
         function entity_full(type, record, original) {
+            let bbk = [];
+
             entity_base(type, record, original);
-            expect(record.entity).to.deep.equal(original.entity);
-            expect(record.instance).to.deep.equal(original.instance || {});
+            bbk = bbk.concat(entity_each(record.entity, original.entity));
+            bbk = bbk.concat(entity_each(record.instance, original.instance));
+
+            return bbk;
         }
 
         // --- tests an entity list
@@ -154,6 +174,8 @@ describe('Consumer Tests', function() {
         // --- tests an entity item
 
         function entity_item(type, id) {
+            let acts = [];
+
             return Crud.get(URLs.consumer_entity(type, id), (body) => {
                 expect(body).to.be.an('object');
 
@@ -161,10 +183,20 @@ describe('Consumer Tests', function() {
                 let original = records[type].find(i => i.name === record.name);
 
                 expect(original).to.be.an('object');
-                entity_full(type, record, original);
+                let bbk = entity_full(type, record, original);
+
+                for (let i = 0 ; i < bbk.length ; i++) {
+                    acts.push (Crud.get(bbk[i].url, (linked) => {
+                        let parts = bbk[i].bbk.split('/');
+                        expect(linked).to.be.an('object');
+                        expect(linked.type).to.be.eq(parts[2]);  // no other general expectations we can test ofther than entity type
+                    }));
+                }
 
                 return chakram.wait();
-            });
+            })
+
+            .then(() => Promise.all(acts));
         }
 
         // -- the entity api tests start here
@@ -193,6 +225,10 @@ describe('Consumer Tests', function() {
             }
 
             return Promise.all(tests);
+        });
+
+        it('performing deep inspection tests - expect a delay here...', () => {
+            return true;
         });
 
         it('the entity instances are all present individually', () => {

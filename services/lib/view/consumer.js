@@ -91,9 +91,11 @@ module.exports = class Consumer extends View {
             doc = Object.assign(doc, { entity: item.record.entity });
             doc = Object.assign(doc, { instance: item.record.instance || {} })
 
+            // remove the policy masked fields
+            
             masks = masks || [];
 
-            for (let i = 0 ; i < masks.length ; i++) {  // remove the policy masked fields
+            for (let i = 0 ; i < masks.length ; i++) {
                 let details = this.unpack(masks[i]);
 
                 if (details.valid &&
@@ -103,6 +105,11 @@ module.exports = class Consumer extends View {
                         delete doc[details.section][details.field];  // we hit a match for a field mask
                 }
             }
+
+            // remap bbk links to public urls - in entity and instance parts only
+
+            this.each_value(doc.entity, this.map_bbk_links);
+            this.each_value(doc.instance, this.map_bbk_links);
         }
 
         doc = Object.assign(doc, { legal: legal });  // adds the legal context
