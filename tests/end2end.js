@@ -174,7 +174,7 @@ describe('End-to-End Tests', function() {
 
         .then(() => {
             headers(coordinator.token);
-            let properties = Seeder.policies.find(p => p.slug == policy).properties;
+            let properties = Seeder.policies.find(p => p.slug === policy).properties;
             properties.policy.data_segment.field_masks = masks;
             return Crud.update(URLs.policy(policy), properties);
         })
@@ -208,7 +208,7 @@ describe('End-to-End Tests', function() {
 
         .then(() => {
             headers(coordinator.token);
-            let properties = Seeder.policies.find(p => p.slug == policy).properties;
+            let properties = Seeder.policies.find(p => p.slug === policy).properties;
             properties.policy.data_segment.field_masks = [];
             return Crud.update(URLs.policy(policy), properties);
         });

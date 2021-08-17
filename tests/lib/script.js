@@ -58,7 +58,7 @@ module.exports = class Script {
     // --- close a session
 
     _op_close(commit) {
-        return Session.close(this.session.cid, this.session.sid, commit == 'true')
+        return Session.close(this.session.cid, this.session.sid, commit === 'true')
     }
 
     // --- check records are present or absent

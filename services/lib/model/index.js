@@ -54,7 +54,7 @@ redis
 // --- postgres test and report
 
 db.raw('SELECT COUNT(id) FROM entity')
-.then(result => { result.rowCount == 1 ? log.info('postgres', 'connected') : log.warn('postgres', 'connected', 'database not reachable') })
+.then(result => { result.rowCount === 1 ? log.info('postgres', 'connected') : log.warn('postgres', 'connected', 'database not reachable') })
 .catch(error => { log.error('postgres', 'error', error) });
 
 // --- exports
