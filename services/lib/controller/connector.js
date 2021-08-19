@@ -43,7 +43,7 @@ module.exports = class Connector {
         return {
             name: body.name || '',
             description: body.description || '',
-            webhook: body.webhook || null,
+            webhook: body.webhook ? body.webhook.replace(/\/$/g, '') : null, // we store without any trailing slashes
             cache: body.cache || 0
         };
     }
