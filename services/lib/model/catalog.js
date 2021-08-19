@@ -55,6 +55,7 @@ module.exports = class Catalog {
             'catalog.vendor_id',
             'entity.slug as entity_slug',
             'entity.properties as entity_properties',
+            'connector.properties as connector_properties',
             'catalog.record',
             'catalog.created_at',
             'catalog.updated_at'
