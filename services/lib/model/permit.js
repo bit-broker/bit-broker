@@ -48,7 +48,7 @@ module.exports = class Permit {
     // --- generates a public key from a connector id and a vendor id
 
     static public_key(connector_id, vendor_id) {
-        return crypto.createHash('sha256').update(`${connector_id}:${vendor_id}`).digest('hex');
+        return crypto.createHash('sha256').update(`${ connector_id }:${ vendor_id }`).digest('hex');
     }
 
     // --- obtains an access token and a key_id from the auth-service
