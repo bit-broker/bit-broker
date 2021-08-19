@@ -32,6 +32,8 @@ const Shared = require('./lib/shared.js');  // include first for dotenv
 const URLs = require('./lib/urls.js');
 const Crud = require('./lib/crud.js');
 const Seeder = require('./lib/seeder.js');
+const Webhook = require('./lib/webhook.js');
+const crypto = require('crypto');
 const chakram = require('chakram');
 const expect = chakram.expect;
 
@@ -41,16 +43,45 @@ describe('Consumer Tests', function() {
 
     this.timeout(0); // we are not interested in non-functional tests here
 
+    // --- callback function to add extra data via a webhook
+
+    function webhook_callback(type, id) {
+
+        /* This function makes a deterministic set of extra data to add via
+           the webhook server. It is called by the webhook server and also
+           the later end-to-end test, hence it must be deterministic - else
+           comparison tests will fail. It always add an extra item to the
+           entity object, but it 50/50 adds another extra item to the
+           instance object. */
+
+        let record = Seeder.record(type, id);
+
+        let hash1 = crypto.createHash('sha256').update(`${ record.name }`).digest('hex');
+        let hash2 = crypto.createHash('sha256').update(`${ type }${ id }`).digest('hex');
+
+        let extra = { entity: { data: hash1 } };
+        if (hash2[0] >= '0' && hash2[0] <= '7') extra.instance = { data: hash2 };  // fifty fifty chance of including instance data
+
+        return extra;
+    }
+
     // --- before any tests are run
 
     before(() => {
-        return Shared.before_any();
+        return Shared.before_any()
+        .then (() => {
+            DATA.WEBHOOK.server = new Webhook(DATA.WEBHOOK.URL, DATA.WEBHOOK.NAME, webhook_callback);
+            DATA.WEBHOOK.server.start();
+        });
     });
 
     // --- after all the tests have been run
 
     after(() => {
-        return Shared.after_all(false);
+        return Shared.after_all(false)
+        .then (() => {
+            DATA.WEBHOOK.server.stop();
+        });
     });
 
     // --- start up tests
@@ -67,6 +98,13 @@ describe('Consumer Tests', function() {
 
         it('the database is empty', () => {
             return Shared.empty();
+        });
+
+        it('the webhook server is up', () => {
+            return Crud.get(DATA.WEBHOOK.URL, (body) => {
+                expect(body).to.be.an('object');
+                expect(body.name).to.be.eq(DATA.WEBHOOK.NAME);
+            });
         });
     });
 
