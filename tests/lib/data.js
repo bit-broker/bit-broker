@@ -193,7 +193,10 @@ const DATA = {
         INVALID: [
           ['foo', 'www.', '.com', 'http/:foo.com', 'http:// www.foo.com'],  // uri non conform
           ['ftp://foo.org', 'www.foo.org', 'foo.org', 'http:www.foo.com', 'http:/'] // regex non match
-        ]
+        ],
+        NAME: 'Testing Webhook Server',
+        URL: 'http://localhost:8888/',
+        HOOKS: [{ entity: 'country', connector: 'wikipedia' }] // these will have an active webhook
     },
 
     RECORDS: {
