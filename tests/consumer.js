@@ -59,8 +59,8 @@ describe('Consumer Tests', function() {
         let hash1 = crypto.createHash('sha256').update(`${ record.name }`).digest('hex');
         let hash2 = crypto.createHash('sha256').update(`${ type }${ id }`).digest('hex');
 
-        let extra = { entity: { data: hash1 } };
-        if (hash2[0] >= '0' && hash2[0] <= '7') extra.instance = { data: hash2 };  // fifty fifty chance of including instance data
+        let extra = { entity: { foo: hash1 } };
+        if (hash2[0] >= '0' && hash2[0] <= '7') extra.instance = { bar: hash2 };  // fifty fifty chance of including instance data
 
         return extra;
     }
