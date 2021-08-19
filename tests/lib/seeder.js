@@ -62,6 +62,12 @@ module.exports = class Seeder {
         return JSON.parse(fs.readFileSync(`./data/${ name }.json`));
     }
 
+    // --- returns a record for the given name and id
+
+    static record(name, id) {
+        return this.records(name).find(i => i.id === id);
+    }
+
     // --- adds the housing entities
 
     static add_entities() {
@@ -78,7 +84,7 @@ module.exports = class Seeder {
 
     // --- adds the housing connectors
 
-    static add_connectors() {
+    static add_connectors(webhooks = []) {
         let steps = [];
         let entities = Seeder.entities;
 
@@ -89,8 +95,12 @@ module.exports = class Seeder {
 
             for (let j = 0; j < entity.connectors.length; j++) {
                 let connector = entity.connectors[j];
+                let webhook = webhooks.find(i => i.entity === entity.slug && i.connector == connector.slug);
+
+                connector.properties.webhook = webhook ? webhook.url : null; // add a webhook if specified in parameters
+
                 steps.push(Crud.add(URLs.connector(entity.slug, connector.slug), connector.properties, null, result => {
-                    this.cids[`${ entity.slug }/${ connector.slug }`] = `${ entity.slug }/${ result.id }`;
+                    this.cids[`${ entity.slug }/${ connector.slug }`] = `${ entity.slug }/${ result.id }`;  // stash the connector id for later bbk mapping
                 }));
             }
         }
