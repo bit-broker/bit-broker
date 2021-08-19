@@ -813,7 +813,9 @@ describe('Connector Session Tests', function() {
         ]);
     });
 
-    it('performing random mix tests - expect a delay here...', () => { return true; });
+    it('performing random mix tests - expect a delay here...', () => {
+        return true; // a message about the next slow test only
+    });
 
     it('random mix', () => {
         const COUNT_STEPS = 64;
