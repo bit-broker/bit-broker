@@ -117,7 +117,7 @@ describe('Consumer Tests', function() {
         });
 
         it('create the housing connectors', () => {
-            return Seeder.add_connectors();
+            return Seeder.add_connectors(/* WEBHOOK-PENDING DATA.WEBHOOK.HOOKS.map(i => i = {...i, url: DATA.WEBHOOK.URL })*/);  // specify webhooks with url
         });
 
         it('add all the seed data', () => {
@@ -141,46 +141,56 @@ describe('Consumer Tests', function() {
 
         // --- tests a base entity record
 
-        function entity_base(type, record, original) {
-            expect(record.id).to.be.a('string');
-            expect(record.id).to.match(new RegExp(DATA.PUBLIC_ID.REGEX));
-            expect(record.id.length).to.be.eq(DATA.PUBLIC_ID.SIZE);
-            expect(record.url).to.be.eq(URLs.consumer_entity(type, record.id));
-            expect(record.type).to.be.eq(type);
-            expect(record.name).to.be.eq(original.name);
+        function entity_base(type, fetched, original) {
+            expect(fetched.id).to.be.a('string');
+            expect(fetched.id).to.match(new RegExp(DATA.PUBLIC_ID.REGEX));
+            expect(fetched.id.length).to.be.eq(DATA.PUBLIC_ID.SIZE);
+            expect(fetched.url).to.be.eq(URLs.consumer_entity(type, fetched.id));
+            expect(fetched.type).to.be.eq(type);
+            expect(fetched.name).to.be.eq(original.name);
 
             if (policy.properties.policy.legal_context) {
-                expect(record.legal).to.deep.equal(policy.properties.policy.legal_context);
+                expect(fetched.legal).to.deep.equal(policy.properties.policy.legal_context);
             } else {
-                expect(record.legal).to.be.an('array');
-                expect(record.legal.length).to.be.eq(0);
+                expect(fetched.legal).to.be.an('array');
+                expect(fetched.legal.length).to.be.eq(0);
             }
         }
 
         // --- tests each property of an object
 
-        function entity_each(record, original) {
+        function entity_each(type, name, fetched, original, extra, entity) {
             let bbk = [];
 
             for (let i in original) {
                 if (typeof original[i] === 'string' && original[i].startsWith('bbk://')) {
-                    bbk.push({ bbk: original[i], url: record[i] });  // deferred for later testing
+                    bbk.push({ bbk: original[i], url: fetched[i] });  // deferred for later testing
                 } else {
-                    expect(record[i]).to.deep.equal(original[i]);
+                    expect(fetched[i]).to.deep.equal(original[i]);
                 }
             }
+
+/*  WEBHOOK-PENDING          for (let i in fetched) {
+                if (!original || !original.hasOwnProperty(i)) {
+                  //  console.log(i); // + ":" + fetched[i]);
+                    //console.log(fetched[i]);
+                    let item = Seeder.records(type).find(i => i.name === name);
+                    //console.log(webhook_callback(type, item.id));
+                    //expect(fetched[i]).to.deep.equal(extra[i]);
+                }
+            } */
 
             return bbk;
         }
 
         // --- test a full entity record
 
-        function entity_full(type, record, original) {
+        function entity_full(type, fetched, original) {
             let bbk = [];
 
-            entity_base(type, record, original);
-            bbk = bbk.concat(entity_each(record.entity, original.entity));
-            bbk = bbk.concat(entity_each(record.instance, original.instance));
+            entity_base(type, fetched, original);
+            bbk = bbk.concat(entity_each(fetched.type, fetched.name, fetched.entity, original.entity, true));
+            bbk = bbk.concat(entity_each(fetched.type, fetched.name, fetched.instance, original.instance, false));
 
             return bbk;
         }
@@ -194,13 +204,13 @@ describe('Consumer Tests', function() {
                 expect(body).to.be.an('array');
 
                 for (let i = 0; i < body.length; i++) {
-                    let record = body[i];
-                    let original = records[type].find(i => i.name === record.name);
+                    let fetched = body[i];
+                    let original = records[type].find(i => i.name === fetched.name);
 
                     expect(original).to.be.an('object');
-                    entity_base(type, record, original);
+                    entity_base(type, fetched, original);
 
-                    original.public_id = record.id;
+                    original.public_id = fetched.id;  // store this id for later use
                 }
 
                 expect(body.length).to.be.eq(records[type].length);
@@ -217,17 +227,17 @@ describe('Consumer Tests', function() {
             return Crud.get(URLs.consumer_entity(type, id), (body) => {
                 expect(body).to.be.an('object');
 
-                let record = body;
-                let original = records[type].find(i => i.name === record.name);
+                let fetched = body;
+                let original = records[type].find(i => i.name === fetched.name);
 
                 expect(original).to.be.an('object');
-                let bbk = entity_full(type, record, original);
+                let bbk = entity_full(type, fetched, original);
 
                 for (let i = 0 ; i < bbk.length ; i++) {
                     acts.push (Crud.get(bbk[i].url, (linked) => {
                         let parts = bbk[i].bbk.split('/');
                         expect(linked).to.be.an('object');
-                        expect(linked.type).to.be.eq(parts[2]);  // no other general expectations we can test ofther than entity type
+                        expect(linked.type).to.be.eq(parts[2]);  // no other general expectations we can test other than entity type
                     }));
                 }
 
