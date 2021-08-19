@@ -78,7 +78,7 @@ describe('Consumer Tests', function() {
     // --- after all the tests have been run
 
     after(() => {
-        return Shared.after_all(false)
+        return Shared.after_all()
         .then (() => {
             DATA.WEBHOOK.server.stop();
         });
