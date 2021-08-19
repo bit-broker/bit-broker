@@ -337,7 +337,8 @@ describe('Coordinator Service Tests', function() {
                 expect(body.id).to.match(new RegExp(DATA.ID.REGEX));
                 expect(body.token).to.be.a('string');
                 expect(body.token).to.match(new RegExp(DATA.KEY.REGEX));
-            });
+            })
+            .then (() => { values1.webhook = values1.webhook.replace(/\/$/g, ''); }) // insertion will strip any trailing slashes from webhook url
         });
 
         it('it is present in the entities connector list', () => {
@@ -361,7 +362,8 @@ describe('Coordinator Service Tests', function() {
                 expect(body.id).to.match(new RegExp(DATA.ID.REGEX));
                 expect(body.token).to.be.a('string');
                 expect(body.token).to.match(new RegExp(DATA.KEY.REGEX));
-            });
+            })
+            .then (() => { values2.webhook = values2.webhook.replace(/\/$/g, ''); }) // insertion will strip any trailing slashes from webhook url
         });
 
         it('both are present in the connector list', () => {
