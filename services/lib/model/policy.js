@@ -124,11 +124,11 @@ module.exports = class Policy {
             this.cache.get(key)
             .then(response => {
                 if (response === null) {
-                    log.error('cache miss; fall back to db query for slug: ' + slug)
+                    log.warn('policy', 'cache', 'miss - fallback to db', slug);
                     this.find(slug)
                     .then(item => {
                         if (item === undefined) { // slug not found in database
-                            log.error('slug not found in db: ' + slug)
+                            log.warn('policy', 'cache', 'not found in db', slug);
                             resolve(null)
                         } else {
                             // re-populate cache...
@@ -144,7 +144,7 @@ module.exports = class Policy {
                 }
             })
             .catch(error => {
-                log.error('cache read error; fall back db query for slug: ' + slug, error)
+                log.error('policy', 'cache', 'read error - fallback to db', slug, error);
                 this.find(slug)
                 .then(item => resolve(item.properties.policy))
                 .catch(error => {
@@ -167,12 +167,12 @@ module.exports = class Policy {
             this.cache.set(CONST.POLICY.CACHE_PREFIX + slug, JSON.stringify(cachedPolicy))
             .then(result => {
                 if (result !== 'OK') {
-                    log.error('cache write error', result)
+                    log.error('policy', 'cache', 'write error', result);
                 }
                 resolve();
             })
             .catch(error => {
-                log.error('cache write error', error)
+                log.error('policy', 'cache', 'write error', error);
                 resolve();
             })
         })
@@ -185,12 +185,12 @@ module.exports = class Policy {
             this.cache.del(CONST.POLICY.CACHE_PREFIX + slug)
             .then(result => {
                 if (result !== 1) {
-                    log.error('cache del error', result)
+                    log.error('policy', 'cache', 'delete error', result);
                 }
                 resolve();
             })
             .catch(error => {
-                log.error('cache del error', error)
+                log.error('policy', 'cache', 'delete error', error);
                 resolve();
             })
         })
