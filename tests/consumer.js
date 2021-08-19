@@ -117,7 +117,7 @@ describe('Consumer Tests', function() {
         });
 
         it('create the housing connectors', () => {
-            return Seeder.add_connectors(/* WEBHOOK-PENDING DATA.WEBHOOK.HOOKS.map(i => i = {...i, url: DATA.WEBHOOK.URL })*/);  // specify webhooks with url
+            return Seeder.add_connectors(DATA.WEBHOOK.HOOKS.map(i => i = {...i, url: DATA.WEBHOOK.URL }));  // specify webhooks with url
         });
 
         it('add all the seed data', () => {
@@ -159,8 +159,10 @@ describe('Consumer Tests', function() {
 
         // --- tests each property of an object
 
-        function entity_each(type, name, fetched, original, extra, entity) {
+        function entity_each(type, vendor_id, fetched, original, entity) {
             let bbk = [];
+
+            // everything in original should also be in fetched - deffering bbk links
 
             for (let i in original) {
                 if (typeof original[i] === 'string' && original[i].startsWith('bbk://')) {
@@ -170,15 +172,31 @@ describe('Consumer Tests', function() {
                 }
             }
 
-/*  WEBHOOK-PENDING          for (let i in fetched) {
-                if (!original || !original.hasOwnProperty(i)) {
-                  //  console.log(i); // + ":" + fetched[i]);
-                    //console.log(fetched[i]);
-                    let item = Seeder.records(type).find(i => i.name === name);
-                    //console.log(webhook_callback(type, item.id));
-                    //expect(fetched[i]).to.deep.equal(extra[i]);
+            if (DATA.WEBHOOK.HOOKS.find(i => i.entity === type)) {  // this entity type has webhook added items
+                let extras = webhook_callback(type, vendor_id);
+                let extra = extras[entity ? 'entity' : 'instance'];
+
+                // extra things within fetched which are not present in original, must be webhook items
+
+                for (let i in fetched) {
+                    if (!original || !original.hasOwnProperty(i)) {
+                        expect(fetched[i]).to.deep.equal(extra[i]);
+                    }
                 }
-            } */
+
+                // now in reverse - all webhook items should be present within fetched
+
+                for (let i in extra) {
+                    expect(extra[i]).to.deep.equal(fetched[i]);
+                }
+            } else {
+
+                // all fetched items should be on the original - i.e. no webhook items
+
+                for (let i in fetched) {
+                    expect(original.hasOwnProperty(i)).to.be.eq(true);
+                }
+            }
 
             return bbk;
         }
@@ -187,10 +205,11 @@ describe('Consumer Tests', function() {
 
         function entity_full(type, fetched, original) {
             let bbk = [];
+            let vendor_id = records[type].find(i => i.name === fetched.name).id;
 
             entity_base(type, fetched, original);
-            bbk = bbk.concat(entity_each(fetched.type, fetched.name, fetched.entity, original.entity, true));
-            bbk = bbk.concat(entity_each(fetched.type, fetched.name, fetched.instance, original.instance, false));
+            bbk = bbk.concat(entity_each(type, vendor_id, fetched.entity, original.entity, true));
+            bbk = bbk.concat(entity_each(type, vendor_id, fetched.instance, original.instance, false));
 
             return bbk;
         }
