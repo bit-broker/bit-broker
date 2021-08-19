@@ -34,6 +34,7 @@ const failure = require('http-errors');
 const model = require('../model/index.js');
 const view = require('../view/index.js');
 const log = require('../logger.js').Logger;
+const fetch = require('node-fetch');
 
 // --- timeseries class (embedded)
 
@@ -166,7 +167,17 @@ module.exports = class Consumer {
 
             .then(item => {
                 if (!item) throw failure(HTTP.NOT_FOUND);
-                res.json(view.consumer.instance(item, policy.legal_context, policy.data_segment.field_masks));
+
+                let webhook = item.connector_properties.webhook;
+                let request = Promise.resolve(); // assume no webhook
+
+                if (webhook) {
+                    request = fetch(`${ webhook }/entity/${ item.entity_slug }/${ item.vendor_id }`, { headers: CONST.FETCH.HEADERS, timeout: CONST.FETCH.TIMEOUT });
+                }
+
+                request.then(res => res ? res.json() : null)
+                .then(extra => res.json(view.consumer.instance(item, extra, policy.legal_context, policy.data_segment.field_masks)))
+                .catch(error => res.json(view.consumer.instance(item, null, policy.legal_context, policy.data_segment.field_masks))); // on fail: same record without webhook data
             })
         })
 

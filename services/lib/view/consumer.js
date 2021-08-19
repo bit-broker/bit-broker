@@ -79,7 +79,7 @@ module.exports = class Consumer extends View {
 
     // --- an entity instance
 
-    static instance(item, legal, masks, full = true) {
+    static instance(item, extra, legal, masks, full = true) {
         let doc = {
             id: item.public_id,
             url: this.rest(process.env.CONSUMER_BASE, 'entity', item.entity_slug, item.public_id),
@@ -91,8 +91,15 @@ module.exports = class Consumer extends View {
             doc = Object.assign(doc, { entity: item.record.entity });
             doc = Object.assign(doc, { instance: item.record.instance || {} })
 
-            // remove the policy masked fields
-            
+            // merge in webhook extra data if any
+
+            if (extra && typeof extra === 'object') {
+                if (extra.entity && typeof extra.entity === 'object') doc.entity = Object.assign(doc.entity, extra.entity);
+                if (extra.instance && typeof extra.instance === 'object') doc.instance = Object.assign(doc.instance, extra.instance);
+            }
+
+            // remove any policy masked fields
+
             masks = masks || [];
 
             for (let i = 0 ; i < masks.length ; i++) {
@@ -106,7 +113,7 @@ module.exports = class Consumer extends View {
                 }
             }
 
-            // remap bbk links to public urls - in entity and instance parts only
+            // remap bbk links to public urls - within entity and instance parts only
 
             this.each_value(doc.entity, this.map_bbk_links);
             this.each_value(doc.instance, this.map_bbk_links);
@@ -123,7 +130,7 @@ module.exports = class Consumer extends View {
         let doc = [];
 
         for (let i = 0; i < items.length; i++) {
-            doc.push(this.instance(items[i], legal, undefined, false));
+            doc.push(this.instance(items[i], null, legal, undefined, false));
         }
 
         return doc;
