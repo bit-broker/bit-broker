@@ -266,7 +266,7 @@ describe('Consumer Tests', function() {
         });
 
         it('performing deep inspection tests - expect a delay here...', () => {
-            return true;
+            return true; // a message about the next slow test only
         });
 
         it('the entity instances are all present individually', () => {
