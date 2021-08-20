@@ -177,7 +177,11 @@ module.exports = class Consumer {
 
                 request.then(res => res ? res.json() : null)
                 .then(extra => res.json(view.consumer.instance(item, extra, policy.legal_context, policy.data_segment.field_masks)))
-                .catch(error => res.json(view.consumer.instance(item, null, policy.legal_context, policy.data_segment.field_masks))); // on fail: same record without webhook data
+                .catch(error => // on fail: same record, but without any webhook data
+                {
+                    log.warn('webhook failure', type, id, error);
+                    return res.json(view.consumer.instance(item, null, policy.legal_context, policy.data_segment.field_masks))
+                });
             })
         })
 
