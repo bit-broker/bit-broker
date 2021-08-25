@@ -129,6 +129,12 @@ class Shared {
         .then(() => this.nowt(URLs.user(), 1))
         .then(() => this.nowt(URLs.policy()));
     }
+
+    // --- blocking sleep for the given milliseconds - USE WITH CAUTION
+
+    sleep(ms) {
+        if (ms > 0) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+    }
 }
 
 // --- exported classes
