@@ -8,10 +8,10 @@
                 "access_control": {
                     "enabled": true,
                     "quota": {
-                        "max_number": 24000,
+                        "max_number": 86400,
                         "interval_type": "day"
                     },
-                    "rate": 1000
+                    "rate": 10
                 },
                 "data_segment": {
                     "segment_query": {},
@@ -30,10 +30,10 @@
                 "access_control": {
                     "enabled": true,
                     "quota": {
-                        "max_number": 24000,
+                        "max_number": 86400,
                         "interval_type": "day"
                     },
-                    "rate": 1000
+                    "rate": 10
                 },
                 "data_segment": {
                     "segment_query": { "type": "country" },
@@ -52,10 +52,10 @@
                 "access_control": {
                     "enabled": true,
                     "quota": {
-                        "max_number": 24000,
+                        "max_number": 86400,
                         "interval_type": "day"
                     },
-                    "rate": 1000
+                    "rate": 10
                 },
                 "data_segment": {
                     "segment_query": { "type": "heritage-site" },
@@ -74,10 +74,10 @@
                 "access_control": {
                     "enabled": true,
                     "quota": {
-                        "max_number": 24000,
+                        "max_number": 86400,
                         "interval_type": "day"
                     },
-                    "rate": 1000
+                    "rate": 10
                 },
                 "data_segment": {
                     "segment_query": { "type": "country", "entity.code": { "$in": ["AT", "BE", "BG", "CY", "CZ", "DE", "DK", "EE", "FI", "FR", "GR", "HR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI", "ES", "SE"] }},
@@ -96,10 +96,10 @@
                 "access_control": {
                     "enabled": true,
                     "quota": {
-                        "max_number": 24000,
+                        "max_number": 86400,
                         "interval_type": "day"
                     },
-                    "rate": 1000
+                    "rate": 10
                 },
                 "data_segment": {
                     "segment_query": { "type": "country", "entity.population": { "$gt": 1000000000 }},
@@ -118,10 +118,10 @@
                 "access_control": {
                     "enabled": true,
                     "quota": {
-                        "max_number": 24000,
+                        "max_number": 86400,
                         "interval_type": "day"
                     },
-                    "rate": 1000
+                    "rate": 10
                 },
                 "data_segment": {
                     "segment_query": { "type": "country", "entity.continent": "North America" },
@@ -140,10 +140,10 @@
                 "access_control": {
                     "enabled": true,
                     "quota": {
-                        "max_number": 24000,
+                        "max_number": 86400,
                         "interval_type": "day"
                     },
-                    "rate": 1000
+                    "rate": 10
                 },
                 "data_segment": {
                     "segment_query": { "entity.location": { "$within": { "$geometry": { "type": "Polygon","coordinates": [[[-12.386341,59.062341],[-12.386341,49.952269],[2.500282,49.952269],[2.500282,59.062341],[-12.386341,59.062341]]]}}}},
