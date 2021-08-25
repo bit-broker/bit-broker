@@ -186,4 +186,16 @@ module.exports = class Crud {
         .then (() => Crud.verify(url, resource || body))
         .then (() => Crud.delete(url));
     }
+
+    // --- delete every one of a set of URLs
+
+    static delete_all(urls) {
+        let deletes = [];
+
+        for (let i = 0 ; i < urls.length ; i++) {
+            deletes.push (this.delete(urls[i]));
+        }
+
+        return Promise.all(deletes);
+    }
 }
