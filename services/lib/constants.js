@@ -29,6 +29,9 @@ module.exports = {
         UPSERT: 'upsert',
         DELETE: 'delete'
     },
+    CONTRIBUTOR: {
+        ACCESS_CONTROL: { enabled: true, quota: { max_number: 86400, interval_type: 'day' }, rate: 10 } // rate is implicitly in seconds
+    },
     FETCH: {
         HEADERS: {
             'Accept': 'application/json, text/plain',
