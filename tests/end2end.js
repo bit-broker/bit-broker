@@ -79,7 +79,7 @@ describe('End-to-End Tests', function() {
     // --- helpers to check expected server access
 
     function server_accessible(access, url) {
-        return access ? Crud.get(url) : (LOCAL ? Promise.resolve(SKIPPED) : Crud.not_found(url));
+        return access ? Crud.get(url) : (LOCAL ? Promise.resolve(SKIPPED) : Crud.unauthorized(url));
     }
 
     function server_access(coordinator, contributor, consumer) {
