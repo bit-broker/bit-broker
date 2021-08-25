@@ -32,7 +32,7 @@
 // --- dependancies
 
 const CONST = require('../constants.js');
-const fetch = require('node-fetch');
+const Limiter = require('./limiter.js');
 const cloneDeep = require('clone-deep');
 const log = require('../logger.js').Logger;
 
@@ -45,17 +45,6 @@ module.exports = class Policy {
     constructor(db, cache) {
         this.db = db;
         this.cache = cache;
-    }
-
-    // --- calls the external rate limiter
-
-    rate_limiter(slug, method, body) {
-        return fetch(`${ process.env.RATE_SERVICE }/${ slug }/config`, {
-            method: method,
-            body: body,
-            headers: CONST.FETCH.HEADERS,
-            timeout: CONST.FETCH.TIMEOUT
-        });
     }
 
     // --- select column list
@@ -94,7 +83,7 @@ module.exports = class Policy {
 
         return this.db.transaction((trx) => {
             return this.rows.transacting(trx).insert(values)
-            .then(() => this.rate_limiter(slug, 'PUT', values.properties.policy.access_control));
+            .then(() => Limiter.upsert(slug, values.properties.policy.access_control));
         });
     }
 
@@ -103,7 +92,7 @@ module.exports = class Policy {
     update(slug, values) {
         return this.db.transaction((trx) => {
             return this.find(slug).transacting(trx).update(values)
-            .then(() => this.rate_limiter(slug, 'PUT', values.properties.policy.access_control));
+            .then(() => Limiter.upsert(slug, values.properties.policy.access_control));
         });
     }
 
@@ -112,7 +101,7 @@ module.exports = class Policy {
     delete(slug) {
         return this.db.transaction((trx) => {
             return this.find(slug).transacting(trx).delete()
-            .then(() => this.rate_limiter(slug, 'DELETE'));
+            .then(() => Limiter.delete(slug));
         });
     }
 
