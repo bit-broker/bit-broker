@@ -38,6 +38,7 @@
 // --- dependancies
 
 const CONST = require('../constants.js');
+const Limiter = require('./limiter.js');
 const Permit = require('./permit.js');
 const Session = require('./session.js');
 
@@ -112,9 +113,12 @@ module.exports = class Connector {
             values.contribution_key_id = token.jti;
             values.entity_id = this.db.from('entity').select('id').where({ slug: this.entity.slug }).first(); // this will *not* execute here, but is compounded into the SQL below
 
-            return this.write.insert(values)
-            .then(result => result.rowCount > 0)
-            .then(worked => worked ? { id: values.contribution_id, token: token.token } : false);
+            return this.db.transaction((trx) => {
+                return this.write.transacting(trx).insert(values)
+                .then(() => Limiter.upsert(CONST.PREFIX.CONNECTOR + values.slug, CONST.CONNECTOR.ACCESS_CONTROL))
+            })
+
+            .then(() => { return { id: values.contribution_id, token: token.token }});
         });
     }
 
@@ -127,7 +131,10 @@ module.exports = class Connector {
     // --- deletes a connector on the instance entity type - NO need to delete associated connector keys, as they will not work now anyway
 
     delete(slug) {
-        return this.write.where({ slug }).delete().then(result => result.rowCount > 0);
+        return this.db.transaction((trx) => {
+            return this.write.transacting(trx).where({ slug }).delete()
+            .then(() => Limiter.delete(CONST.PREFIX.CONNECTOR + slug));
+        });
     }
 
     // --- gets the session sub-model

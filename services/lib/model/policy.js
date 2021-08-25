@@ -83,7 +83,7 @@ module.exports = class Policy {
 
         return this.db.transaction((trx) => {
             return this.rows.transacting(trx).insert(values)
-            .then(() => Limiter.upsert(slug, values.properties.policy.access_control));
+            .then(() => Limiter.upsert(CONST.PREFIX.POLICY + slug, values.properties.policy.access_control));
         });
     }
 
@@ -92,7 +92,7 @@ module.exports = class Policy {
     update(slug, values) {
         return this.db.transaction((trx) => {
             return this.find(slug).transacting(trx).update(values)
-            .then(() => Limiter.upsert(slug, values.properties.policy.access_control));
+            .then(() => Limiter.upsert(CONST.PREFIX.POLICY + slug, values.properties.policy.access_control));
         });
     }
 
@@ -101,7 +101,7 @@ module.exports = class Policy {
     delete(slug) {
         return this.db.transaction((trx) => {
             return this.find(slug).transacting(trx).delete()
-            .then(() => Limiter.delete(slug));
+            .then(() => Limiter.delete(CONST.PREFIX.POLICY + slug));
         });
     }
 
@@ -109,7 +109,7 @@ module.exports = class Policy {
 
     cacheRead(slug) {
         return new Promise((resolve, reject) => {
-            let key = CONST.POLICY.CACHE_PREFIX + slug;
+            let key = CONST.PREFIX.POLICY + slug;
             this.cache.get(key)
             .then(response => {
                 if (response === null) {
@@ -153,7 +153,7 @@ module.exports = class Policy {
             delete cachedPolicy.access_control;
         }
         return new Promise((resolve, reject) => {
-            this.cache.set(CONST.POLICY.CACHE_PREFIX + slug, JSON.stringify(cachedPolicy))
+            this.cache.set(CONST.PREFIX.POLICY + slug, JSON.stringify(cachedPolicy))
             .then(result => {
                 if (result !== 'OK') {
                     log.error('policy', 'cache', 'write error', result);
@@ -171,7 +171,7 @@ module.exports = class Policy {
 
     cacheClear(slug) {
         return new Promise((resolve, reject) => {
-            this.cache.del(CONST.POLICY.CACHE_PREFIX + slug)
+            this.cache.del(CONST.PREFIX.POLICY + slug)
             .then(result => {
                 if (result !== 1) {
                     log.error('policy', 'cache', 'delete error', result);
