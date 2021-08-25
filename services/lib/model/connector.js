@@ -115,7 +115,7 @@ module.exports = class Connector {
 
             return this.db.transaction((trx) => {
                 return this.write.transacting(trx).insert(values)
-                .then(() => Limiter.upsert(CONST.PREFIX.CONNECTOR + values.slug, CONST.CONNECTOR.ACCESS_CONTROL))
+                .then(() => Limiter.upsert(CONST.PREFIX.CONNECTOR + values.slug, CONST.CONNECTOR.ACCESS_CONTROL)) // currently, we use the same rate limit policy for all connectors
             })
 
             .then(() => { return { id: values.contribution_id, token: token.token }});
@@ -125,7 +125,7 @@ module.exports = class Connector {
     // --- updates a connector on the instance entity type
 
     update(slug, values) {
-        return this.write.where({ slug }).update(values).then(result => result.rowCount > 0);
+        return this.write.where({ slug }).update(values).then(result => result.rowCount > 0);  // no change to rate limit policy is needed here
     }
 
     // --- deletes a connector on the instance entity type - NO need to delete associated connector keys, as they will not work now anyway
