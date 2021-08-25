@@ -255,6 +255,10 @@ describe('End-to-End Tests', function() {
         return server_access(true, false, false).then (skipped => skipped ? this.skip() : true);
     });
 
+    it('reset the whole system when in production mode', function () {
+        return LOCAL ? this.skip() : reset();
+    });
+
     it('there are no entities present', function () {
         return Crud.verify_all(URLs.entity(), []);
     });
