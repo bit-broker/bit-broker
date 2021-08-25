@@ -214,6 +214,30 @@ describe('End-to-End Tests', function() {
         });
     }
 
+    // -- resets the whole system back to factory defaults via API calls
+
+    /*
+        NOTE: Outside of end2end, system reset is done via database calls.
+              However, this is the only test script which uses production
+              APIs only. Hence resetting is done here using API calls only.
+    */
+
+    function reset() {
+        let resets = [];
+
+        return Crud.get(URLs.entity(), entities => {
+            resets.push(Crud.delete_all(entities.map(i => i.url)));
+        })
+        .then (() => Crud.get(URLs.policy(), policies => {
+            resets.push(Crud.delete_all(policies.map(i => i.url)));
+        }))
+        .then (() => Crud.get(URLs.user(), users => {
+            users.shift(); // dont delete the first (admin) user
+            resets.push(Crud.delete_all(users.map(i => i.url)));
+        }))
+        .then (() => Promise.all(resets));
+    }
+
     // --- the tests themselves
 
     it('tests are in production mode', function () {
