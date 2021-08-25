@@ -71,8 +71,11 @@ describe('End-to-End Tests', function() {
     // --- helper to make the access headers
 
     function headers(token, policy) {
-        let header = { authorizaion: token };
+        let header = {};
+
+        header['x-bbk-auth-token'] = token;
         if (LOCAL) header['x-bb-policy'] = policy;
+
         Crud.headers(header);
     }
 
