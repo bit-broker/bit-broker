@@ -27,6 +27,7 @@
 
 // -- dependancies
 
+const Shared = require('./lib/shared.js');  // include first for dotenv
 const Crud = require('./lib/crud.js');
 const Seeder = require('./lib/seeder.js');
 const URLs = require('./lib/urls.js');
@@ -74,8 +75,9 @@ describe('End-to-End Tests', function() {
         let header = {};
 
         header['x-bbk-auth-token'] = token;
-        if (LOCAL) header['x-bb-policy'] = policy;
+        if (LOCAL) Object.assign(header, Shared.policy_header(policy));
 
+        // Shared.sleep(1000);
         Crud.headers(header);
     }
 

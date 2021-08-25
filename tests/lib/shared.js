@@ -135,6 +135,12 @@ class Shared {
     sleep(ms) {
         if (ms > 0) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
     }
+
+    // --- returns a policy header item
+
+    policy_header(slug) {
+        return { 'x-bbk-audience': `BBK-POLICY:${ slug }` };
+    }
 }
 
 // --- exported classes

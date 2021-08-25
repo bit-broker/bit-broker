@@ -39,7 +39,7 @@ module.exports = class Script {
     constructor(entity, connector, policy) {
         this.entity = entity;
         this.connector = connector;
-        this.policy = { headers: { 'x-bb-policy': policy }};
+        this.policy = { headers: Shared.policy_header(policy) };
         this.session = {};
     }
 

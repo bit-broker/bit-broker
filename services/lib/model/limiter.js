@@ -33,8 +33,8 @@ module.exports = class Limiter {
 
     // --- updates or inserts a rate limit config
 
-    static upsert(slug, properties) {
-        return fetch(`${ process.env.RATE_SERVICE }/${ slug }/config`, {
+    static upsert(prefix, slug, properties) {
+        return fetch(`${ process.env.RATE_SERVICE }/${ prefix }${ slug }/config`, {
             method: 'PUT',
             body: JSON.stringify(properties),
             headers: CONST.FETCH.HEADERS,
@@ -44,8 +44,8 @@ module.exports = class Limiter {
 
     // --- deletes a rate limit config
 
-    static delete(slug) {
-        return fetch(`${ process.env.RATE_SERVICE }/${ slug }/config`, {
+    static delete(prefix, slug) {
+        return fetch(`${ process.env.RATE_SERVICE }/${ prefix }${ slug }/config`, {
             method: 'DELETE',
             headers: CONST.FETCH.HEADERS,
             timeout: CONST.FETCH.TIMEOUT

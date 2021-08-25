@@ -40,12 +40,12 @@ module.exports = {
         TIMEOUT: 2000
     },
     POLICY: {
-        HEADER: 'x-bb-policy',
+        HEADER: 'x-bbk-audience',
         EMPTY: { data_segment: { segment_query: {}, field_masks: [] }, legal_context: [] } // the policy to use when USE_POLICY is false in .en
     },
     PREFIX: {
         POLICY: 'BBK-POLICY:',
-        CONNECTOR: 'BBK-CONNECTOR:',
+        CONNECTOR: 'BBK-CONNECTOR:'
     },
     REDIS: {
       TIMEOUT: 2000

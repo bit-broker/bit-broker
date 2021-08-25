@@ -37,6 +37,7 @@
 
 // --- dependancies
 
+const CONST = require('../constants.js');
 const Permit = require('./permit.js');
 
 // --- access class (exported)
@@ -97,7 +98,7 @@ module.exports = class Access {
     // --- inserts a new access on the instance user type
 
     insert(values) {
-        return Permit.generate_token(values.role, values.context)
+        return Permit.generate_token(values.role, values.role === CONST.ROLE.CONSUMER ? CONST.PREFIX.POLICY : '', values.context)
 
         .then (token => {
             values.user_id = this.user.id;
@@ -112,7 +113,7 @@ module.exports = class Access {
 
     update(values) {
         return Permit.revoke_tokens([values.key_id])
-        .then (() => Permit.generate_token(values.role, values.context))
+        .then (() => Permit.generate_token(values.role, values.role === CONST.ROLE.CONSUMER ? CONST.PREFIX.POLICY : '', values.context))
         .then (token => {
             return this.find(values.id).update({ key_id: token.jti }).returning('id')
             .then(id => id && id.length ? { id: id[0], token: token.token } : false);

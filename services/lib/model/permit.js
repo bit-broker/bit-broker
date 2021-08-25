@@ -53,10 +53,10 @@ module.exports = class Permit {
 
     // --- obtains an access token and a key_id from the auth-service
 
-    static generate_token(scope, audience, prefix = CONST.PREFIX.POLICY) {
+    static generate_token(scope, prefix, context) {
         return fetch(process.env.AUTH_SERVICE + '/token', {
             method: 'POST',
-            body: JSON.stringify({ scope: scope, aud: prefix + audience }),
+            body: JSON.stringify({ scope: scope, aud: prefix + context }),
             headers: CONST.FETCH.HEADERS,
             timeout: CONST.FETCH.TIMEOUT
         })

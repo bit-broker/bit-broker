@@ -83,7 +83,7 @@ module.exports = class Policy {
 
         return this.db.transaction((trx) => {
             return this.rows.transacting(trx).insert(values)
-            .then(() => Limiter.upsert(CONST.PREFIX.POLICY + slug, values.properties.policy.access_control));
+            .then(() => Limiter.upsert(CONST.PREFIX.POLICY, slug, values.properties.policy.access_control));
         });
     }
 
@@ -92,7 +92,7 @@ module.exports = class Policy {
     update(slug, values) {
         return this.db.transaction((trx) => {
             return this.find(slug).transacting(trx).update(values)
-            .then(() => Limiter.upsert(CONST.PREFIX.POLICY + slug, values.properties.policy.access_control));
+            .then(() => Limiter.upsert(CONST.PREFIX.POLICY, slug, values.properties.policy.access_control));
         });
     }
 
@@ -101,7 +101,7 @@ module.exports = class Policy {
     delete(slug) {
         return this.db.transaction((trx) => {
             return this.find(slug).transacting(trx).delete()
-            .then(() => Limiter.delete(CONST.PREFIX.POLICY + slug));
+            .then(() => Limiter.delete(CONST.PREFIX.POLICY, slug));
         });
     }
 

@@ -269,7 +269,7 @@ describe('Consumer Tests', function() {
         // -- the entity api tests start here
 
         it('can set the policy header', () => {
-            Crud.headers({ 'x-bb-policy': policy.slug }); // we are not testing policy visibility here - that happens in end2end. Here we just test the api is working and returning he right document.
+            Crud.headers(Shared.policy_header(policy.slug)); // we are not testing policy visibility here - that happens in end2end. Here we just test the api is working and returning he right document.
             return true;
         });
 
@@ -325,7 +325,7 @@ describe('Consumer Tests', function() {
         // --- tests a catalog query
 
         function catalog(test) {
-            Crud.headers({ 'x-bb-policy': test.policy || DATA.POLICY.ALLAREA.ID })
+            Crud.headers(Shared.policy_header(test.policy || DATA.POLICY.ALLAREA.ID))
             return Crud.get(URLs.consumer_catalog(test.query), (body) => {
                 expect(body).to.be.an('array');
 
