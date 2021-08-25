@@ -37,6 +37,7 @@
 
 // --- dependancies
 
+const CONST = require('../constants.js');
 const Permit = require('./permit.js');
 const Session = require('./session.js');
 
