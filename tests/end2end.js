@@ -76,9 +76,9 @@ describe('End-to-End Tests', function() {
 
         header['x-bbk-auth-token'] = token;
         if (LOCAL) Object.assign(header, Shared.policy_header(policy));
-
-        // Shared.sleep(1000);
         Crud.headers(header);
+
+        // Shared.sleep(1250);
     }
 
     // --- helpers to check expected server access
@@ -148,6 +148,7 @@ describe('End-to-End Tests', function() {
             }
 
             tests.push (Crud.verify_all(URLs.consumer_entity(), entities)); // check entity types
+            tests.push (new Promise((resolve) => { headers(coordinator.token); resolve(); })); // back to coordinator key
             tests.push (Crud.delete(URLs.access(consumer.uid, consumer.aid))); // remove the key
 
             return Promise.all(tests);
@@ -179,6 +180,7 @@ describe('End-to-End Tests', function() {
 
         .then(() => {
             headers(coordinator.token);
+
             let properties = Seeder.policies.find(p => p.slug === policy).properties;
             properties.policy.data_segment.field_masks = masks;
             return Crud.update(URLs.policy(policy), properties);
@@ -213,6 +215,7 @@ describe('End-to-End Tests', function() {
 
         .then(() => {
             headers(coordinator.token);
+
             let properties = Seeder.policies.find(p => p.slug === policy).properties;
             properties.policy.data_segment.field_masks = [];
             return Crud.update(URLs.policy(policy), properties);
@@ -249,11 +252,8 @@ describe('End-to-End Tests', function() {
         return LOCAL ? this.skip() : true;
     });
 
-    it('enable the bootstrap key', function () {
+    it('enable the bootstrap key and check the server access rules are met (coor: true, cont: false, cons: false)', function () {
         headers(process.env.TESTS_BOOTSTRAP_KEY);
-    });
-
-    it('the server access rules are met (coor: true, cont: false, cons: false)', function () {
         return server_access(true, false, false).then (skipped => skipped ? this.skip() : true);
     });
 
@@ -279,17 +279,14 @@ describe('End-to-End Tests', function() {
         });
     });
 
-    it('generate a key for the coordinator user', function () {
+    it('generate a new key for the coordinator user', function () {
         return Crud.add(URLs.access(coordinator.uid), { role: 'coordinator' }, undefined, (token) => {
             coordinator.token = token;
         });
     });
 
-    it('switch to the coordinator key', function () {
+    it('switch to new coordinator key and check the server access rules are still met (coor: true, cont: false, cons: false)', function () {
         headers(coordinator.token);
-    });
-
-    it('the server access rules are still met (coor: true, cont: false, cons: false)', function () {
         return server_access(true, false, false).then (skipped => skipped ? this.skip() : true);
     });
 
@@ -304,11 +301,8 @@ describe('End-to-End Tests', function() {
         });
     });
 
-    it('switch to country connector key', function () {
+    it('switch to country connector key and check server access rules are met (coor: false, cont: true, cons: false)', function () {
         headers(country.connectors[0].token);
-    });
-
-    it('the server access rules are met (coor: false, cont: true, cons: false)', function () {
         return server_access(false, true, false).then (skipped => skipped ? this.skip() : true);
     });
 
@@ -334,11 +328,8 @@ describe('End-to-End Tests', function() {
         return Crud.get(URLs.session_close(country.connectors[0].id, country.connectors[0].session, 'true'));
     });
 
-    it('switch to the coordinator key', function () {
-        headers(coordinator.token);
-    });
-
     it('create the heritage-site entity', function () {
+        headers(coordinator.token);
         return Crud.add(URLs.entity(site.slug), site.properties);
     });
 
@@ -349,11 +340,8 @@ describe('End-to-End Tests', function() {
         });
     });
 
-    it('switch to heritage-site connector key', function () {
+    it('switch to the connector key and then open a stream session on heritage-site', function () {
         headers(site.connectors[0].token);
-    });
-
-    it('open a stream session on heritage-site', function () {
         return Crud.get(URLs.session_open(site.connectors[0].id, 'stream'), (session) => {
             site.connectors[0].session = session;
         });
@@ -375,11 +363,9 @@ describe('End-to-End Tests', function() {
         return Crud.get(URLs.session_close(site.connectors[0].id, site.connectors[0].session, 'true'));
     });
 
-    it('switch to the coordinator key', function () {
-        headers(coordinator.token);
-    });
-
     it('add all the policies', function () {
+        headers(coordinator.token);
+
         let act = [];
         let all = Seeder.policies;
 
@@ -404,19 +390,13 @@ describe('End-to-End Tests', function() {
         });
     });
 
-    it('switch to the consumer key', function () {
+    it('switch to the consumer key and check the server access rules are still met (coor: false, cont: false, cons: true)', function () {
         headers(consumer.token, consumer.policy);
-    });
-
-    it('the server access rules are still met (coor: false, cont: false, cons: true)', function () {
         return server_access(false, false, true).then (skipped => skipped ? this.skip() : true);
     });
 
-    it('switch to the coordinator key', function () {
-        headers(coordinator.token);
-    });
-
     it('delete the consumer key', function () {
+        headers(coordinator.token);
         return Crud.delete(URLs.access(consumer.uid, consumer.aid));
     });
 
@@ -467,118 +447,124 @@ describe('End-to-End Tests', function() {
         return Crud.verify_all(URLs.access(consumer.uid), []);
     });
 
-    it('generate and switch to a consumer key on "access-all-areas"', function () {
+    it('generate a consumer key on "access-all-areas"', function () {
         return Crud.add(URLs.access(consumer.uid), { role: 'consumer', context: 'access-all-areas' }, undefined, (token, location) => {
             consumer.token = token;
             consumer.aid = parseInt(location.match(/\d+$/).shift());
-            headers(consumer.token, 'access-all-areas');
         });
     });
 
-    it('check consumer api is accessible', function () {
+    it('switch to the consumer key and check that the consumer api is accessible', function () {
+        headers(consumer.token, 'access-all-areas');
         return Crud.get(URLs.consumer_catalog());
     });
 
     it('refresh consumer key on "access-all-areas"', function () {
+        headers(coordinator.token);
         return Crud.update(URLs.access(consumer.uid, consumer.aid), { role: 'consumer', context: 'access-all-areas' }, (token) =>
         {
+            consumer.old_token = consumer.token;
             consumer.token = token;
         });
     });
 
     it('check consumer api is not accessible with old key', function () {
+        headers(consumer.old_token, 'access-all-areas');
         return LOCAL ? this.skip() : Crud.not_found(URLs.consumer_catalog());
     });
 
-    it('switch to new key', function () {
-        headers(consumer.token, 'access-all-areas');
-    });
-
-    it('check consumer api is accessible', function () {
+    it('check consumer api is accessible with the new key', function () {
         return Crud.get(URLs.consumer_catalog());
     });
 
     it('delete consumer api key on "access-all-areas"', function () {
+        headers(coordinator.token);
         return Crud.delete(URLs.access(consumer.uid, consumer.aid));
     });
 
-    it('check consumer api is not accessible with deleted key', function () {
+    it('check consumer api is not accessible with the now deleted key', function () {
+        headers(consumer.token, 'access-all-areas');
         return LOCAL ? this.skip() : Crud.not_found(URLs.consumer_catalog());
     });
 
-    it('generate and switch to a new consumer key on "access-all-areas"', function () {
+    it('generate a new consumer key on "access-all-areas"', function () {
+        headers(coordinator.token);
         return Crud.add(URLs.access(consumer.uid), { role: 'consumer', context: 'access-all-areas' }, undefined, (token, location) => {
             consumer.token = token;
             consumer.aid = parseInt(location.match(/\d+$/).shift());
-            headers(consumer.token, 'access-all-areas');
         });
     });
 
-    it('check consumer api is accessible', function () {
+    it('check consumer api is accessible with the new key', function () {
+        headers(consumer.token, 'access-all-areas');
         return Crud.get(URLs.consumer_catalog());
     });
 
     it('delete the "access-all-areas" policy"', function () {
+        headers(coordinator.token);
         return Crud.delete(URLs.policy('access-all-areas'));
     });
 
-    it('check consumer api is not accessible on the deleted policy', function () {
+    it('check consumer api is not accessible with the now deleted policy', function () {
+        headers(consumer.token, 'access-all-areas');
         return Crud.unauthorized(URLs.consumer_catalog());
     });
 
-    it('generate and switch to a consumer key on "all-countries"', function () {
+    it('generate a consumer key on "all-countries"', function () {
+        headers(coordinator.token);
         return Crud.add(URLs.access(consumer.uid), { role: 'consumer', context: 'all-countries' }, undefined, (token, location) => {
             consumer.token = token;
             consumer.aid = parseInt(location.match(/\d+$/).shift());
-            headers(consumer.token, 'all-countries');
         });
     });
 
-    it('check consumer api is accessible', function () {
+    it('check consumer api is accessible with the new key', function () {
+        headers(consumer.token, 'all-countries');
         return Crud.get(URLs.consumer_catalog());
     });
 
     it('delete the consumer user', function () {
+        headers(coordinator.token);
         return Crud.delete(URLs.user(consumer.uid));
     });
 
-    it('check consumer api is not accessible for a deleted user', function () {
+    it('check consumer api is not accessible for the now deleted user', function () {
+        headers(consumer.token, 'all-countries');
         return LOCAL ? this.skip() : Crud.not_found(URLs.consumer_catalog());
     });
 
-    it('switch to country connector key', function () {
+    it('switch to country connector key and then check can open stream session', function () {
         headers(country.connectors[0].token);
-    });
-
-    it('check can open stream session on country', function () {
         return Crud.get(URLs.session_open(country.connectors[0].id));
     });
 
     it('delete the country connector', function () {
+        headers(coordinator.token);
         return Crud.delete(URLs.connector(country.slug, country.connectors[0].slug));
     });
 
-    it('check can no longer open stream session on country', function () {
+    it('check can no longer open stream session with the now deleted connector', function () {
+        headers(country.connectors[0].token);
         return Crud.not_found(URLs.session_open(country.connectors[0].id));
     });
 
-    it('switch to heritage-site connector key', function () {
+    it('switch to heritage-site connector key and then check can open stream session', function () {
         headers(site.connectors[0].token);
-    });
-
-    it('check can open stream session on heritage-site', function () {
         return Crud.get(URLs.session_open(site.connectors[0].id));
     });
 
     it('delete the heritage-site entity', function () {
+        headers(coordinator.token);
         return Crud.delete(URLs.entity(site.slug));
     });
 
-    it('check can no longer open stream session on heritage-site', function () {
+    it('check can no longer open stream session on the now deleted entity', function () {
+        headers(site.connectors[0].token);
         return Crud.not_found(URLs.session_open(site.connectors[0].id));
     });
 
     it('delete the coordinator user', function () {
+        headers(coordinator.token);
         return Crud.delete(URLs.user(coordinator.uid));
     });
 
@@ -586,16 +572,10 @@ describe('End-to-End Tests', function() {
         return LOCAL ? this.skip() : Crud.not_found(URLs.entity());
     });
 
-    it('switch to the bootstrap key', function () {
+    it('switch back to the bootstrap key and delete remaining objects', function () {
         headers(process.env.TESTS_BOOTSTRAP_KEY);
-    });
 
-    it('delete the country entity', function () {
-        return Crud.delete(URLs.entity(country.slug));
-    });
-
-    it('delete the remaining policies', function () {
-        let act = [];
+        let act = [ Crud.delete(URLs.entity(country.slug)) ];
 
         return Crud.get(URLs.policy(), (list) => {
             for (let i = 0 ; i < list.length ; i++) {
