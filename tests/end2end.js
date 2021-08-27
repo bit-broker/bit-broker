@@ -474,6 +474,7 @@ describe('End-to-End Tests', function() {
     });
 
     it('check consumer api is accessible with the new key', function () {
+        headers(consumer.token, 'access-all-areas');
         return Crud.get(URLs.consumer_catalog());
     });
 
