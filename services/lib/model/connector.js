@@ -105,7 +105,7 @@ module.exports = class Connector {
     // --- inserts a new connector on the instance entity type
 
     insert(slug, values) {
-        return Permit.generate_token('contributor', CONST.PREFIX.CONNECTOR, slug)
+        return Permit.generate_token(CONST.ROLE.CONTRIBUTOR, slug)
 
         .then (token => {
             values.slug = slug;
@@ -115,7 +115,7 @@ module.exports = class Connector {
 
             return this.db.transaction((trx) => {
                 return this.write.transacting(trx).insert(values)
-                .then(() => Limiter.upsert(CONST.PREFIX.CONNECTOR, slug, CONST.CONNECTOR.ACCESS_CONTROL)) // currently, we use the same rate limit policy for all connectors
+                .then(() => Limiter.upsert(CONST.ROLE.CONTRIBUTOR, slug, CONST.CONNECTOR.ACCESS_CONTROL)) // currently, we use the same rate limit policy for all connectors
             })
 
             .then(() => { return { id: values.contribution_id, token: token.token }});
@@ -133,7 +133,7 @@ module.exports = class Connector {
     delete(slug) {
         return this.db.transaction((trx) => {
             return this.write.transacting(trx).where({ slug }).delete()
-            .then(() => Limiter.delete(CONST.PREFIX.CONNECTOR, slug));
+            .then(() => Limiter.delete(CONST.ROLE.CONTRIBUTOR, slug));
         });
     }
 

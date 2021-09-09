@@ -31,10 +31,16 @@ const fetch = require('node-fetch');
 
 module.exports = class Limiter {
 
+    // --- makes the rate limit url
+
+    static url(role, context) {
+        return `${ process.env.RATE_SERVICE }/${ role }:${ context }/config`;
+    }
+
     // --- updates or inserts a rate limit config
 
-    static upsert(prefix, slug, properties) {
-        return fetch(`${ process.env.RATE_SERVICE }/${ prefix }${ slug }/config`, {
+    static upsert(role, context, properties) {
+        return fetch(this.url(role, context), {
             method: 'PUT',
             body: JSON.stringify(properties),
             headers: CONST.FETCH.HEADERS,
@@ -44,8 +50,8 @@ module.exports = class Limiter {
 
     // --- deletes a rate limit config
 
-    static delete(prefix, slug) {
-        return fetch(`${ process.env.RATE_SERVICE }/${ prefix }${ slug }/config`, {
+    static delete(role, context) {
+        return fetch(this.url(role, context), {
             method: 'DELETE',
             headers: CONST.FETCH.HEADERS,
             timeout: CONST.FETCH.TIMEOUT

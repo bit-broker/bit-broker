@@ -72,14 +72,12 @@ module.exports = class Consumer {
 
     // --- within the context of an active policy
 
-    static with_policy(audience) {
+    static with_policy(slug) {
         if (Status.USE_POLICY) {
-            let slug = audience.replace(CONST.PREFIX.POLICY, '');
-
             return model.policy.cacheRead(slug || '') // empty string is not a valid policy slug
 
             .then(item => {
-                if (!item) throw failure(HTTP.UNAUTHORIZED);
+                if (!item) throw failure(HTTP.FORBIDDEN);
                 return item;
             })
         } else {
