@@ -77,8 +77,6 @@ describe('End-to-End Tests', function() {
         header['x-bbk-auth-token'] = token;
         if (LOCAL) Object.assign(header, Shared.policy_header(policy));
         Crud.headers(header);
-
-        // Shared.sleep(1250);
     }
 
     // --- helpers to check expected server access
