@@ -468,7 +468,7 @@ describe('End-to-End Tests', function() {
 
     it('check consumer api is not accessible with old key', function () {
         headers(consumer.old_token, 'access-all-areas');
-        return LOCAL ? this.skip() : Crud.not_found(URLs.consumer_catalog());
+        return LOCAL ? this.skip() : Crud.forbidden(URLs.consumer_catalog());
     });
 
     it('check consumer api is accessible with the new key', function () {
@@ -483,7 +483,7 @@ describe('End-to-End Tests', function() {
 
     it('check consumer api is not accessible with the now deleted key', function () {
         headers(consumer.token, 'access-all-areas');
-        return LOCAL ? this.skip() : Crud.not_found(URLs.consumer_catalog());
+        return LOCAL ? this.skip() : Crud.forbidden(URLs.consumer_catalog());
     });
 
     it('generate a new consumer key on "access-all-areas"', function () {
@@ -506,7 +506,7 @@ describe('End-to-End Tests', function() {
 
     it('check consumer api is not accessible with the now deleted policy', function () {
         headers(consumer.token, 'access-all-areas');
-        return Crud.unauthorized(URLs.consumer_catalog());
+        return LOCAL ? this.skip() : Crud.forbidden(URLs.consumer_catalog());
     });
 
     it('generate a consumer key on "all-countries"', function () {
@@ -529,7 +529,7 @@ describe('End-to-End Tests', function() {
 
     it('check consumer api is not accessible for the now deleted user', function () {
         headers(consumer.token, 'all-countries');
-        return LOCAL ? this.skip() : Crud.not_found(URLs.consumer_catalog());
+        return LOCAL ? this.skip() : Crud.forbidden(URLs.consumer_catalog());
     });
 
     it('switch to country connector key and then check can open stream session', function () {
@@ -544,7 +544,7 @@ describe('End-to-End Tests', function() {
 
     it('check can no longer open stream session with the now deleted connector', function () {
         headers(country.connectors[0].token);
-        return Crud.not_found(URLs.session_open(country.connectors[0].id));
+        return LOCAL ? this.skip() : Crud.forbidden(URLs.session_open(country.connectors[0].id));
     });
 
     it('switch to heritage-site connector key and then check can open stream session', function () {
@@ -559,7 +559,7 @@ describe('End-to-End Tests', function() {
 
     it('check can no longer open stream session on the now deleted entity', function () {
         headers(site.connectors[0].token);
-        return Crud.not_found(URLs.session_open(site.connectors[0].id));
+        return LOCAL ? this.skip() : Crud.forbidden(URLs.session_open(site.connectors[0].id));
     });
 
     it('delete the coordinator user', function () {
@@ -568,7 +568,7 @@ describe('End-to-End Tests', function() {
     });
 
     it('check coordinator api is not accessible for deleted user', function () {
-        return LOCAL ? this.skip() : Crud.not_found(URLs.entity());
+        return LOCAL ? this.skip() : Crud.forbidden(URLs.entity());
     });
 
     it('switch back to the bootstrap key and delete remaining objects', function () {
