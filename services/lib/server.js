@@ -72,7 +72,7 @@ module.exports = class Server {
             text = status.IS_LIVE ? '' : reason; // we *dont* send the internal error text back with the response when in production mode;
 
             log.error(reason);
-            log.error(error.stack || 'no stack trace');
+            log.error('stack', error.stack || 'no stack trace');
         }
 
         let response = { error: { code: code, status: HTTP.getReasonPhrase(code), message: text || '' }};
