@@ -122,13 +122,26 @@ module.exports = class Crud {
     static unauthorized(url, body = undefined, action = chakram.get) {
         return action(url, body)
         .then(response => {
-            expect(response.body).to.be.a('string');
-            expect(response.body.toLowerCase()).to.contain('unauthorized');
+        //  TODO: below will be fixed when error objects are introduced
+        //  expect(response.body).to.be.a('string');
+        //  expect(response.body.toLowerCase()).to.contain('unauthorized');
             expect(response).to.have.status(HTTP.UNAUTHORIZED);
             return chakram.wait();
         });
     }
 
+    // --- attempts a forbidden request on a resource
+
+    static forbidden(url, body = undefined, action = chakram.get) {
+        return action(url, body)
+        .then(response => {
+        //  TODO: below will be fixed when error objects are introduced
+        //  expect(response.body).to.be.a('string');
+        //  expect(response.body.toLowerCase()).to.contain('unauthorized');
+            expect(response).to.have.status(HTTP.FORBIDDEN);
+            return chakram.wait();
+        });
+    }
     // --- gets a resource
 
     static get(url, checker) {
