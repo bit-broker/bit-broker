@@ -54,20 +54,29 @@ module.exports = class Server {
     // --- generic error handler
 
     error(res, error) {
+        let code = HTTP.INTERNAL_SERVER_ERROR;
+        let text = '';
+
         if (error instanceof failure.HttpError) { // an http-error object
-            res.status(error.status).send(error.message || '');
+            code = error.status;
+            text = error.status === HTTP.BAD_REQUEST ? error.message : '';
 
         } else if (error instanceof SyntaxError) { // a body-parser error for bad user JSON
-            res.status(HTTP.BAD_REQUEST).send(error.message || '');
+            code = HTTP.BAD_REQUEST;
+            text = error.message;
 
         } else { // some other kind of error
-            let text = error.message || error.toString();
-            let show = status.IS_LIVE ? '' : text; // we *dont* send the internal error text back with the response when in production mode
+            let reason = error.message || error.toString();
 
-            res.status(HTTP.INTERNAL_SERVER_ERROR).send(show);
-            log.error(text);
+            code = HTTP.INTERNAL_SERVER_ERROR;
+            text = status.IS_LIVE ? '' : reason; // we *dont* send the internal error text back with the response when in production mode;
+
+            log.error(reason);
             log.error(error.stack || 'no stack trace');
         }
+
+        let response = { error: { code: code, status: HTTP.getReasonPhrase(code), message: text || '' }};
+        res.status(code).send(JSON.stringify(response));
     }
 
     // --- returns the ip address of the host machince

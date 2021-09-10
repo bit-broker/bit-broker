@@ -28,6 +28,7 @@ const HTTP = require('http-status-codes');
 const DATA = require('./data.js');
 const Shared = require('./shared.js');  // include first for dotenv
 const URLs = require('./urls.js');
+const Crud = require('./crud.js');
 const chakram = require('chakram');
 const expect = chakram.expect;
 
@@ -97,18 +98,7 @@ module.exports = class Session {
     // --- test for a known bad sessions action
 
     static bad_request(cid, sid, action, data, errors) {
-        return chakram.post(URLs.session_action(cid, sid, action), data)
-        .then(response => {
-            expect(response.body).to.be.a('string');
-            for (let i = 0; i < errors.length; i++) {
-                for (let j in errors[i]) {
-                    expect(response.body.toLowerCase()).to.contain(j);
-                    expect(response.body.toLowerCase()).to.contain(errors[i][j]);
-                }
-            }
-            expect(response).to.have.status(HTTP.BAD_REQUEST);
-            return chakram.wait();
-        });
+        return Crud.bad_request(URLs.session_action(cid, sid, action), errors, data, chakram.post);
     }
 
     // --- closes an existing sesson on the given connector

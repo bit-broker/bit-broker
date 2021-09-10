@@ -42,6 +42,24 @@ module.exports = class Crud {
         chakram.setRequestDefaults ({ headers });
     }
 
+    // --- checks an error response
+
+    static check_error(response, code, errors = []) {
+        expect(response.body).to.be.an('object');
+        expect(response.body.error).to.be.an('object');
+        expect(response.body.error.code).to.be.eq(code);
+        expect(response.body.error.status).to.be.eq(HTTP.getReasonPhrase(code));
+
+        for (let i = 0; i < errors.length; i++) {
+            for (let j in errors[i]) {
+                expect(response.body.error.message.toLowerCase()).to.contain(j);
+                expect(response.body.error.message.toLowerCase()).to.contain(errors[i][j]);
+            }
+        }
+
+        expect(response).to.have.status(code);
+    }
+
     // --- adds a resource
 
     static add(url, body, location, checker) {
@@ -59,9 +77,7 @@ module.exports = class Crud {
     static duplicate(url, body) {
         return chakram.post(url, body)
         .then(response => {
-            expect(response.body).to.be.a('string');
-            expect(response.body.toLowerCase()).to.contain('conflict');
-            expect(response).to.have.status(HTTP.CONFLICT);
+            this.check_error(response, HTTP.CONFLICT);
             return chakram.wait();
         });
     }
@@ -93,9 +109,7 @@ module.exports = class Crud {
     static not_found(url, body = undefined, action = chakram.get) {
         return action(url, body)
         .then(response => {
-            expect(response.body).to.be.a('string');
-            expect(response.body.toLowerCase()).to.contain('not found');
-            expect(response).to.have.status(HTTP.NOT_FOUND);
+            this.check_error(response, HTTP.NOT_FOUND);
             return chakram.wait();
         });
     }
@@ -105,14 +119,7 @@ module.exports = class Crud {
     static bad_request(url, errors, body = undefined, action = chakram.get) {
         return action(url, body)
         .then(response => {
-            expect(response.body).to.be.a('string');
-            for (let i = 0; i < errors.length; i++) {
-                for (let j in errors[i]) {
-                    expect(response.body.toLowerCase()).to.contain(j);
-                    expect(response.body.toLowerCase()).to.contain(errors[i][j]);
-                }
-            }
-            expect(response).to.have.status(HTTP.BAD_REQUEST);
+            this.check_error(response, HTTP.BAD_REQUEST, errors);
             return chakram.wait();
         });
     }
@@ -122,10 +129,7 @@ module.exports = class Crud {
     static unauthorized(url, body = undefined, action = chakram.get) {
         return action(url, body)
         .then(response => {
-        //  TODO: below will be fixed when error objects are introduced
-        //  expect(response.body).to.be.a('string');
-        //  expect(response.body.toLowerCase()).to.contain('unauthorized');
-            expect(response).to.have.status(HTTP.UNAUTHORIZED);
+            this.check_error(response, HTTP.UNAUTHORIZED);
             return chakram.wait();
         });
     }
@@ -135,10 +139,7 @@ module.exports = class Crud {
     static forbidden(url, body = undefined, action = chakram.get) {
         return action(url, body)
         .then(response => {
-        //  TODO: below will be fixed when error objects are introduced
-        //  expect(response.body).to.be.a('string');
-        //  expect(response.body.toLowerCase()).to.contain('unauthorized');
-            expect(response).to.have.status(HTTP.FORBIDDEN);
+            this.check_error(response, HTTP.FORBIDDEN);
             return chakram.wait();
         });
     }
