@@ -139,7 +139,7 @@ class Shared {
     // --- returns a policy header item
 
     policy_header(slug) {
-        return { 'x-bbk-audience': `BBK-POLICY:${ slug }` };
+        return { 'x-bbk-audience': slug };
     }
 }
 
