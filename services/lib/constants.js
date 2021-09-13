@@ -44,7 +44,7 @@ module.exports = {
         EMPTY: { data_segment: { segment_query: {}, field_masks: [] }, legal_context: [] } // the policy to use when USE_POLICY is false in .en
     },
     REDIS: {
-      TIMEOUT: 2000
+        TIMEOUT: 2000
     },
     ROLE: {
         COORDINATOR: 'coordinator',
