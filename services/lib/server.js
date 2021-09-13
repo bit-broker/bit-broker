@@ -122,8 +122,12 @@ module.exports = class Server {
             this.app.use(metricsMiddleware)
         }
 
+        // --- api version management
+
         if (this.version.length) {
             this.app.use(`/${ this.version }/`, this.router);
+        } else {
+            this.app.use(this.router);
         }
 
         this.app.options('*', cors()); // enable pre-flight on all routes
