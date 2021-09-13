@@ -130,6 +130,8 @@ module.exports = class Server {
             this.app.use(this.router);
         }
 
+        // --- global settings
+
         this.app.options('*', cors()); // enable pre-flight on all routes
         this.app.disable('x-powered-by'); // removes the 'express advert' header value
         this.app.enable('etag'); // use strong etags
