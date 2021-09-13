@@ -61,7 +61,7 @@ describe('User Tests', function() {
         });
 
         it('it responds to an announce request', () => {
-            return Shared.announce(process.env.COORDINATOR_BASE, process.env.COORDINATOR_NAME);
+            return Shared.announce(process.env.COORDINATOR_BASE, 'coordinator');
         });
 
         it('the database is empty', () => {

@@ -62,7 +62,7 @@ describe('Contributor Tests', function() {
         });
 
         it('it responds to an announce request', () => {
-            return Shared.announce(process.env.CONTRIBUTOR_BASE, process.env.CONTRIBUTOR_NAME);
+            return Shared.announce(process.env.CONTRIBUTOR_BASE, 'contributor');
         });
 
         it('the database is empty', () => {

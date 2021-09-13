@@ -93,7 +93,7 @@ describe('Consumer Tests', function() {
         });
 
         it('it responds to an announce request', () => {
-            return Shared.announce(process.env.CONSUMER_BASE, process.env.CONSUMER_NAME);
+            return Shared.announce(process.env.CONSUMER_BASE, 'consumer');
         });
 
         it('the database is empty', () => {
