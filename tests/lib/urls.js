@@ -22,6 +22,12 @@
 
 'use strict'; // code assumes ECMAScript 6
 
+// --- one-time operations
+
+process.env.TESTS_COORDINATOR = process.env.TESTS_COORDINATOR.replace(/\/*$/g, '');
+process.env.TESTS_CONTRIBUTOR = process.env.TESTS_CONTRIBUTOR.replace(/\/*$/g, '');
+process.env.TESTS_CONSUMER = process.env.TESTS_CONSUMER.replace(/\/*$/g, '');
+
 // --- URLs class (embedded)
 
 class URLs {
