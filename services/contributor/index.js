@@ -41,7 +41,7 @@ const log = require(`${ PATH_LIB }/logger.js`).Logger;
 
 // --- running contexts
 
-var api = new Server('bit-broker contributor service', process.env.CONTRIBUTOR_BASE);
+var api = new Server('bit-broker contributor service', process.env.CONTRIBUTOR_PORT, process.env.CONTRIBUTOR_BASE);
 
 // --- catalog endpoints
 

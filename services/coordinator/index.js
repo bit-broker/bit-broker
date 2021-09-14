@@ -51,7 +51,7 @@ const log = require(`${ PATH_LIB }/logger.js`).Logger;
 
 // --- running contexts
 
-var api = new Server('bit-broker coordinator service', process.env.COORDINATOR_BASE);
+var api = new Server('bit-broker coordinator service', process.env.COORDINATOR_PORT, process.env.COORDINATOR_BASE);
 
 // --- entity endpoints
 

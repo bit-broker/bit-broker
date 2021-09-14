@@ -89,11 +89,11 @@ describe('Consumer Tests', function() {
     describe('start up tests', () => {
 
         it('the server is up', () => {
-            return Shared.up(process.env.CONSUMER_BASE);
+            return Shared.up(process.env.TESTS_CONSUMER);
         });
 
         it('it responds to an announce request', () => {
-            return Shared.announce(process.env.CONSUMER_BASE, 'consumer');
+            return Shared.announce(process.env.TESTS_CONSUMER, 'consumer');
         });
 
         it('the database is empty', () => {

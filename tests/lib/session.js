@@ -43,10 +43,10 @@ module.exports = class Session {
 
         .then(response => {
             expect(response.body).to.be.an('object');
-            expect(response.body.contribution.id).to.be.a('string');
-            expect(response.body.contribution.id).to.match(new RegExp(DATA.ID.REGEX));
-            expect(response.body.contribution.id.length).to.be.eq(DATA.ID.SIZE);
-            return response.body.contribution.id;
+            expect(response.body.contribution_id).to.be.a('string');
+            expect(response.body.contribution_id).to.match(new RegExp(DATA.ID.REGEX));
+            expect(response.body.contribution_id.length).to.be.eq(DATA.ID.SIZE);
+            return response.body.contribution_id;
         })
 
         .then(cid => {

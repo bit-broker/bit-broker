@@ -57,11 +57,11 @@ describe('User Tests', function() {
     describe('start up tests', () => {
 
         it('the server is up', () => {
-            return Shared.up(process.env.COORDINATOR_BASE);
+            return Shared.up(process.env.TESTS_COORDINATOR);
         });
 
         it('it responds to an announce request', () => {
-            return Shared.announce(process.env.COORDINATOR_BASE, 'coordinator');
+            return Shared.announce(process.env.TESTS_COORDINATOR, 'coordinator');
         });
 
         it('the database is empty', () => {

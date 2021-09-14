@@ -54,7 +54,7 @@ module.exports = class Policy {
         model.policy.list()
 
         .then(items => {
-            res.json(view.coordinator.policies(items));
+            res.json(view.coordinator.policies(req.originalRoute, items));
         })
 
         .catch(error => next(error));
@@ -69,7 +69,7 @@ module.exports = class Policy {
 
         .then(item => {
             if (!item) throw failure(HTTP.NOT_FOUND);
-            res.json(view.coordinator.policy(item));
+            res.json(view.coordinator.policy(req.originalRoute, item));
         })
 
         .catch(error => next(error));

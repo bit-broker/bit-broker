@@ -14,10 +14,12 @@ require('dotenv').config({ path: `${ PATH_CFG }/.env` });
 const Server = require(`${ PATH_LIB }/server.js`);
 const log = require(`${ PATH_LIB }/logger.js`).Logger;
 const crypto = require('crypto')
+const url = require('url');
 
 // --- running contexts
 
-var api = new Server('dummy auth service', process.env.AUTH_SERVICE);
+let parts = url.parse(process.env.AUTH_SERVICE);
+let api = new Server('dummy auth service', parts.port || 80, parts.path.replace(/^\/|\/$/g, ''));
 
 // --- dummy endpoints
 

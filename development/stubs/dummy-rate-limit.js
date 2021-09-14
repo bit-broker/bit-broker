@@ -13,10 +13,12 @@ require('dotenv').config({ path: `${ PATH_CFG }/.env` });
 
 const Server = require(`${ PATH_LIB }/server.js`);
 const log = require(`${ PATH_LIB }/logger.js`).Logger;
+const url = require('url');
 
 // --- running contexts
 
-var api = new Server('dummy rate limit service', process.env.RATE_SERVICE);
+let parts = url.parse(process.env.RATE_SERVICE);
+let api = new Server('dummy rate limit service', parts.port || 80, parts.path.replace(/^\/|\/$/g, ''));
 
 // --- dummy endpoints
 

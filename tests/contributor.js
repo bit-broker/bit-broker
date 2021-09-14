@@ -58,11 +58,11 @@ describe('Contributor Tests', function() {
     describe('start up tests', () => {
 
         it('the server is up', () => {
-            return Shared.up(process.env.CONTRIBUTOR_BASE);
+            return Shared.up(process.env.TESTS_CONTRIBUTOR);
         });
 
         it('it responds to an announce request', () => {
-            return Shared.announce(process.env.CONTRIBUTOR_BASE, 'contributor');
+            return Shared.announce(process.env.TESTS_CONTRIBUTOR, 'contributor');
         });
 
         it('the database is empty', () => {

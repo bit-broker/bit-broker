@@ -53,7 +53,7 @@ module.exports = class User {
         model.user.list()
 
         .then(items => {
-            res.json(view.coordinator.users(items));
+            res.json(view.coordinator.users(req.originalRoute, items));
         })
 
         .catch(error => next(error));
@@ -68,7 +68,7 @@ module.exports = class User {
 
         .then(item => {
             if (!item) throw failure(HTTP.NOT_FOUND);
-            res.json(view.coordinator.user(item));
+            res.json(view.coordinator.user(req.originalRoute, item));
         })
 
         .catch(error => next(error));

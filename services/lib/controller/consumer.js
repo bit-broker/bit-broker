@@ -103,7 +103,7 @@ module.exports = class Consumer {
             return model.catalog.query(policy.data_segment.segment_query, JSON.parse(q))
 
             .then(items => {
-                res.json(view.consumer.instances(items, policy.legal_context));
+                res.json(view.consumer.instances(req.originalRoute, items, policy.legal_context));
             })
         })
 
@@ -120,7 +120,7 @@ module.exports = class Consumer {
             return model.catalog.types(policy.data_segment.segment_query)
 
             .then(items => {
-                res.json(view.consumer.entities(items, policy.legal_context)); // can be empty
+                res.json(view.consumer.entities(req.originalRoute, items, policy.legal_context)); // can be empty
             })
         })
 
@@ -146,7 +146,7 @@ module.exports = class Consumer {
                 return model.catalog.list(policy.data_segment.segment_query, type)
 
                 .then(items => {
-                    res.json(view.consumer.instances(items, policy.legal_context)); // can be empty
+                    res.json(view.consumer.instances(req.originalRoute, items, policy.legal_context)); // can be empty
                 })
             })
         })
@@ -176,11 +176,11 @@ module.exports = class Consumer {
                 }
 
                 request.then(res => res ? res.json() : null)
-                .then(extra => res.json(view.consumer.instance(item, extra, policy.legal_context, policy.data_segment.field_masks)))
+                .then(extra => res.json(view.consumer.instance(req.originalRoute, item, extra, policy.legal_context, policy.data_segment.field_masks)))
                 .catch(error => // on fail: same record, but without any webhook data
                 {
                     log.warn('webhook failure', type, id, error);
-                    return res.json(view.consumer.instance(item, null, policy.legal_context, policy.data_segment.field_masks))
+                    return res.json(view.consumer.instance(req.originalRoute, item, null, policy.legal_context, policy.data_segment.field_masks))
                 });
             })
         })

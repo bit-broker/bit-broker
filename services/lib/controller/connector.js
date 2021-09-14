@@ -61,7 +61,7 @@ module.exports = class Connector {
         })
 
         .then(items => {
-            res.json(view.contributor.connectors(items)); // can be empty
+            res.json(view.contributor.connectors(req.originalRoute, items)); // can be empty
         })
 
         .catch(error => next(error));
@@ -82,7 +82,7 @@ module.exports = class Connector {
 
         .then(item => {
             if (!item) throw failure(HTTP.NOT_FOUND);
-            res.json(view.contributor.connector(item));
+            res.json(view.contributor.connector(req.originalRoute, item));
         })
 
         .catch(error => next(error));

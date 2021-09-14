@@ -64,7 +64,7 @@ module.exports = class Script {
     // --- check records are present or absent
 
     _op_check(given, present) {
-        return chakram.get(`${ process.env.CONSUMER_BASE }/entity/${ this.entity }`, this.policy)
+        return chakram.get(`${ process.env.TESTS_CONSUMER }/entity/${ this.entity }`, this.policy)
         .then(response => {
             expect(response.body).to.be.an('array');
 

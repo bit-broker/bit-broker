@@ -61,7 +61,7 @@ module.exports = class Access {
         })
 
         .then(items => {
-            res.json(view.coordinator.accesses(items)); // can be empty
+            res.json(view.coordinator.accesses(req.originalRoute, items)); // can be empty
         })
 
         .catch(error => next(error));
@@ -82,7 +82,7 @@ module.exports = class Access {
 
         .then(item => {
             if (!item) throw failure(HTTP.NOT_FOUND);
-            res.json(view.coordinator.access(item));
+            res.json(view.coordinator.access(req.originalRoute, item));
         })
 
         .catch(error => next(error));

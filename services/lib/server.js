@@ -34,13 +34,13 @@ const cors = require('cors');
 const logger = require('./logger.js');
 const status = require('./status.js')
 const locales = require('./locales.js');
-const url = require('url');
 const os = require('os');
 
 // --- constants - not deployment configurable
 
 const MAX_POST_SIZE = '100mb'; // see body-parser documentation
 const DEFAULT_PORT = 80;
+const DEFAULT_PROTOCOL = 'http'; // used only when no request headers are present
 
 // --- running contexts
 
@@ -90,18 +90,16 @@ module.exports = class Server {
 
     // --- constructor
 
-    constructor(name, base, announce = true) {
+    constructor(name, port, base, announce = true) {
 
         // --- set class properties
 
         this.app = express();
         this.router = express.Router();
 
-        let parts = url.parse(base);
         this.name = name;
-        this.base = base.replace(/\/$/g, ''); // we store without trailing slashes
-        this.port = parts.port || DEFAULT_PORT;
-        this.version = parts.path.replace(/^\/|\/$/g, ''); // strips all slashes
+        this.port = port || DEFAULT_PORT;
+        this.base = base.replace(/^\/|\/$/g, ''); // we store without leading or trailing slashes
 
         // --- server logging
 
@@ -122,10 +120,17 @@ module.exports = class Server {
             this.app.use(metricsMiddleware)
         }
 
+        // --- the original client route, before load balancers and ingress controllers got in the way
+
+        this.app.use((req, res, next) => {
+            req.originalRoute = (req.header('x-forwarded-scheme') || req.header('x-forwarded-proto') || DEFAULT_PROTOCOL) + '://' + req.header('host');
+            next();
+        });
+
         // --- api version management
 
-        if (this.version.length) {
-            this.app.use(`/${ this.version }/`, this.router);
+        if (this.base.length) {
+            this.app.use(`/${ this.base }/`, this.router);
         } else {
             this.app.use(this.router);
         }
@@ -155,7 +160,7 @@ module.exports = class Server {
                 res.json({
                     now: new Date().toISOString(),
                     name: this.name,
-                    version: this.version,
+                    base: req.originalRoute + req.originalUrl,
                     status: status.IS_LIVE ? 'production' : 'development'
                 });
             });
@@ -167,7 +172,7 @@ module.exports = class Server {
     listen(cb = null) {
         log.info(this.name, 'started');
         this.app.listen(this.port, () => {
-            log.info('name', this.name, 'base', this.base, 'version', this.version, 'port', this.port, 'ip address', this.ip_address(), 'metrics', status.USE_SERVER_METRICS ? 'on' : 'off');
+            log.info('name', this.name, 'base', this.base, 'port', this.port, 'ip address', this.ip_address(), 'metrics', status.USE_SERVER_METRICS ? 'on' : 'off');
             if (cb) cb();
         });
     }

@@ -35,10 +35,10 @@ module.exports = class Coordinator extends View {
 
     // --- an entity type
 
-    static entity(item, full = true) {
+    static entity(route, item, full = true) {
         let doc = {
             id: item.slug,
-            url: this.rest(process.env.COORDINATOR_BASE, 'entity', item.slug),
+            url: this.rest(route, process.env.COORDINATOR_BASE, 'entity', item.slug),
             name: item.properties.name,
             description: item.properties.description
         };
@@ -54,11 +54,11 @@ module.exports = class Coordinator extends View {
 
     // --- a list of entity types
 
-    static entities(items) {
+    static entities(route, items) {
         let doc = [];
 
         for (let i = 0; i < items.length; i++) {
-            doc.push(this.entity(items[i], false));
+            doc.push(this.entity(route, items[i], false));
         }
 
         return doc;
@@ -66,10 +66,10 @@ module.exports = class Coordinator extends View {
 
     // --- a user
 
-    static user(item, full = true) {
+    static user(route, item, full = true) {
         let doc = {
             id: item.id,
-            url: this.rest(process.env.COORDINATOR_BASE, 'user', item.id),
+            url: this.rest(route, process.env.COORDINATOR_BASE, 'user', item.id),
             name: item.properties.name,
             email: item.email
         };
@@ -83,11 +83,11 @@ module.exports = class Coordinator extends View {
 
     // --- a list of users
 
-    static users(items) {
+    static users(route, items) {
         let doc = [];
 
         for (let i = 0; i < items.length; i++) {
-            doc.push(this.user(items[i], false));
+            doc.push(this.user(route, items[i], false));
         }
 
         return doc;
@@ -95,10 +95,10 @@ module.exports = class Coordinator extends View {
 
     // --- an access
 
-    static access(item, full = true) {
+    static access(route, item, full = true) {
         let doc = {
             id: item.id,
-            url: this.rest(process.env.COORDINATOR_BASE, 'user', item.user_id, 'access', item.id),
+            url: this.rest(route, process.env.COORDINATOR_BASE, 'user', item.user_id, 'access', item.id),
             role: item.role,
             context: item.context,
             created: item.created_at
@@ -113,11 +113,11 @@ module.exports = class Coordinator extends View {
 
     // --- a list of accesses
 
-    static accesses(items) {
+    static accesses(route, items) {
         let doc = [];
 
         for (let i = 0; i < items.length; i++) {
-            doc.push(this.access(items[i], false));
+            doc.push(this.access(route, items[i], false));
         }
 
         return doc;
@@ -125,10 +125,10 @@ module.exports = class Coordinator extends View {
 
     // --- a policy
 
-    static policy(item, full = true) {
+    static policy(route, item, full = true) {
         let doc = {
             id: item.slug,
-            url: this.rest(process.env.COORDINATOR_BASE, 'policy', item.slug),
+            url: this.rest(route, process.env.COORDINATOR_BASE, 'policy', item.slug),
             name: item.properties.name,
             description: item.properties.description
         };
@@ -150,11 +150,11 @@ module.exports = class Coordinator extends View {
 
     // --- a list of policy ids
 
-    static policies(items) {
+    static policies(route, items) {
         let doc = [];
 
         for (let i = 0; i < items.length; i++) {
-            doc.push(this.policy(items[i], false));
+            doc.push(this.policy(route, items[i], false));
         }
 
         return doc;

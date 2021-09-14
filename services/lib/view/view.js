@@ -45,13 +45,13 @@ module.exports = class View {
 
     // --- iterates every value within an object recursively, calling the specified callback
 
-    static each_value(object, cb) {
+    static each_value(route, object, cb) {
         if (object) {
             for (var key in object) {
                 if (typeof object[key] === 'object') {
                     this.each_value(object[key], cb);
                 } else {
-                    object[key] = cb(object[key]);
+                    object[key] = cb(route, object[key]);
                 }
             }
         }
@@ -59,12 +59,12 @@ module.exports = class View {
 
     // --- maps bbk links to public urls - used in conjunction with the each_value function
 
-    static map_bbk_links(item) {
+    static map_bbk_links(route, item) {
         if (typeof item === 'string') {
             let match = View.REGEX_BBK.exec(item);
 
             if (match) {
-                item = View.rest(process.env.CONSUMER_BASE, 'entity', match[1], Permit.public_key(match[2], match[3]));
+                item = View.rest(route, process.env.CONSUMER_BASE, 'entity', match[1], Permit.public_key(match[2], match[3]));
             }
         }
 

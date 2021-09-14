@@ -35,10 +35,10 @@ module.exports = class Contributor extends View {
 
     // --- a connector
 
-    static connector(item, full = true) {
+    static connector(route, item, full = true) {
         let doc = {
             id: item.slug,
-            url: this.rest(process.env.COORDINATOR_BASE, 'entity', item.entity_slug, 'connector', item.slug),
+            url: this.rest(route, process.env.COORDINATOR_BASE, 'entity', item.entity_slug, 'connector', item.slug),
             name: item.properties.name,
             description: item.properties.description
         };
@@ -47,12 +47,9 @@ module.exports = class Contributor extends View {
             doc = Object.assign(doc, {
                 entity: {
                     id: item.entity_slug,
-                    url: this.rest(process.env.COORDINATOR_BASE, 'entity', item.entity_slug),
+                    url: this.rest(route, process.env.COORDINATOR_BASE, 'entity', item.entity_slug),
                 },
-                contribution: {
-                    id: item.contribution_id,
-                    url: item.contribution_id === null ? null : this.rest(process.env.CONTRIBUTOR_BASE, 'connector', item.contribution_id),
-                },
+                contribution_id: item.contribution_id,
                 webhook: item.properties.webhook,
                 cache: item.properties.cache,
                 in_session: item.session_id !== null
@@ -64,11 +61,11 @@ module.exports = class Contributor extends View {
 
     // --- a list of connectors
 
-    static connectors(items) {
+    static connectors(route, items) {
         let doc = [];
 
         for (let i = 0; i < items.length; i++) {
-            doc.push(this.connector(items[i], false));
+            doc.push(this.connector(route, items[i], false));
         }
 
         return doc;
