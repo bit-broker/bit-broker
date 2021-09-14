@@ -27,6 +27,10 @@
 const CONST = require('../constants.js');
 const fetch = require('node-fetch');
 
+// --- one-time operations
+
+process.env.RATE_SERVICE = process.env.RATE_SERVICE.replace(/\/*$/g, ''); // clean-up service url on start-up - no trailing slashes
+
 // --- limiter class (exported)
 
 module.exports = class Limiter {

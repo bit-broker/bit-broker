@@ -29,6 +29,10 @@ const CONST = require('../constants.js');
 const crypto = require('crypto');
 const fetch = require('node-fetch');
 
+// --- one-time operations
+
+process.env.AUTH_SERVICE = process.env.AUTH_SERVICE.replace(/\/*$/g, ''); // clean-up service url on start-up - no trailing slashes
+
 // --- session class (exported)
 
 module.exports = class Permit {
