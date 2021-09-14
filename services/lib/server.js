@@ -99,7 +99,7 @@ module.exports = class Server {
 
         this.name = name;
         this.port = port || DEFAULT_PORT;
-        this.base = base.replace(/^\/|\/$/g, ''); // we store without leading or trailing slashes
+        this.base = base ? base.replace(/^\/*|\/*$/g, '') : ''; // we store without leading or trailing slashes
 
         // --- server logging
 
@@ -175,7 +175,7 @@ module.exports = class Server {
     listen(cb = null) {
         log.info(this.name, 'started');
         this.app.listen(this.port, () => {
-            log.info('name', this.name, 'base', this.base, 'port', this.port, 'ip address', this.ip_address(), 'metrics', status.USE_SERVER_METRICS ? 'on' : 'off');
+            log.info('name', this.name, 'base', this.base ? this.base : '[none]', 'port', this.port, 'ip address', this.ip_address(), 'metrics', status.USE_SERVER_METRICS ? 'on' : 'off');
             if (cb) cb();
         });
     }
