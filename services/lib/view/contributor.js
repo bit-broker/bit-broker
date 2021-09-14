@@ -38,7 +38,7 @@ module.exports = class Contributor extends View {
     static connector(route, item, full = true) {
         let doc = {
             id: item.slug,
-            url: this.rest(route, process.env.COORDINATOR_BASE, 'entity', item.entity_slug, 'connector', item.slug),
+            url: this.rest(route, 'entity', item.entity_slug, 'connector', item.slug),
             name: item.properties.name,
             description: item.properties.description
         };
@@ -47,7 +47,7 @@ module.exports = class Contributor extends View {
             doc = Object.assign(doc, {
                 entity: {
                     id: item.entity_slug,
-                    url: this.rest(route, process.env.COORDINATOR_BASE, 'entity', item.entity_slug),
+                    url: this.rest(route, 'entity', item.entity_slug),
                 },
                 contribution_id: item.contribution_id,
                 webhook: item.properties.webhook,

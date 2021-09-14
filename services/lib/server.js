@@ -123,7 +123,10 @@ module.exports = class Server {
         // --- the original client route, before load balancers and ingress controllers got in the way
 
         this.app.use((req, res, next) => {
-            req.originalRoute = (req.header('x-forwarded-scheme') || req.header('x-forwarded-proto') || DEFAULT_PROTOCOL) + '://' + req.header('host');
+            let proto = req.header('x-forwarded-scheme') || req.header('x-forwarded-proto') || DEFAULT_PROTOCOL;
+            let host = req.header('host');
+            let base = this.base.length ? `/${ this.base }` : '';
+            req.originalRoute = `${ proto }://${ host }${ base }`;
             next();
         });
 
@@ -160,7 +163,7 @@ module.exports = class Server {
                 res.json({
                     now: new Date().toISOString(),
                     name: this.name,
-                    base: req.originalRoute + req.originalUrl,
+                    base: req.originalRoute,
                     status: status.IS_LIVE ? 'production' : 'development'
                 });
             });

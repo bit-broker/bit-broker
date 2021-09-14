@@ -64,7 +64,7 @@ module.exports = class View {
             let match = View.REGEX_BBK.exec(item);
 
             if (match) {
-                item = View.rest(route, process.env.CONSUMER_BASE, 'entity', match[1], Permit.public_key(match[2], match[3]));
+                item = View.rest(route, 'entity', match[1], Permit.public_key(match[2], match[3]));
             }
         }
 

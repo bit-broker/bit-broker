@@ -38,7 +38,7 @@ module.exports = class Consumer extends View {
     static entity(route, item, legal) {
         return {
             id: item.entity_slug,
-            url: this.rest(route, process.env.CONSUMER_BASE, 'entity', item.entity_slug),
+            url: this.rest(route, 'entity', item.entity_slug),
             name: item.entity_properties.name,
             description: item.entity_properties.description,
             legal: legal  // will get excluded if not passed in
@@ -82,7 +82,7 @@ module.exports = class Consumer extends View {
     static instance(route, item, extra, legal, masks, full = true) {
         let doc = {
             id: item.public_id,
-            url: this.rest(route, process.env.CONSUMER_BASE, 'entity', item.entity_slug, item.public_id),
+            url: this.rest(route, 'entity', item.entity_slug, item.public_id),
             type: item.entity_slug,
             name: item.record.name
         };

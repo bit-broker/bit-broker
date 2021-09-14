@@ -38,7 +38,7 @@ module.exports = class Coordinator extends View {
     static entity(route, item, full = true) {
         let doc = {
             id: item.slug,
-            url: this.rest(route, process.env.COORDINATOR_BASE, 'entity', item.slug),
+            url: this.rest(route, 'entity', item.slug),
             name: item.properties.name,
             description: item.properties.description
         };
@@ -69,7 +69,7 @@ module.exports = class Coordinator extends View {
     static user(route, item, full = true) {
         let doc = {
             id: item.id,
-            url: this.rest(route, process.env.COORDINATOR_BASE, 'user', item.id),
+            url: this.rest(route, 'user', item.id),
             name: item.properties.name,
             email: item.email
         };
@@ -98,7 +98,7 @@ module.exports = class Coordinator extends View {
     static access(route, item, full = true) {
         let doc = {
             id: item.id,
-            url: this.rest(route, process.env.COORDINATOR_BASE, 'user', item.user_id, 'access', item.id),
+            url: this.rest(route, 'user', item.user_id, 'access', item.id),
             role: item.role,
             context: item.context,
             created: item.created_at
@@ -128,7 +128,7 @@ module.exports = class Coordinator extends View {
     static policy(route, item, full = true) {
         let doc = {
             id: item.slug,
-            url: this.rest(route, process.env.COORDINATOR_BASE, 'policy', item.slug),
+            url: this.rest(route, 'policy', item.slug),
             name: item.properties.name,
             description: item.properties.description
         };
