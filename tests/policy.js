@@ -219,6 +219,8 @@ describe('Policy Tests', function() {
             return Crud.bad_request(url(DATA.POLICY.INVALID.ID), [{ policy: DATA.ERRORS.REQUIRED }], policy, chakram.put);
         });
 
+        it('TODO: significant extra, detailed policy validation tests are required to be inserted here');
+
         it('can delete the first policy', () => {
             return Crud.delete(url(DATA.POLICY.ALLAREA.ID));
         });

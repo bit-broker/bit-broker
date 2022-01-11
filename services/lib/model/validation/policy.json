@@ -31,7 +31,8 @@
                     "type": "object",
                     "properties": {
                         "max_number": {
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
                         },
                         "interval_type": {
                             "enum": [
@@ -39,10 +40,12 @@
                                 "month"
                             ]
                         }
-                    },
-                    "required": []
+                    }
                 },
-                "rate": {}
+                "rate": {
+                    "type": "integer",
+                    "minimum": 0
+                }
             },
             "required": [
                 "enabled"
@@ -67,6 +70,8 @@
         },
         "_legal_context": {
             "type": "array",
+            "minItems": 0,
+            "maxItems": 100,
             "items": {
                 "$ref": "#/definitions/_legal_item"
             }
@@ -92,7 +97,7 @@
                         "string",
                         "null"
                     ],
-                    "maxLength": 256,
+                    "maxLength": 1024,
                     "format": "uri",
                     "pattern": "^https?://.*$"
                 }
