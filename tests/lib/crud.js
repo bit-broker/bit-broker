@@ -53,9 +53,6 @@ module.exports = class Crud {
         for (let i = 0; i < errors.length; i++) {
             for (let property in errors[i]) {
                 let match = response.body.error.message.find(e => e.name === property && e.reason.toLowerCase().indexOf(errors[i][property]) !== -1);
-
-// TODO: temp                if (match === undefined) console.log(response.body.error.message);
-// TODO: temp                if (match === undefined) console.log(errors);
                 expect(match).to.not.be.undefined;
             }
         }

@@ -204,19 +204,19 @@ describe('Policy Tests', function() {
         it('cannot update a policy without a data segment', () => {
             let policy = JSON.parse(JSON.stringify(DATA.POLICY.ALLAREA.DETAIL));
             delete policy.policy.data_segment;
-            return Crud.bad_request(url(DATA.POLICY.INVALID.ID), [{ policy: DATA.ERRORS.REQUIRED }], policy, chakram.put);
+            return Crud.bad_request(url(DATA.POLICY.INVALID.ID), [{ policy: DATA.ERRORS.REQUIRED('data_segment') }], policy, chakram.put);
         });
 
         it('cannot update a policy without a segment query', () => {
             let policy = JSON.parse(JSON.stringify(DATA.POLICY.ALLAREA.DETAIL));
             delete policy.policy.data_segment.segment_query;
-            return Crud.bad_request(url(DATA.POLICY.INVALID.ID), [{ 'policy.data_segment': DATA.ERRORS.REQUIRED }], policy, chakram.put);
+            return Crud.bad_request(url(DATA.POLICY.INVALID.ID), [{ 'policy.data_segment': DATA.ERRORS.REQUIRED('segment_query') }], policy, chakram.put);
         });
 
         it('cannot update a policy without a legal context', () => {
             let policy = JSON.parse(JSON.stringify(DATA.POLICY.ALLAREA.DETAIL));
             delete policy.policy.legal_context;
-            return Crud.bad_request(url(DATA.POLICY.INVALID.ID), [{ policy: DATA.ERRORS.REQUIRED }], policy, chakram.put);
+            return Crud.bad_request(url(DATA.POLICY.INVALID.ID), [{ policy: DATA.ERRORS.REQUIRED('legal_context') }], policy, chakram.put);
         });
 
         it('TODO: significant extra, detailed policy validation tests are required to be inserted here');

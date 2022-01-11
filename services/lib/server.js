@@ -63,7 +63,7 @@ module.exports = class Server {
 
         } else if (error instanceof SyntaxError) { // a body-parser error for bad user JSON
             code = HTTP.BAD_REQUEST;
-            text = [ error.message ]; // bad_request always returns an array
+            text = [ failure.response('syntax', error.message) ]; // bad_request always returns an array
 
         } else { // some other kind of error
             let reason = error.message || error.toString();
