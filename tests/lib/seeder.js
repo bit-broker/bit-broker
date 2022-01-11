@@ -170,4 +170,22 @@ module.exports = class Seeder {
 
         return Promise.all(steps);
     }
+
+    // --- adds the access
+
+    static add_access() {
+        let steps = [];
+        let users = Seeder.users;
+
+        for (let i = 0; i < users.length; i++) {
+            let user = users[i];
+
+            for (let j = 0; j < user.access.length; j++) {
+                let access = user.access[j];
+                steps.push(Crud.add(URLs.access(i + 1), { role: 'consumer', context: access }));
+            }
+        }
+
+        return Promise.all(steps);
+    }
 }

@@ -71,4 +71,8 @@ describe('Database Seeding', function() {
     it('create the users', () => {
         return Seeder.add_users();
     });
+
+    it('create the accesses', () => {
+        return Seeder.add_access();
+    });
 });

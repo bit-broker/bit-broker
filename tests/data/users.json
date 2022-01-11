@@ -3,24 +3,28 @@
         "properties": {
             "name": "alice",
             "email": "alice@domain.com"
-        }
+        },
+        "access": [ "access-all-areas", "all-countries", "all-heritage-sites", "european-union", "over-a-billion", "north-america", "british-isles" ]
     },
     {
         "properties": {
             "name": "bob",
             "email": "bob@domain.com"
-        }
+        },
+        "access": [ "all-countries", "all-heritage-sites" ]
     },
     {
         "properties": {
             "name": "carol",
             "email": "carol@domain.com"
-        }
+        },
+        "access": [ "european-union", "over-a-billion", "north-america", "british-isles" ]
     },
     {
         "properties": {
             "name": "ted",
             "email": "ted@domain.com"
-        }
+        },
+        "access": []
     }
 ]
