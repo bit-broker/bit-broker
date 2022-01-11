@@ -502,7 +502,7 @@ describe('Coordinator Service Tests', function() {
         });
 
         it('disallows multiple invalid paramters', () => {
-            let errors = [{ description: DATA.ERRORS.MIN, cache: DATA.ERRORS.MIN , webhook: DATA.ERRORS.CONFORM }];
+            let errors = [{ description: DATA.ERRORS.MIN, cache: DATA.ERRORS.BIG , webhook: DATA.ERRORS.CONFORM }];
             let delta = { description: '', cache: DATA.CACHE.LONGEST + 1, webhook: DATA.pick(DATA.WEBHOOK.INVALID[0]) };
             return Crud.bad_request(connector, errors, {...values, ...delta}, chakram.post);
         });
@@ -539,7 +539,7 @@ describe('Coordinator Service Tests', function() {
         });
 
         it('disallows update of multiple invalid paramters', () => {
-            let errors = [{ description: DATA.ERRORS.MIN, cache: DATA.ERRORS.MIN , webhook: DATA.ERRORS.CONFORM }];
+            let errors = [{ description: DATA.ERRORS.MIN, cache: DATA.ERRORS.BIG , webhook: DATA.ERRORS.CONFORM }];
             let delta = { description: '', cache: DATA.CACHE.LONGEST + 1, webhook: DATA.pick(DATA.WEBHOOK.INVALID[0]) };
             return Crud.bad_request(connector, errors, {...values, ...delta}, chakram.put);
         });

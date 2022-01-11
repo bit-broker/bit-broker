@@ -28,7 +28,7 @@
 // --- dependancies
 
 const HTTP = require('http-status-codes');
-const failure = require('http-errors');
+const failure = require('../errors.js');
 const model = require('../model/index.js');
 const view = require('../view/index.js');
 const log = require('../logger.js').Logger;
@@ -56,7 +56,7 @@ module.exports = class Connector {
         model.entity.connector(eid)
 
         .then(connectors => {
-            if (!connectors) throw failure(HTTP.NOT_FOUND);
+            if (!connectors) throw new failure(HTTP.NOT_FOUND);
             return connectors.list();
         })
 
@@ -76,12 +76,12 @@ module.exports = class Connector {
         model.entity.connector(eid)
 
         .then(connectors => {
-            if (!connectors) throw failure(HTTP.NOT_FOUND);
+            if (!connectors) throw new failure(HTTP.NOT_FOUND);
             return connectors.find(cid);
         })
 
         .then(item => {
-            if (!item) throw failure(HTTP.NOT_FOUND);
+            if (!item) throw new failure(HTTP.NOT_FOUND);
             res.json(view.contributor.connector(req.originalRoute, item));
         })
 
@@ -102,19 +102,19 @@ module.exports = class Connector {
         errors = errors.concat(model.validate.connector(properties));
 
         if (errors.length) {
-            throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
+            throw new failure(HTTP.BAD_REQUEST, errors);
         }
 
         model.entity.connector(eid)
 
         .then(connectors => {
-            if (!connectors) throw failure(HTTP.NOT_FOUND);
+            if (!connectors) throw new failure(HTTP.NOT_FOUND);
             return connectors.find(cid)
 
             .then(item => {
                 if (item) {
                     log.info('entity', eid, 'connector', cid, 'insert', 'duplicate');
-                    throw failure(HTTP.CONFLICT);
+                    throw new failure(HTTP.CONFLICT);
                 }
 
                 return connectors.insert(cid, { properties });
@@ -143,17 +143,17 @@ module.exports = class Connector {
         errors = errors.concat(model.validate.connector(properties));
 
         if (errors.length) {
-            throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
+            throw new failure(HTTP.BAD_REQUEST, errors);
         }
 
         model.entity.connector(eid)
 
         .then(connectors => {
-            if (!connectors) throw failure(HTTP.NOT_FOUND);
+            if (!connectors) throw new failure(HTTP.NOT_FOUND);
             return connectors.find(cid)
 
             .then(item => {
-                if (!item) throw failure(HTTP.NOT_FOUND);
+                if (!item) throw new failure(HTTP.NOT_FOUND);
                 return connectors.update(cid, { properties });
             });
         })
@@ -177,11 +177,11 @@ module.exports = class Connector {
         model.entity.connector(eid)
 
         .then(connectors => {
-            if (!connectors) throw failure(HTTP.NOT_FOUND);
+            if (!connectors) throw new failure(HTTP.NOT_FOUND);
             return connectors.find(cid)
 
             .then(item => {
-                if (!item) throw failure(HTTP.NOT_FOUND);
+                if (!item) throw new failure(HTTP.NOT_FOUND);
                 return connectors.delete(cid);
             });
         })

@@ -28,7 +28,7 @@
 // --- dependancies
 
 const HTTP = require('http-status-codes');
-const failure = require('http-errors');
+const failure = require('../errors.js');
 const model = require('../model/index.js');
 const view = require('../view/index.js');
 const log = require('../logger.js').Logger;
@@ -67,7 +67,7 @@ module.exports = class User {
         model.user.find(uid)
 
         .then(item => {
-            if (!item) throw failure(HTTP.NOT_FOUND);
+            if (!item) throw new failure(HTTP.NOT_FOUND);
             res.json(view.coordinator.user(req.originalRoute, item));
         })
 
@@ -84,7 +84,7 @@ module.exports = class User {
         errors = errors.concat(model.validate.user(properties));
 
         if (errors.length) {
-            throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
+            throw new failure(HTTP.BAD_REQUEST, errors);
         }
 
         model.user.find_by_email(properties.email)
@@ -92,7 +92,7 @@ module.exports = class User {
         .then(item => {
             if (item) {
                 log.info('user', properties.email, 'insert', 'duplicate');
-                throw failure(HTTP.CONFLICT);
+                throw new failure(HTTP.CONFLICT);
             }
 
             return model.user.insert({ email: properties.email, properties: { name: properties.name } });
@@ -118,13 +118,13 @@ module.exports = class User {
         errors = errors.concat(model.validate.name(properties.name));
 
         if (errors.length) {
-            throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
+            throw new failure(HTTP.BAD_REQUEST, errors);
         }
 
         model.user.find(uid)
 
         .then(item => {
-            if (!item) throw failure(HTTP.NOT_FOUND);
+            if (!item) throw new failure(HTTP.NOT_FOUND);
             return model.user.update(uid, { properties: { name: properties.name }});
         })
 
@@ -145,7 +145,7 @@ module.exports = class User {
         model.user.find(uid)
 
         .then(item => {
-            if (!item) throw failure(HTTP.NOT_FOUND);
+            if (!item) throw new failure(HTTP.NOT_FOUND);
             return model.user.delete(uid)
         })
 

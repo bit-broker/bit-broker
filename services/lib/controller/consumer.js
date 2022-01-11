@@ -30,7 +30,7 @@
 const HTTP = require('http-status-codes');
 const CONST = require('../constants.js');
 const Status = require('../status.js');
-const failure = require('http-errors');
+const failure = require('../errors.js');
 const model = require('../model/index.js');
 const view = require('../view/index.js');
 const log = require('../logger.js').Logger;
@@ -56,7 +56,7 @@ class Timeseries {
         let id = req.params.id.toLowerCase();
         let tsid = req.params.tsid.toLowerCase();
 
-        throw failure(HTTP.NOT_FOUND); // TODO
+        throw new failure(HTTP.NOT_FOUND); // TODO
     }
 }
 
@@ -77,7 +77,7 @@ module.exports = class Consumer {
             return model.policy.cacheRead(slug || '') // empty string is not a valid policy slug
 
             .then(item => {
-                if (!item) throw failure(HTTP.FORBIDDEN);
+                if (!item) throw new failure(HTTP.FORBIDDEN);
                 return item;
             })
         } else {
@@ -94,7 +94,7 @@ module.exports = class Consumer {
         errors = errors.concat(model.validate.query(q));
 
         if (errors.length) {
-            throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
+            throw new failure(HTTP.BAD_REQUEST, errors);
         }
 
         Consumer.with_policy(req.header(CONST.POLICY.HEADER))
@@ -141,7 +141,7 @@ module.exports = class Consumer {
 
             .then(types => {
                 let slugs = types.map(t => t.entity_slug);
-          //      if (!slugs.includes(type)) throw failure(HTTP.NOT_FOUND);  // the entity type is either not present or not in policy
+          //      if (!slugs.includes(type)) throw new failure(HTTP.NOT_FOUND);  // the entity type is either not present or not in policy
 
                 return model.catalog.list(policy.data_segment.segment_query, type)
 
@@ -166,7 +166,7 @@ module.exports = class Consumer {
             return model.catalog.find(policy.data_segment.segment_query, type, id)
 
             .then(item => {
-                if (!item) throw failure(HTTP.NOT_FOUND);
+                if (!item) throw new failure(HTTP.NOT_FOUND);
 
                 let webhook = item.connector_properties.webhook;
                 let request = Promise.resolve(); // assume no webhook

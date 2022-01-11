@@ -51,9 +51,12 @@ module.exports = class Crud {
         expect(response.body.error.status).to.be.eq(HTTP.getReasonPhrase(code));
 
         for (let i = 0; i < errors.length; i++) {
-            for (let j in errors[i]) {
-                expect(response.body.error.message.toLowerCase()).to.contain(j);
-                expect(response.body.error.message.toLowerCase()).to.contain(errors[i][j]);
+            for (let property in errors[i]) {
+                let match = response.body.error.message.find(e => e.name === property && e.reason.toLowerCase().indexOf(errors[i][property]) !== -1);
+
+// TODO: temp                if (match === undefined) console.log(response.body.error.message);
+// TODO: temp                if (match === undefined) console.log(errors);
+                expect(match).to.not.be.undefined;
             }
         }
 

@@ -26,6 +26,7 @@
 
 const Validator = require('jsonschema').Validator; // specifically NOT json-schema
 const Query = require('./query.js');
+const failure = require('../errors.js');
 const locales = require('../locales.js');
 const fs = require('fs');
 
@@ -71,16 +72,18 @@ module.exports = class Validate {
 
     // --- checks a document against a schema and gathers human readable error messages
 
-    scheme(instance, scheme, name = '', bbk = true) {
+    scheme(instance, scheme, property = '', bbk = true) {
         if (bbk) {
-            scheme = { "$ref": `bbk://${ scheme }` }; // standard bbk scheme reference
+            scheme = { '$ref': `bbk://${ scheme }` }; // standard bbk scheme reference
         }
 
         let errs = this.schema.validate(instance, scheme).errors;
         let msgs = [];
 
         for (let i = 0; i < errs.length; i++) {
-            msgs.push(errs[i].stack.replace(/^instance[\.]?/, name).trim());
+            let name = errs[i].property.replace(/^instance[\.]?/, property).replace(/\[\d+\]/, '').trim();
+            let reason = errs[i].message;
+            msgs.push(failure.response(name, reason));
         }
 
         return msgs;
@@ -118,7 +121,7 @@ module.exports = class Validate {
     records_delete(records) { return this.scheme(records, 'records#/delete', 'records'); }
     records_upsert(records) { return this.scheme(records, 'records#/upsert', 'records'); }
     records_entity(records, scheme) {
-        scheme = { type: "array", items: { type: "object", properties: { entity: scheme }}};  // scheme applies to all entity properties of all records in the array
+        scheme = { type: 'array', items: { type: 'object', properties: { entity: scheme }}};  // scheme applies to all entity properties of all records in the array
         return this.scheme(records, scheme, 'records', false);
     }
 
@@ -131,7 +134,7 @@ module.exports = class Validate {
             if (Query.scoped(item)) {
                 let q = Query.process(JSON.parse(item));
 
-                if (q.valid === false || q.where.match(/"\$\w+"/) !== null) { // valid queries should no longer contain any "$xxx" style keys
+                if (q.valid === false || q.where.match(/"\$\w+"/) !== null) { // valid queries should no longer contain any '$xxx' style keys
                     error = 'cannot-be-parsed';
                 }
             } else {

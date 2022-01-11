@@ -29,7 +29,7 @@
 
 const HTTP = require('http-status-codes');
 const CONST = require('../constants.js');
-const failure = require('http-errors');
+const failure = require('../errors.js');
 const locales = require('../locales.js');
 const model = require('../model/index.js');
 const view = require('../view/index.js');
@@ -56,7 +56,7 @@ module.exports = class Access {
         model.user.access(uid)
 
         .then(accesses => {
-            if (!accesses) throw failure(HTTP.NOT_FOUND);
+            if (!accesses) throw new failure(HTTP.NOT_FOUND);
             return accesses.list();
         })
 
@@ -76,12 +76,12 @@ module.exports = class Access {
         model.user.access(uid)
 
         .then(accesses => {
-            if (!accesses) throw failure(HTTP.NOT_FOUND);
+            if (!accesses) throw new failure(HTTP.NOT_FOUND);
             return accesses.find(aid);
         })
 
         .then(item => {
-            if (!item) throw failure(HTTP.NOT_FOUND);
+            if (!item) throw new failure(HTTP.NOT_FOUND);
             res.json(view.coordinator.access(req.originalRoute, item));
         })
 
@@ -92,25 +92,31 @@ module.exports = class Access {
 
     static check_role_context(role, context) {
         let check = null;
+        let where = '';
 
         switch (role) {
             case CONST.ROLE.COORDINATOR:
                 check = Promise.resolve(context === null ? '' : locales.__('error.access-invalid-context', context));
+                where = 'context';
             break;
 
             case CONST.ROLE.CONTRIBUTOR:
                 check = Promise.resolve(locales.__('error.access-invalid-role', role));
+                where = 'role';
             break;
 
             case CONST.ROLE.CONSUMER:
                 check = model.policy.find(context).then (item => item ? '' : locales.__('error.access-invalid-context', context));
+                where = 'context';
             break;
 
             default:
                 check = Promise.resolve(locales.__('error.access-invalid-role', role));
+                where = 'role';
+            break;
         }
 
-        return check;
+        return check.then(error => failure.response(where, error));
     }
 
     // --- adds a new access for a given user
@@ -125,27 +131,27 @@ module.exports = class Access {
         errors = errors.concat(model.validate.access(properties));
 
         if (errors.length) {
-            throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
+            throw new failure(HTTP.BAD_REQUEST, errors);
         }
 
         Access.check_role_context (properties.role, properties.context)  // extended checks on role and context pair
 
         .then (error => {
-            if (error.length) {
-                throw failure(HTTP.BAD_REQUEST, error);
+            if (error.reason.length) {
+                throw new failure(HTTP.BAD_REQUEST, [ error ]); // bad_request always returns an array
             }
 
             return model.user.access(uid);
         })
 
         .then(accesses => {
-            if (!accesses) throw failure(HTTP.NOT_FOUND);
+            if (!accesses) throw new failure(HTTP.NOT_FOUND);
             return accesses.find_by_role_context(properties.role, properties.context)
 
             .then(item => {
                 if (item) {
                     log.info('coordinator', 'user', uid, 'access', 'insert', 'duplicate');
-                    throw failure(HTTP.CONFLICT);
+                    throw new failure(HTTP.CONFLICT);
                 }
 
                 return accesses.insert(properties);
@@ -173,15 +179,15 @@ module.exports = class Access {
         model.user.access(uid)
 
         .then(accesses => {
-            if (!accesses) throw failure(HTTP.NOT_FOUND);
+            if (!accesses) throw new failure(HTTP.NOT_FOUND);
             return accesses.find(aid)
 
             .then(item => {
-                if (!item) throw failure(HTTP.NOT_FOUND);
+                if (!item) throw new failure(HTTP.NOT_FOUND);
 
                 if (item.role !== properties.role ||
                     item.context !== properties.context) {
-                    throw failure(HTTP.BAD_REQUEST, locales.__('error.access-details-not-matched'));
+                    throw new failure(HTTP.BAD_REQUEST, [ failure.response('access', locales.__('error.access-details-not-matched')) ]); // bad_request always returns an array
                 }
 
                 return accesses.update(item);
@@ -207,11 +213,11 @@ module.exports = class Access {
         model.user.access(uid)
 
         .then(accesses => {
-            if (!accesses) throw failure(HTTP.NOT_FOUND);
+            if (!accesses) throw new failure(HTTP.NOT_FOUND);
             return accesses.find(aid)
 
             .then(item => {
-                if (!item) throw failure(HTTP.NOT_FOUND);
+                if (!item) throw new failure(HTTP.NOT_FOUND);
                 return accesses.delete(aid, item);
             });
         })

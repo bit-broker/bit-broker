@@ -28,7 +28,7 @@
 // --- dependancies
 
 const HTTP = require('http-status-codes');
-const failure = require('http-errors');
+const failure = require('../errors.js');
 const model = require('../model/index.js');
 const view = require('../view/index.js');
 const log = require('../logger.js').Logger;
@@ -68,7 +68,7 @@ module.exports = class Entity {
         model.entity.find(eid)
 
         .then(item => {
-            if (!item) throw failure(HTTP.NOT_FOUND);
+            if (!item) throw new failure(HTTP.NOT_FOUND);
             res.json(view.coordinator.entity(req.originalRoute, item));
         })
 
@@ -87,7 +87,7 @@ module.exports = class Entity {
         errors = errors.concat(model.validate.entity(properties));
 
         if (errors.length) {
-            throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
+            throw new failure(HTTP.BAD_REQUEST, errors);
         }
 
         model.entity.find(eid)
@@ -95,7 +95,7 @@ module.exports = class Entity {
         .then(item => {
             if (item) {
                 log.info('entity', eid, 'insert', 'duplicate');
-                throw failure(HTTP.CONFLICT);
+                throw new failure(HTTP.CONFLICT);
             }
 
             return model.entity.insert(eid, { properties });
@@ -121,13 +121,13 @@ module.exports = class Entity {
         errors = errors.concat(model.validate.entity(properties));
 
         if (errors.length) {
-            throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
+            throw new failure(HTTP.BAD_REQUEST, errors);
         }
 
         model.entity.find(eid)
 
         .then(item => {
-            if (!item) throw failure(HTTP.NOT_FOUND);
+            if (!item) throw new failure(HTTP.NOT_FOUND);
             return model.entity.update(eid, { properties });
         })
 
@@ -148,7 +148,7 @@ module.exports = class Entity {
         model.entity.find(eid)
 
         .then(item => {
-            if (!item) throw failure(HTTP.NOT_FOUND);
+            if (!item) throw new failure(HTTP.NOT_FOUND);
             return model.entity.delete(eid)
         })
 

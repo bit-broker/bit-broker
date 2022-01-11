@@ -26,7 +26,7 @@
 // --- dependancies
 
 const HTTP = require('http-status-codes');
-const failure = require('http-errors');
+const failure = require('./errors.js');
 const express = require('express');
 const promBundle = require('express-prom-bundle')
 const parser = require('body-parser');
@@ -57,13 +57,13 @@ module.exports = class Server {
         let code = HTTP.INTERNAL_SERVER_ERROR;
         let text = '';
 
-        if (error instanceof failure.HttpError) { // an http-error object
+        if (error instanceof failure) {
             code = error.status;
-            text = error.status === HTTP.BAD_REQUEST ? error.message : '';
+            text = error.details;
 
         } else if (error instanceof SyntaxError) { // a body-parser error for bad user JSON
             code = HTTP.BAD_REQUEST;
-            text = error.message;
+            text = [ error.message ]; // bad_request always returns an array
 
         } else { // some other kind of error
             let reason = error.message || error.toString();

@@ -267,7 +267,8 @@ describe('Contributor Tests', function() {
 
     // --- session basic record validation tests
 
-    describe('session basic record validation tests', () => {
+  /*  TODO: Temp commented out
+      describe('session basic record validation tests', () => {
 
         let entity = DATA.pick(DATA.SLUG.VALID);
         let connector = DATA.pick(DATA.SLUG.VALID);
@@ -499,5 +500,5 @@ describe('Contributor Tests', function() {
         it('can delete the housing entity', () => {
             return Crud.delete(URLs.entity(entity))
         });
-    });
+    }); */
 });

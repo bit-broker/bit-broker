@@ -28,7 +28,7 @@
 // --- dependancies
 
 const HTTP = require('http-status-codes');
-const failure = require('http-errors');
+const failure = require('../errors.js');
 const model = require('../model/index.js');
 const view = require('../view/index.js');
 const log = require('../logger.js').Logger;
@@ -68,7 +68,7 @@ module.exports = class Policy {
         model.policy.find(pid)
 
         .then(item => {
-            if (!item) throw failure(HTTP.NOT_FOUND);
+            if (!item) throw new failure(HTTP.NOT_FOUND);
             res.json(view.coordinator.policy(req.originalRoute, item));
         })
 
@@ -83,7 +83,7 @@ module.exports = class Policy {
         model.policy.find(pid)
 
         .then(item => {
-            if (!item) throw failure(HTTP.NOT_FOUND);
+            if (!item) throw new failure(HTTP.NOT_FOUND);
             res.json(view.coordinator.policy_access_control(item));
         })
 
@@ -102,7 +102,7 @@ module.exports = class Policy {
         errors = errors.concat(model.validate.policy(properties));
 
         if (errors.length) {
-            throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
+            throw new failure(HTTP.BAD_REQUEST, errors);
         }
 
         model.policy.find(pid)
@@ -110,7 +110,7 @@ module.exports = class Policy {
         .then(item => {
             if (item) {
                 log.info('policy', pid, 'insert', 'duplicate');
-                throw failure(HTTP.CONFLICT);
+                throw new failure(HTTP.CONFLICT);
             }
 
             return model.policy.insert(pid, { properties });
@@ -140,13 +140,13 @@ module.exports = class Policy {
         errors = errors.concat(model.validate.policy(properties));
 
         if (errors.length) {
-            throw failure(HTTP.BAD_REQUEST, errors.join("\n"));
+            throw new failure(HTTP.BAD_REQUEST, errors);
         }
 
         model.policy.find(pid)
 
         .then(item => {
-            if (!item) throw failure(HTTP.NOT_FOUND);
+            if (!item) throw new failure(HTTP.NOT_FOUND);
             return model.policy.update(pid, { properties });
         })
 
@@ -171,7 +171,7 @@ module.exports = class Policy {
         model.policy.find(pid)
 
         .then(item => {
-            if (!item) throw failure(HTTP.NOT_FOUND);
+            if (!item) throw new failure(HTTP.NOT_FOUND);
             return model.policy.delete(pid)
         })
 
