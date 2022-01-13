@@ -49,11 +49,33 @@ module.exports = class Crud {
         expect(response.body.error).to.be.an('object');
         expect(response.body.error.code).to.be.eq(code);
         expect(response.body.error.status).to.be.eq(HTTP.getReasonPhrase(code));
+        expect(response.body.error).to.have.property('message');
+
+        if (errors.length) { // error message should now be an array
+            let messages = response.body.error.message;
+            expect(messages).to.be.an('array');
+
+            for (let i = 0; i < messages.length; i++) {
+                expect(messages[i]).to.have.property('name');
+                expect(messages[i]).to.have.property('index');
+                expect(messages[i]).to.have.property('reason');
+            }
+        }
 
         for (let i = 0; i < errors.length; i++) {
             for (let property in errors[i]) {
-                let match = response.body.error.message.find(e => e.name === property && e.reason.toLowerCase().indexOf(errors[i][property]) !== -1);
-                expect(match).to.not.be.undefined;
+                let match = property.match(/\[(\d+)\]/);
+                let indexed = match && match.length && match.length > 1;
+                let index = indexed ? parseInt(match[1]) : null; // first matching group or null
+                let name = indexed ? property.replace(match[0], '') : property;
+
+                let found = response.body.error.message.find(e => {
+                    return e.name === name &&
+                          (indexed ? e.index === index : true) &&
+                           e.reason.toLowerCase().indexOf(errors[i][property]) !== -1;
+                });
+
+                expect(found).to.not.be.undefined;
             }
         }
 

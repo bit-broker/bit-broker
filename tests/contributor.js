@@ -429,6 +429,22 @@ describe('Contributor Tests', function() {
             return Promise.all(tests);
         });
 
+        it('can get error index within the record array', () => {
+            let tests = [];
+            let valid = { ...record, entity: { value: 1 } };
+            let invalid = { ...record, entity: { value: -1 } };
+
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [ invalid ], [{ 'records.entity.value[0]': DATA.ERRORS.SMALL }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [ valid, invalid ], [{ 'records.entity.value[1]': DATA.ERRORS.SMALL }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [ invalid, valid ], [{ 'records.entity.value[0]': DATA.ERRORS.SMALL }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [ valid, valid, invalid ], [{ 'records.entity.value[2]': DATA.ERRORS.SMALL }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [ valid, invalid, valid ], [{ 'records.entity.value[1]': DATA.ERRORS.SMALL }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [ invalid, invalid ], [{ 'records.entity.value[0]': DATA.ERRORS.SMALL }, { 'records.entity.value[1]': DATA.ERRORS.SMALL }]));
+            tests.push(Session.bad_request(session.cid, session.sid, 'upsert', [ invalid, valid, invalid ], [{ 'records.entity.value[0]': DATA.ERRORS.SMALL }, { 'records.entity.value[2]': DATA.ERRORS.SMALL }]));
+
+            return Promise.all(tests);
+        });
+
         it('can close the original session', () => {
             return Session.close(session.cid, session.sid, true);
         });

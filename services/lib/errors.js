@@ -39,7 +39,7 @@ module.exports = class HttpError {
 
     // --- standard format for error responses
 
-    static response(name, reason) {
-        return { name, reason };  // this error response format is as per RFC#7807
+    static response(name, reason, index = null) {
+        return { name, index, reason };  // name / reason format is as per RFC#7807 - index is an addition for arrays
     }
 }
