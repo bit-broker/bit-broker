@@ -150,7 +150,7 @@ module.exports = class Access {
 
             .then(item => {
                 if (item) {
-                    log.info('coordinator', 'user', uid, 'access', 'insert', 'duplicate');
+                    log.info('coordinator', 'user', uid, 'access', 'insert', properties.role, properties.context, 'duplicate');
                     throw new failure(HTTP.CONFLICT);
                 }
 
@@ -159,7 +159,7 @@ module.exports = class Access {
         })
 
         .then(result => {
-            log.info('coordinator', 'user', uid, 'access', 'insert', 'complete', result.id);
+            log.info('coordinator', 'user', uid, 'access', 'insert', properties.role, properties.context, 'complete', result.id);
             let href = `${ req.protocol }://${ req.get('host') }${ req.originalUrl.replace(/\/$/, '') }/${ result.id }`;
             res.set({ 'Location': href }).status(HTTP.CREATED).send(result.token);
         })
