@@ -59,12 +59,27 @@ module.exports = class User {
         .catch(error => next(error));
     }
 
-    // --- get details of a named users
+    // --- get details of a named user
 
     get(req, res, next) {
         let uid = req.params.uid.toLowerCase();
 
         model.user.find(uid)
+
+        .then(item => {
+            if (!item) throw new failure(HTTP.NOT_FOUND);
+            res.json(view.coordinator.user(req.originalRoute, item));
+        })
+
+        .catch(error => next(error));
+    }
+
+    // --- get details of a user by email
+
+    get_email(req, res, next) {
+        let email = req.params.email.toLowerCase();
+
+        model.user.find_by_email(email)
 
         .then(item => {
             if (!item) throw new failure(HTTP.NOT_FOUND);

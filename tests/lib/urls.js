@@ -60,6 +60,7 @@ class URLs {
     entity(eid) { return this.rest('entity', eid); }
     connector(eid, cid) { return this.rest('entity', eid, 'connector', cid); }
     user(uid) { return this.rest('user', uid); }
+    user_email(email) { return this.rest('user', 'email', email); }
     access(uid, aid) { return this.rest('user', uid, 'access', aid); }
     policy(pid, resource) { return this.rest('policy', pid, resource); }
 

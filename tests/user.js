@@ -155,6 +155,18 @@ describe('User Tests', function() {
             ]);
         });
 
+        it('can find the first user by email', () => {
+            return Crud.verify(URLs.user_email(values1.email), { id: id1, url: user1, name: update1.name, email: values1.email });
+        });
+
+        it('can find the second user by email', () => {
+            return Crud.verify(URLs.user_email(values2.email), { id: id2, url: user2, name: values2.name, email: values2.email });
+        });
+
+        it('cannot find a third user by email', () => {
+            return Crud.not_found(URLs.user_email(DATA.pluck(DATA.EMAIL.VALID)));
+        });
+
         it('can delete the first user', () => {
             return Crud.delete(user1);
         });

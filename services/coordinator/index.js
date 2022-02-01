@@ -82,6 +82,7 @@ api.router.delete('/policy/:pid', controller.policy.delete);
 
 api.router.get('/user', controller.user.list);
 api.router.get('/user/:uid', controller.user.get);
+api.router.get('/user/email/:email', controller.user.get_email);
 api.router.post('/user', controller.user.insert);
 api.router.put('/user/:uid', controller.user.update);
 api.router.delete('/user/:uid', controller.user.delete);  // rescinds all the user's keys
