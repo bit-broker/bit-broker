@@ -245,7 +245,7 @@ const DATA = {
                     },
                     "data_segment": {
                         "segment_query": { "type": "country" },
-                        "field_masks": ["movie.rating"]
+                        "field_masks": ["country.continent"]
                     },
                     "legal_context": [{ "type": "attribution", "text": "test attribution", "link": "https://bit-broker.io" }]
                 }
