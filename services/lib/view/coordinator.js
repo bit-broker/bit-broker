@@ -71,7 +71,8 @@ module.exports = class Coordinator extends View {
             id: item.id,
             url: this.rest(route, 'user', item.id),
             name: item.properties.name,
-            email: item.email
+            email: item.email,
+            admin: item.admin
         };
 
         if (full) {
