@@ -99,7 +99,7 @@ module.exports = class User {
 
         errors = errors.concat(model.validate.user(properties));
         errors = errors.concat(model.validate.user_addendum(properties.addendum));
-        
+
         if (errors.length) {
             throw new failure(HTTP.BAD_REQUEST, errors);
         }
