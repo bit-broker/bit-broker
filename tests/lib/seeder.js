@@ -37,6 +37,7 @@ module.exports = class Seeder {
     // --- static variables
 
     static cids = {};
+    static uids = {};
 
     // --- returns entity seed data
 
@@ -163,9 +164,14 @@ module.exports = class Seeder {
         let steps = [];
         let users = Seeder.users;
 
+        this.uids = {};
+
         for (let i = 0; i < users.length; i++) {
             let user = users[i];
-            steps.push(Crud.add(URLs.user(), user.properties));
+            steps.push(Crud.add(URLs.user(), user.properties, undefined, (body, location) =>
+            {
+                this.uids[user.properties.email] = parseInt(location.match(/\d+$/).shift()); // stash use id for later use by other functions
+            }));
         }
 
         return Promise.all(steps);
@@ -182,7 +188,8 @@ module.exports = class Seeder {
 
             for (let j = 0; j < user.access.length; j++) {
                 let access = user.access[j];
-                steps.push(Crud.add(URLs.access(i + 1), { role: 'consumer', context: access }));
+                let uid = this.uids[user.properties.email];
+                steps.push(Crud.add(URLs.access(uid), { role: 'consumer', context: access }));
             }
         }
 
