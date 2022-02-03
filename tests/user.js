@@ -191,13 +191,94 @@ describe('User Tests', function() {
         });
     });
 
+    // --- user addendum manipulation tests
+
+    describe('user addendum manipulation tests', () => {
+
+        let user = { id: null, name: DATA.name(), email: DATA.pick(DATA.EMAIL.VALID), addendum: { foo: DATA.text() } };
+        let admin = { id: 1, url: URLs.user(1), name: 'admin' };
+        let url = null;
+        let all = URLs.user();
+        let addendums = [  // update in the order given
+            {},
+            { foo: 1 },
+            { foo: 2 },
+            { foo: 1, bar: 1 },
+            { foo: 2, bar: 1 },
+            { foo: 2 },
+            { foo: { bar: 1 }},
+            { foo: DATA.text(), bar: 1, foo1: { bar1: DATA.text() }},
+            { foo: [DATA.text(), DATA.text(), DATA.text()]},
+        ];
+
+        before(() => {
+            return Shared.empty();
+        });
+
+        after(() => {
+            return Shared.empty();
+        });
+
+        it('get the last user id sequence value', () => {
+            return Shared.last_id('users')
+            .then(last => {
+                user.id = last + 1;
+                url = URLs.user(user.id);
+            });
+        });
+
+        it('the user is not there to start with', () => {
+            return Crud.not_found(url);
+        });
+
+        it('can add the user with an addendum', () => {
+            return Crud.add(all, user, url);
+        });
+
+        it('it is present in the user list', () => {
+            let listed = { ...user };
+            delete listed.addendum; // addendum not in list
+
+            return Crud.verify_all(all, [ admin, listed ]);
+        });
+
+        it('it is present when addressed directly', () => {
+            return Crud.verify(url, user);
+        });
+
+        it('can correctly update a user with various addendums', () => {
+            let test = Promise.resolve();
+
+            for(let i = 0 ; i < addendums.length; i++) {
+                let update = { ...user, addendum: addendums[i] };
+                test = test
+                  .then(() => Crud.update(url, update))
+                  .then(() => Crud.verify(url, update));
+            }
+
+            return test;
+        });
+
+        it('can delete the user', () => {
+            return Crud.delete(url);
+        });
+
+        it('the user is gone when addressed directly', () => {
+            return Crud.not_found(url);
+        });
+
+        it('the user list is empty, except for the admin user', () => {
+            return Crud.verify_all(all, [ admin ]);
+        });
+    });
+
     // --- user validation tests - here we test invalid entries only, on add and update
 
     describe('user validation tests', () => {
 
         let id = null; // will be filled in during the first test
         let user = null;
-        let values = { email:DATA.pick(DATA.EMAIL.VALID), name: DATA.name() };
+        let values = { email: DATA.pick(DATA.EMAIL.VALID), name: DATA.name() };
         let all = URLs.user();
 
         before(() => {
@@ -238,6 +319,14 @@ describe('User Tests', function() {
             return test;
         });
 
+        it('cannot create a user with an invalid addendum', () => {
+            return Promise.resolve()
+            .then(() => Crud.bad_request(all, [{ addendum: DATA.ERRORS.TYPE }], { ...values, addendum: DATA.text() }, chakram.post))
+            .then(() => Crud.bad_request(all, [{ addendum: DATA.ERRORS.TYPE }], { ...values, addendum: 1 }, chakram.post))
+            .then(() => Crud.bad_request(all, [{ addendum: DATA.ERRORS.TYPE }], { ...values, addendum: [] }, chakram.post))
+            .then(() => Crud.bad_request(all, [{ addendum: DATA.ERRORS.TYPE }], { ...values, addendum: [1] }, chakram.post));
+        });
+
         it('can add a user', () => {
             return Crud.add(all, values, user);
         });
@@ -249,6 +338,14 @@ describe('User Tests', function() {
             .then(() => Crud.bad_request(user, [{ name: DATA.ERRORS.MIN }], { ...values, name: '' }, chakram.put))
             .then(() => Crud.bad_request(user, [{ name: DATA.ERRORS.MAX }], { ...values, name: DATA.name(DATA.NAME.LONGEST + 1)}, chakram.put))
             return test;
+        });
+
+        it('cannot update a user with an invalid addendum', () => {
+            return Promise.resolve()
+            .then(() => Crud.bad_request(user, [{ addendum: DATA.ERRORS.TYPE }], { ...values, addendum: DATA.text() }, chakram.put))
+            .then(() => Crud.bad_request(user, [{ addendum: DATA.ERRORS.TYPE }], { ...values, addendum: 1 }, chakram.put))
+            .then(() => Crud.bad_request(user, [{ addendum: DATA.ERRORS.TYPE }], { ...values, addendum: [] }, chakram.put))
+            .then(() => Crud.bad_request(user, [{ addendum: DATA.ERRORS.TYPE }], { ...values, addendum: [1] }, chakram.put));
         });
 
         it('can delete the first user', () => {

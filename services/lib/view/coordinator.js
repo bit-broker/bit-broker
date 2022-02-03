@@ -75,7 +75,9 @@ module.exports = class Coordinator extends View {
         };
 
         if (full) {
-            // nothing more yet
+            doc = Object.assign(doc, {
+                addendum: item.properties.addendum
+            });
         }
 
         return doc;

@@ -193,7 +193,7 @@ module.exports = class Crud {
         return chakram.get(url)
         .then(response => {
             expect(response.body).to.be.an('object');
-            include ? expect(response.body).to.deep.include(resource) : expect(response.body).to.deep.equal(resource);
+            include ? expect(response.body).to.containSubset(resource) : expect(response.body).to.deep.equal(resource);
             expect(response).to.have.status(HTTP.OK);
             return chakram.wait();
         });
@@ -208,7 +208,7 @@ module.exports = class Crud {
             expect(response.body).to.be.an('array');
             expect(response.body.length).to.be.eq(resources.length);
             for (let i = 0; i < resources.length; i++) {
-                include ? expect(response.body[i]).to.deep.include(resources[i]) : expect(response.body[i]).to.deep.equal(resources[i]);
+                include ? expect(response.body[i]).to.containSubset(resources[i]) : expect(response.body[i]).to.deep.equal(resources[i]);
             }
             expect(response).to.have.status(HTTP.OK);
             return chakram.wait();
