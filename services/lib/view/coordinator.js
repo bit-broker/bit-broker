@@ -72,7 +72,7 @@ module.exports = class Coordinator extends View {
             url: this.rest(route, 'user', item.id),
             name: item.properties.name,
             email: item.email,
-            admin: item.admin,
+            coordinator: item.coordinator,
             accesses: item.accesses
         };
 

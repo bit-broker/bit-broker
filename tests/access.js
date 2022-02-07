@@ -123,8 +123,8 @@ describe('User Access Tests', function() {
         it('they are both present in the user list', () => {
             return Crud.verify_all(all, [
                 admin,
-                { ...user1, id: uids[1], url: URLs.user(uids[1]), admin: false, accesses: {} },
-                { ...user2, id: uids[2], url: URLs.user(uids[2]), admin: false, accesses: {} }
+                { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: false, accesses: {} },
+                { ...user2, id: uids[2], url: URLs.user(uids[2]), coordinator: false, accesses: {} }
             ]);
         });
 
@@ -147,13 +147,13 @@ describe('User Access Tests', function() {
         it('it is reflected in the admin status on user list', () => {
             return Crud.verify_all(all, [
                 admin,
-                { ...user1, id: uids[1], url: URLs.user(uids[1]), admin: true, accesses: {} },
-                { ...user2, id: uids[2], url: URLs.user(uids[2]), admin: false, accesses: {} }
+                { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: true, accesses: {} },
+                { ...user2, id: uids[2], url: URLs.user(uids[2]), coordinator: false, accesses: {} }
             ]);
         });
 
         it('it is reflected in the admin status on user', () => {
-            return Crud.verify(URLs.user(uids[1]), { ...user1, id: uids[1], url: URLs.user(uids[1]), admin: true, accesses: {} });
+            return Crud.verify(URLs.user(uids[1]), { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: true, accesses: {} });
         });
 
         it('it is present in the user access list', () => {
@@ -191,13 +191,13 @@ describe('User Access Tests', function() {
         it('it is reflected in the admin status on user list', () => {
             return Crud.verify_all(all, [
                 admin,
-                { ...user1, id: uids[1], url: URLs.user(uids[1]), admin: true, accesses: {} },
-                { ...user2, id: uids[2], url: URLs.user(uids[2]), admin: false, accesses: {} }
+                { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: true, accesses: {} },
+                { ...user2, id: uids[2], url: URLs.user(uids[2]), coordinator: false, accesses: {} }
             ]);
         });
 
         it('it is reflected in the admin status on user', () => {
-            return Crud.verify(URLs.user(uids[1]), { ...user1, id: uids[1], url: URLs.user(uids[1]), admin: true, accesses: {} });
+            return Crud.verify(URLs.user(uids[1]), { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: true, accesses: {} });
         });
 
         it('can ask for a coordinator token for second user', () => {
@@ -212,13 +212,13 @@ describe('User Access Tests', function() {
         it('it is reflected in the admin status on user list', () => {
             return Crud.verify_all(all, [
                 admin,
-                { ...user1, id: uids[1], url: URLs.user(uids[1]), admin: true, accesses: {} },
-                { ...user2, id: uids[2], url: URLs.user(uids[2]), admin: true, accesses: {} }
+                { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: true, accesses: {} },
+                { ...user2, id: uids[2], url: URLs.user(uids[2]), coordinator: true, accesses: {} }
             ]);
         });
 
         it('it is reflected in the admin status on user', () => {
-            return Crud.verify(URLs.user(uids[2]), { ...user2, id: uids[2], url: URLs.user(uids[2]), admin: true, accesses: {} });
+            return Crud.verify(URLs.user(uids[2]), { ...user2, id: uids[2], url: URLs.user(uids[2]), coordinator: true, accesses: {} });
         });
 
         it('it is present in the user access list', () => {
@@ -243,13 +243,13 @@ describe('User Access Tests', function() {
         it('it is reflected in the accesses list on user list', () => {
             return Crud.verify_all(all, [
                 admin,
-                { ...user1, id: uids[1], url: URLs.user(uids[1]), admin: true, accesses: { [aids[3]]: values2.context } },
-                { ...user2, id: uids[2], url: URLs.user(uids[2]), admin: true, accesses: {} }
+                { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: true, accesses: { [aids[3]]: values2.context } },
+                { ...user2, id: uids[2], url: URLs.user(uids[2]), coordinator: true, accesses: {} }
             ]);
         });
 
         it('it is reflected in the accesses list on user', () => {
-            return Crud.verify(URLs.user(uids[1]), { ...user1, id: uids[1], url: URLs.user(uids[1]), admin: true, accesses: { [aids[3]]: values2.context } });
+            return Crud.verify(URLs.user(uids[1]), { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: true, accesses: { [aids[3]]: values2.context } });
         });
 
         it('it is present in the user access list', () => {
@@ -276,13 +276,13 @@ describe('User Access Tests', function() {
         it('it is reflected in the accesses list  on user list', () => {
             return Crud.verify_all(all, [
                 admin,
-                { ...user1, id: uids[1], url: URLs.user(uids[1]), admin: true, accesses: { [aids[3]]: values2.context } },
-                { ...user2, id: uids[2], url: URLs.user(uids[2]), admin: true, accesses: {} }
+                { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: true, accesses: { [aids[3]]: values2.context } },
+                { ...user2, id: uids[2], url: URLs.user(uids[2]), coordinator: true, accesses: {} }
             ]);
         });
 
         it('it is reflected in the accesses list  on user', () => {
-            return Crud.verify(URLs.user(uids[1]), { ...user1, id: uids[1], url: URLs.user(uids[1]), admin: true, accesses: { [aids[3]]: values2.context } });
+            return Crud.verify(URLs.user(uids[1]), { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: true, accesses: { [aids[3]]: values2.context } });
         });
 
         it('it is present in the user access list', () => {
@@ -312,13 +312,13 @@ describe('User Access Tests', function() {
         it('it is reflected in the accesses list on user list', () => {
             return Crud.verify_all(all, [
                 admin,
-                { ...user1, id: uids[1], url: URLs.user(uids[1]), admin: true, accesses: { [aids[3]]: values2.context, [aids[4]]: values3.context } },
-                { ...user2, id: uids[2], url: URLs.user(uids[2]), admin: true, accesses: {} }
+                { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: true, accesses: { [aids[3]]: values2.context, [aids[4]]: values3.context } },
+                { ...user2, id: uids[2], url: URLs.user(uids[2]), coordinator: true, accesses: {} }
             ]);
         });
 
         it('it is reflected in the accesses list on user', () => {
-            return Crud.verify(URLs.user(uids[1]), { ...user1, id: uids[1], url: URLs.user(uids[1]), admin: true, accesses: { [aids[3]]: values2.context, [aids[4]]: values3.context } });
+            return Crud.verify(URLs.user(uids[1]), { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: true, accesses: { [aids[3]]: values2.context, [aids[4]]: values3.context } });
         });
 
         it('it is present in the user access list', () => {
@@ -340,13 +340,13 @@ describe('User Access Tests', function() {
         it('it is reflected in the admin status on user list', () => {
             return Crud.verify_all(all, [
                 admin,
-                { ...user1, id: uids[1], url: URLs.user(uids[1]), admin: false, accesses: { [aids[3]]: values2.context, [aids[4]]: values3.context } },
-                { ...user2, id: uids[2], url: URLs.user(uids[2]), admin: true, accesses: {} }
+                { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: false, accesses: { [aids[3]]: values2.context, [aids[4]]: values3.context } },
+                { ...user2, id: uids[2], url: URLs.user(uids[2]), coordinator: true, accesses: {} }
             ]);
         });
 
         it('it is reflected in the admin status on user', () => {
-            return Crud.verify(URLs.user(uids[1]), { ...user1, id: uids[1], url: URLs.user(uids[1]), admin: false, accesses: { [aids[3]]: values2.context, [aids[4]]: values3.context } });
+            return Crud.verify(URLs.user(uids[1]), { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: false, accesses: { [aids[3]]: values2.context, [aids[4]]: values3.context } });
         });
 
         it('it is no longer present in the user access list', () => {
@@ -371,13 +371,13 @@ describe('User Access Tests', function() {
         it('it is reflected in the accesses list on user list', () => {
             return Crud.verify_all(all, [
                 admin,
-                { ...user1, id: uids[1], url: URLs.user(uids[1]), admin: false, accesses: { [aids[4]]: values3.context } },
-                { ...user2, id: uids[2], url: URLs.user(uids[2]), admin: true, accesses: {} }
+                { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: false, accesses: { [aids[4]]: values3.context } },
+                { ...user2, id: uids[2], url: URLs.user(uids[2]), coordinator: true, accesses: {} }
             ]);
         });
 
         it('it is reflected in the accesses list on user', () => {
-            return Crud.verify(URLs.user(uids[1]), { ...user1, id: uids[1], url: URLs.user(uids[1]), admin: false, accesses: { [aids[4]]: values3.context } });
+            return Crud.verify(URLs.user(uids[1]), { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: false, accesses: { [aids[4]]: values3.context } });
         });
 
         it('it is no longer present in the user access list', () => {
@@ -395,13 +395,13 @@ describe('User Access Tests', function() {
         it('it is reflected in the accesses list on user list', () => {
             return Crud.verify_all(all, [
                 admin,
-                { ...user1, id: uids[1], url: URLs.user(uids[1]), admin: false, accesses: {} },
-                { ...user2, id: uids[2], url: URLs.user(uids[2]), admin: true, accesses: {} }
+                { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: false, accesses: {} },
+                { ...user2, id: uids[2], url: URLs.user(uids[2]), coordinator: true, accesses: {} }
             ]);
         });
 
         it('it is reflected in the accesses list on user', () => {
-            return Crud.verify(URLs.user(uids[1]), { ...user1, id: uids[1], url: URLs.user(uids[1]), admin: false, accesses: {} });
+            return Crud.verify(URLs.user(uids[1]), { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: false, accesses: {} });
         });
 
         it('it is no longer present in the user access list', () => {
