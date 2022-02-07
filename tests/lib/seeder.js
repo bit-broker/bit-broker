@@ -177,9 +177,9 @@ module.exports = class Seeder {
         return Promise.all(steps);
     }
 
-    // --- adds the access
+    // --- adds consumer accesses
 
-    static add_access() {
+    static add_consumer_access() {
         let steps = [];
         let users = Seeder.users;
 
@@ -190,6 +190,24 @@ module.exports = class Seeder {
                 let access = user.access[j];
                 let uid = this.uids[user.properties.email];
                 steps.push(Crud.add(URLs.access(uid), { role: 'consumer', context: access }));
+            }
+        }
+
+        return Promise.all(steps);
+    }
+
+    // --- adds any coordinator access
+
+    static add_coordinator_access() {
+        let steps = [];
+        let users = Seeder.users;
+
+        for (let i = 0; i < users.length; i++) {
+            let user = users[i];
+
+            if (user.coordinator) {
+                let uid = this.uids[user.properties.email];
+                steps.push(Crud.add(URLs.access(uid), { role: 'coordinator', context: null }));
             }
         }
 

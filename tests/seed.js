@@ -72,7 +72,11 @@ describe('Database Seeding', function() {
         return Seeder.add_users();
     });
 
-    it('create the accesses', () => {
-        return Seeder.add_access();
+    it('create the consumer accesses', () => {
+        return Seeder.add_consumer_access();
+    });
+
+    it('create any coordinator access', () => {
+        return Seeder.add_coordinator_access();
     });
 });

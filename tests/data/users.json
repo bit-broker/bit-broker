@@ -8,6 +8,7 @@
                 "opaque2": "dolor sit amet"
             }
         },
+        "coordinator": true,
         "access": [ "access-all-areas", "all-countries", "all-heritage-sites", "european-union", "over-a-billion", "north-america", "british-isles" ]
     },
     {
@@ -20,6 +21,7 @@
                 "opaque3": "sed do eiusmod tempor incididunt"
             }
         },
+        "coordinator": false,
         "access": [ "all-countries", "all-heritage-sites" ]
     },
     {
@@ -28,6 +30,7 @@
             "email": "carol@domain.com",
             "addendum": {}
         },
+        "coordinator": true,
         "access": [ "european-union", "over-a-billion", "north-america", "british-isles" ]
     },
     {
@@ -35,6 +38,7 @@
             "name": "ted",
             "email": "ted@domain.com"
         },
+        "coordinator": false,
         "access": []
     }
 ]
