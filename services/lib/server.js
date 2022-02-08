@@ -76,7 +76,7 @@ module.exports = class Server {
         }
 
         let response = { error: { code: code, status: HTTP.getReasonPhrase(code), message: text || '' }};
-        res.status(code).send(JSON.stringify(response));
+        res.status(code).json(response);
     }
 
     // --- returns the ip address of the host machince
