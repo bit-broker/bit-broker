@@ -1,34 +1,34 @@
+/**
+ * Copyright 2021 Cisco and its affiliates
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /*
+The bit-broker coordinator server - offering services to add, remove and
+update entity types and their associated connectors.
 
-  Copyright (c) 2021 Cisco and/or its affiliates.
+Use the following command to generate a bootstrap coordinator access key
 
-  Licensed under the Apache License, Version 2.0 (the "License"); you may not
-  use this file except in compliance with the License. You may obtain a copy of
-  the License at:
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,WITHOUT
-  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-  License for the specific language governing permissions and limitations
-  under the License.
-
-  ----------------------------------------------------------------------------
-
-  The bit-broker coordinator server - offering services to add, remove and
-  update entity types and their associated connectors.
-
-  Use the following command to generate a bootstrap coordinator access key
-
-      curl \
-        --silent \
-        --request POST \
-        --header "Content-Type: application/json" \
-        --data "{\"role\":\"coordinator\"}" \
-        --output bootstrap.key \
-          http://bbk-coordinator:8001/v1/user/1/access
-
+  curl \
+    --silent \
+    --request POST \
+    --header "Content-Type: application/json" \
+    --data "{\"role\":\"coordinator\"}" \
+    --output bootstrap.key \
+    http://bbk-coordinator:8001/v1/user/1/access
 */
 
 'use strict'; // code assumes ECMAScript 6
