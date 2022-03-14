@@ -51,6 +51,7 @@ module.exports = class Policy {
 
     get COLUMNS() {
         return [
+            'id',
             'slug',
             'properties',
             'created_at',
