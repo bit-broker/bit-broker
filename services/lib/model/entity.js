@@ -93,6 +93,7 @@ module.exports = class Entity {
 
     delete(slug) {
         return this.find(slug).delete().then(result => result.rowCount > 0);
+        // TODO: revoke all connector keys (issue#54)
     }
 
     // --- gets the connector sub-model
