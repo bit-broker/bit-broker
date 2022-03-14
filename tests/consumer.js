@@ -101,7 +101,7 @@ describe('Consumer Tests', function() {
         });
 
         it('the webhook server is up', () => {
-            return Crud.get(DATA.WEBHOOK.URL, (body) => {
+            return Crud.get(DATA.WEBHOOK.URL, body => {
                 expect(body).to.be.an('object');
                 expect(body.name).to.be.eq(DATA.WEBHOOK.NAME);
             });
@@ -219,7 +219,7 @@ describe('Consumer Tests', function() {
         function entity_list(type) {
             records[type] = Seeder.records(type);
 
-            return Crud.get(URLs.consumer_entity(type), (body) => {
+            return Crud.get(URLs.consumer_entity(type), body => {
                 expect(body).to.be.an('array');
 
                 for (let i = 0; i < body.length; i++) {
@@ -243,7 +243,7 @@ describe('Consumer Tests', function() {
         function entity_item(type, id) {
             let acts = [];
 
-            return Crud.get(URLs.consumer_entity(type, id), (body) => {
+            return Crud.get(URLs.consumer_entity(type, id), body => {
                 expect(body).to.be.an('object');
 
                 let fetched = body;
@@ -253,7 +253,7 @@ describe('Consumer Tests', function() {
                 let bbk = entity_full(type, fetched, original);
 
                 for (let i = 0 ; i < bbk.length ; i++) {
-                    acts.push (Crud.get(bbk[i].url, (linked) => {
+                    acts.push (Crud.get(bbk[i].url, linked => {
                         let parts = bbk[i].bbk.split('/');
                         expect(linked).to.be.an('object');
                         expect(linked.type).to.be.eq(parts[2]);  // no other general expectations we can test other than entity type
@@ -326,7 +326,7 @@ describe('Consumer Tests', function() {
 
         function catalog(test) {
             Crud.headers(Shared.policy_header(test.policy || DATA.POLICY.ALLAREA.ID))
-            return Crud.get(URLs.consumer_catalog(test.query), (body) => {
+            return Crud.get(URLs.consumer_catalog(test.query), body => {
                 expect(body).to.be.an('array');
 
                 let items = body.map(i => i.name);
