@@ -108,7 +108,7 @@ const DATA = {
         return Math.floor(Math.random() * items.length);
     },
 
-    keys: function(records) { // TODO - needed?
+    keys: function(records) {
         let keys = [];
         records.forEach(record => keys.push(record.id));
         return keys;
