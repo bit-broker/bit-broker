@@ -139,6 +139,18 @@ case $1 in
         fi
     ;;
 
+    bounce)
+        if [ $(count) -ne "0" ]; then
+            stop
+        else
+            info "no services running"
+        fi
+
+        start
+        echo
+        status
+    ;;
+
     reset)
         if [ $(count) -ne "0" ]; then
             stop
@@ -163,6 +175,7 @@ case $1 in
         echo "    logs   → tails all bbk services logs"
         echo "    db     → start a sql session"
         echo "    wipe   → resets the bbk database"
+        echo "    bounce → stop » start"
         echo "    reset  → stop » wipe » start"
     ;;
 
