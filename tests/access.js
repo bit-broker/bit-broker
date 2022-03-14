@@ -73,15 +73,15 @@ describe('User Access Tests', function() {
 
     describe('user access manipulation tests', () => {
 
-        let uids = {}; // will be filled in during the first test
-        let aids = {};
-        let token = null;
-        let admin = { id: 1, url: URLs.user(1), name: 'admin' };
+        let admin = { id: 1, url: URLs.user(1), name: 'admin', accesses: [] };
         let user1 = { name: DATA.name(), email: DATA.pluck(DATA.EMAIL.VALID) };  // pluck to ensure different emails
         let user2 = { name: DATA.name(), email: DATA.pick(DATA.EMAIL.VALID) };
-        let values1 = { role: 'coordinator' };
-        let values2 = { role: 'consumer', context: DATA.POLICY.ALLAREA.ID };
-        let values3 = { role: 'consumer', context: DATA.POLICY.EXAMPLE.ID };
+        let policy1 = DATA.POLICY.ALLAREA;
+        let policy2 = DATA.POLICY.EXAMPLE;
+        let access1 = []; // filled out as we go
+        let access2 = [];
+        let deleted = null;
+        let token = null;
         let all = URLs.user();
 
         before(() => {
@@ -94,17 +94,8 @@ describe('User Access Tests', function() {
 
         it('get the last user id sequence value', () => {
             return Shared.last_id('users').then(last => {
-                uids[1] = last + 1;
-                uids[2] = last + 2
-            });
-        });
-
-        it('get the last access id sequence value', () => {
-            return Shared.last_id('access').then(last => {
-                aids[1] = last + 1;
-                aids[2] = last + 2;
-                aids[3] = last + 3;
-                aids[4] = last + 4;
+                user1.id = last + 1;
+                user2.id = last + 2;
             });
         });
 
@@ -113,158 +104,62 @@ describe('User Access Tests', function() {
         });
 
         it('can add the first housing user', () => {
-            return Crud.add(all, user1, URLs.user(uids[1]));
+            return Crud.add(all, user1, URLs.user(user1.id));
         });
 
         it('can add the second housing user', () => {
-            return Crud.add(all, user2, URLs.user(uids[2]));
+            return Crud.add(all, user2, URLs.user(user2.id));
         });
 
         it('they are both present in the user list', () => {
             return Crud.verify_all(all, [
                 admin,
-                { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: false, accesses: {} },
-                { ...user2, id: uids[2], url: URLs.user(uids[2]), coordinator: false, accesses: {} }
+                { ...user1, accesses: access1 },
+                { ...user2, accesses: access2 }
             ]);
         });
 
         it('can add the first policy', () => {
-            return Crud.add(URLs.policy(DATA.POLICY.ALLAREA.ID), DATA.POLICY.ALLAREA.DETAIL);
+            return Crud.add(URLs.policy(policy1.ID), policy1.DETAIL);
         });
 
         it('can add the second policy', () => {
-            return Crud.add(URLs.policy(DATA.POLICY.EXAMPLE.ID), DATA.POLICY.EXAMPLE.DETAIL);
-        });
-
-        it('can ask for a coordinator token for first user', () => {
-            return Crud.add(URLs.access(uids[1]), values1, URLs.access(uids[1], aids[1]), (body) => {
-                expect(body).to.be.a('string');
-                expect(body).to.match(new RegExp(DATA.KEY.REGEX));
-                token = body;
-            });
-        });
-
-        it('it is reflected in the admin status on user list', () => {
-            return Crud.verify_all(all, [
-                admin,
-                { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: true, accesses: {} },
-                { ...user2, id: uids[2], url: URLs.user(uids[2]), coordinator: false, accesses: {} }
-            ]);
-        });
-
-        it('it is reflected in the admin status on user', () => {
-            return Crud.verify(URLs.user(uids[1]), { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: true, accesses: {} });
-        });
-
-        it('it is present in the user access list', () => {
-            return Crud.verify_all(URLs.access(uids[1]), [
-                { ...values1, id: aids[1], url: URLs.access(uids[1], aids[1]) }
-            ]);
-        });
-
-        it('it is present when addressed directly', () => {
-            return Crud.verify(URLs.access(uids[1], aids[1]), { ...values1, id: aids[1], url: URLs.access(uids[1], aids[1]) });
-        });
-
-        it('the date is present when addressed directly', () => {
-            return Crud.get(URLs.access(uids[1], aids[1]), (body) => {
-                expect(body).to.be.an('object');
-                expect(body.created).to.be.a('string');
-                expect(body.created).to.match(new RegExp(DATA.DATE.REGEX));
-            });
-        });
-
-        it('cannot ask for the same token twice', () => {
-            return Crud.duplicate(URLs.access(uids[1]), values1);
-        });
-
-        it('can update to get a new coordinator token', () => {
-            return Crud.update(URLs.access(uids[1], aids[1]), values1, (body) =>
-            {
-                expect(body).to.be.a('string');
-                expect(body).to.match(new RegExp(DATA.KEY.REGEX));
-                expect(body).to.not.be.eq(token);
-                token = body;
-            });
-        });
-
-        it('it is reflected in the admin status on user list', () => {
-            return Crud.verify_all(all, [
-                admin,
-                { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: true, accesses: {} },
-                { ...user2, id: uids[2], url: URLs.user(uids[2]), coordinator: false, accesses: {} }
-            ]);
-        });
-
-        it('it is reflected in the admin status on user', () => {
-            return Crud.verify(URLs.user(uids[1]), { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: true, accesses: {} });
-        });
-
-        it('can ask for a coordinator token for second user', () => {
-            return Crud.add(URLs.access(uids[2]), values1, URLs.access(uids[2], aids[2]), (body) => {
-                expect(body).to.be.a('string');
-                expect(body).to.match(new RegExp(DATA.KEY.REGEX));
-                expect(body).to.not.be.eq(token);
-                token = body;
-            });
-        });
-
-        it('it is reflected in the admin status on user list', () => {
-            return Crud.verify_all(all, [
-                admin,
-                { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: true, accesses: {} },
-                { ...user2, id: uids[2], url: URLs.user(uids[2]), coordinator: true, accesses: {} }
-            ]);
-        });
-
-        it('it is reflected in the admin status on user', () => {
-            return Crud.verify(URLs.user(uids[2]), { ...user2, id: uids[2], url: URLs.user(uids[2]), coordinator: true, accesses: {} });
-        });
-
-        it('it is present in the user access list', () => {
-            return Crud.verify_all(URLs.access(uids[2]), [
-                { ...values1, id: aids[2], url: URLs.access(uids[2], aids[2]) }
-            ]);
-        });
-
-        it('it is present when addressed directly', () => {
-            return Crud.verify(URLs.access(uids[2], aids[2]), { ...values1, id: aids[2], url: URLs.access(uids[2], aids[2]) });
+            return Crud.add(URLs.policy(policy2.ID), policy2.DETAIL);
         });
 
         it('can ask for a consumer token for first user', () => {
-            return Crud.add(URLs.access(uids[1]), values2, URLs.access(uids[1], aids[3]), (body) => {
+            let url = URLs.access(user1.id, policy1.ID);
+            return Crud.add(url, undefined, url, body => {
                 expect(body).to.be.a('string');
                 expect(body).to.match(new RegExp(DATA.KEY.REGEX));
                 expect(body).to.not.be.eq(token);
                 token = body;
+                access1.push({ id: policy1.ID, url });
             });
         });
 
         it('it is reflected in the accesses list on user list', () => {
             return Crud.verify_all(all, [
                 admin,
-                { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: true, accesses: { [aids[3]]: values2.context } },
-                { ...user2, id: uids[2], url: URLs.user(uids[2]), coordinator: true, accesses: {} }
+                { ...user1, accesses: access1 },
+                { ...user2, accesses: access2 }
             ]);
         });
 
         it('it is reflected in the accesses list on user', () => {
-            return Crud.verify(URLs.user(uids[1]), { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: true, accesses: { [aids[3]]: values2.context } });
+            return Crud.verify(URLs.user(user1.id), { ...user1, accesses: access1 });
         });
 
         it('it is present in the user access list', () => {
-            return Crud.verify_all(URLs.access(uids[1]), [
-                { ...values1, id: aids[1], url: URLs.access(uids[1], aids[1]) },
-                { ...values2, id: aids[3], url: URLs.access(uids[1], aids[3]) }
-            ]);
+            return Crud.verify_all(URLs.access(user1.id), [{ ...access1[0], policy: { id: policy1.ID, url: URLs.policy(policy1.ID) }}]);
         });
 
         it('it is present when addressed directly', () => {
-            return Crud.verify(URLs.access(uids[1], aids[3]), { ...values2, id: aids[3], url: URLs.access(uids[1], aids[3]) });
+            return Crud.verify(access1[0].url, { ...access1[0], policy: { id: policy1.ID, url: URLs.policy(policy1.ID) }});
         });
 
-        it('can update one consumer access to get a new token', () => {
-            return Crud.update(URLs.access(uids[1], aids[3]), values2, (body) =>
+        it('can update a consumer access to get a new token', () => {
+            return Crud.update(access1[0].url, undefined, body =>
             {
                 expect(body).to.be.a('string');
                 expect(body).to.match(new RegExp(DATA.KEY.REGEX));
@@ -273,147 +168,105 @@ describe('User Access Tests', function() {
             });
         });
 
-        it('it is reflected in the accesses list  on user list', () => {
-            return Crud.verify_all(all, [
-                admin,
-                { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: true, accesses: { [aids[3]]: values2.context } },
-                { ...user2, id: uids[2], url: URLs.user(uids[2]), coordinator: true, accesses: {} }
-            ]);
-        });
-
-        it('it is reflected in the accesses list  on user', () => {
-            return Crud.verify(URLs.user(uids[1]), { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: true, accesses: { [aids[3]]: values2.context } });
-        });
-
-        it('it is present in the user access list', () => {
-            return Crud.verify_all(URLs.access(uids[1]), [
-                { ...values1, id: aids[1], url: URLs.access(uids[1], aids[1]) },
-                { ...values2, id: aids[3], url: URLs.access(uids[1], aids[3]) }
-            ]);
-        });
-
-        it('it is present when addressed directly', () => {
-            return Crud.verify(URLs.access(uids[1], aids[3]), { ...values2, id: aids[3], url: URLs.access(uids[1], aids[3]) });
-        });
-
         it('cannot get access for wrong user', () => {
-            return Crud.not_found(URLs.access(uids[1], aids[2]));
+            return Crud.not_found(URLs.access(user2.id, policy1.ID));
+        });
+
+        it('cannot get access for wrong policy', () => {
+            return Crud.not_found(URLs.access(user1.id, policy2.ID));
         });
 
         it('can ask for another consumer token for first user', () => {
-            return Crud.add(URLs.access(uids[1]), values3, URLs.access(uids[1], aids[4]), (body) => {
+            let url = URLs.access(user1.id, policy2.ID);
+            return Crud.add(url, undefined, url, body => {
                 expect(body).to.be.a('string');
                 expect(body).to.match(new RegExp(DATA.KEY.REGEX));
                 expect(body).to.not.be.eq(token);
                 token = body;
+                access1.push({ id: policy2.ID, url });
+            });
+        });
+
+        it('can ask for a consumer token for second user', () => {
+            let url = URLs.access(user2.id, policy1.ID);
+            return Crud.add(url, undefined, url, body => {
+                expect(body).to.be.a('string');
+                expect(body).to.match(new RegExp(DATA.KEY.REGEX));
+                expect(body).to.not.be.eq(token);
+                token = body;
+                access2.push({ id: policy1.ID, url });
             });
         });
 
         it('it is reflected in the accesses list on user list', () => {
             return Crud.verify_all(all, [
                 admin,
-                { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: true, accesses: { [aids[3]]: values2.context, [aids[4]]: values3.context } },
-                { ...user2, id: uids[2], url: URLs.user(uids[2]), coordinator: true, accesses: {} }
+                { ...user1, accesses: access1 },
+                { ...user2, accesses: access2 }
             ]);
         });
 
-        it('it is reflected in the accesses list on user', () => {
-            return Crud.verify(URLs.user(uids[1]), { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: true, accesses: { [aids[3]]: values2.context, [aids[4]]: values3.context } });
-        });
-
-        it('it is present in the user access list', () => {
-            return Crud.verify_all(URLs.access(uids[1]), [
-                { ...values1, id: aids[1], url: URLs.access(uids[1], aids[1]) },
-                { ...values2, id: aids[3], url: URLs.access(uids[1], aids[3]) },
-                { ...values3, id: aids[4], url: URLs.access(uids[1], aids[4]) }
-            ]);
-        });
-
-        it('it is present when addressed directly', () => {
-            return Crud.verify(URLs.access(uids[1], aids[4]), { ...values3, id: aids[4], url: URLs.access(uids[1], aids[4]) });
-        });
-
-        it('can delete the coordinator key on first user', () => {
-            return Crud.delete(URLs.access(uids[1], aids[1]));
-        });
-
-        it('it is reflected in the admin status on user list', () => {
-            return Crud.verify_all(all, [
-                admin,
-                { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: false, accesses: { [aids[3]]: values2.context, [aids[4]]: values3.context } },
-                { ...user2, id: uids[2], url: URLs.user(uids[2]), coordinator: true, accesses: {} }
-            ]);
-        });
-
-        it('it is reflected in the admin status on user', () => {
-            return Crud.verify(URLs.user(uids[1]), { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: false, accesses: { [aids[3]]: values2.context, [aids[4]]: values3.context } });
+        it('can delete last consumer token for first user', () => {
+            deleted = access1.pop();
+            return Crud.delete(deleted.url);
         });
 
         it('it is no longer present in the user access list', () => {
-            return Crud.verify_all(URLs.access(uids[1]), [
-                { ...values2, id: aids[3], url: URLs.access(uids[1], aids[3]) },
-                { ...values3, id: aids[4], url: URLs.access(uids[1], aids[4]) }
+            return Crud.verify_all(all, [
+                admin,
+                { ...user1, accesses: access1 },
+                { ...user2, accesses: access2 }
             ]);
         });
 
+        it('it is no longer present on the accesses list on user', () => {
+            return Crud.verify(URLs.user(user1.id), { ...user1, accesses: access1 });
+        });
+
+        it('iit is no longer present on the user access list', () => {
+            return Crud.verify_all(URLs.access(user1.id), [{ ...access1[0], policy: { id: policy1.ID, url: URLs.policy(policy1.ID) }}]);
+        });
+
         it('it is no longer present when addressed directly', () => {
-            return Crud.not_found(URLs.access(uids[1], aids[1]));
+            return Crud.not_found(deleted.url);
         });
 
         it('cannot re-delete the coordinator key on first user', () => {
-            return Crud.not_found(URLs.access(uids[1], aids[1]), undefined, chakram.delete);
+            return Crud.not_found(deleted.url, undefined, chakram.delete);
         });
 
-        it('can delete the consumer key on first user', () => {
-            return Crud.delete(URLs.access(uids[1], aids[3]));
-        });
-
-        it('it is reflected in the accesses list on user list', () => {
-            return Crud.verify_all(all, [
-                admin,
-                { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: false, accesses: { [aids[4]]: values3.context } },
-                { ...user2, id: uids[2], url: URLs.user(uids[2]), coordinator: true, accesses: {} }
-            ]);
-        });
-
-        it('it is reflected in the accesses list on user', () => {
-            return Crud.verify(URLs.user(uids[1]), { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: false, accesses: { [aids[4]]: values3.context } });
+        it('can delete next consumer token for first user', () => {
+            return Crud.delete(access1.pop().url);
         });
 
         it('it is no longer present in the user access list', () => {
-            return Crud.verify_all(URLs.access(uids[1]), [{ ...values3, id: aids[4], url: URLs.access(uids[1], aids[4]) }]);
-        });
-
-        it('it is no longer present when addressed directly', () => {
-            return Crud.not_found(URLs.access(uids[1], aids[3]));
-        });
-
-        it('can delete the second consumer key on first user', () => {
-            return Crud.delete(URLs.access(uids[1], aids[4]));
-        });
-
-        it('it is reflected in the accesses list on user list', () => {
             return Crud.verify_all(all, [
                 admin,
-                { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: false, accesses: {} },
-                { ...user2, id: uids[2], url: URLs.user(uids[2]), coordinator: true, accesses: {} }
+                { ...user1, accesses: access1 },
+                { ...user2, accesses: access2 }
             ]);
-        });
-
-        it('it is reflected in the accesses list on user', () => {
-            return Crud.verify(URLs.user(uids[1]), { ...user1, id: uids[1], url: URLs.user(uids[1]), coordinator: false, accesses: {} });
-        });
-
-        it('it is no longer present in the user access list', () => {
-            return Crud.verify_all(URLs.access(uids[1]), []);
-        });
-
-        it('it is no longer present when addressed directly', () => {
-            return Crud.not_found(URLs.access(uids[1], aids[4]));
         });
 
         it('can delete the first policy', () => {
-            return Crud.delete(URLs.policy(DATA.POLICY.ALLAREA.ID));
+            return Crud.delete(URLs.policy(policy1.ID));
+        });
+
+        it('access have been cascade deleted on policy deletion', () => {
+            access1 = access1.filter(p => p.id !== policy1.ID);
+            access2 = access2.filter(p => p.id !== policy1.ID);
+            return Crud.verify_all(all, [
+                admin,
+                { ...user1, accesses: access1 },
+                { ...user2, accesses: access2 }
+            ]);
+        });
+
+        it('there are no more accesses in user access list', () => {
+            return Crud.verify_all(all, [
+                admin,
+                { ...user1, accesses: [] },
+                { ...user2, accesses: [] }
+            ]);
         });
 
         it('can delete the second policy', () => {
@@ -421,137 +274,11 @@ describe('User Access Tests', function() {
         });
 
         it('can delete the second housing user', () => {
-            return Crud.delete(URLs.user(uids[1]));
+            return Crud.delete(URLs.user(user1.id));
         });
 
         it('can delete the first housing user', () => {
-            return Crud.delete(URLs.user(uids[2]));
-        });
-    });
-
-    // --- user access validation tests
-
-    describe('user access validation tests', () => {
-
-        let uid = null; // will be filled in during the first test
-        let aid = null;
-        let access = null;
-        let user = { name: DATA.name(), email: DATA.pluck(DATA.EMAIL.VALID) };  // pluck to ensure different emails
-        let coordinator = { role: 'coordinator' };
-        let consumer = { role: 'consumer' };
-        let all = URLs.user();
-
-        function get_key(values) { // gets a key
-            return Crud.add(access, values, URLs.access(uid, ++aid), (body) => {
-                expect(body).to.be.a('string');
-                expect(body).to.match(new RegExp(DATA.KEY.REGEX));
-            });
-        }
-
-        function get_del_key(values) { // gets and then deletes a key
-            return get_key(values)
-            .then (() => Crud.delete(URLs.access(uid, aid)));
-        }
-
-        before(() => {
-            return Shared.empty();
-        });
-
-        after(() => {
-            return Shared.empty();
-        });
-
-        it('get the last user id sequence value', () => {
-            return Shared.last_id('users').then(last => {
-                uid = last + 1;
-                access = URLs.access(uid);
-            });
-        });
-
-        it('get the last access id sequence value', () => {
-            return Shared.last_id('access').then(last => {
-                aid = last;
-            });
-        });
-
-        it('can add the housing user', () => {
-            return Crud.add(all, user, URLs.user(uid));
-        });
-
-        it('can add first policy', () => {
-            return Crud.add(URLs.policy(DATA.POLICY.ALLAREA.ID), DATA.POLICY.ALLAREA.DETAIL);
-        });
-
-        it('can add second policy', () => {
-            return Crud.add(URLs.policy(DATA.POLICY.EXAMPLE.ID), DATA.POLICY.EXAMPLE.DETAIL);
-        });
-
-        it('disallows asking for keys with invalid roles', () => {
-            return Promise.resolve()
-            .then(() => Crud.bad_request(access, [{ role: DATA.ERRORS.ENUM }], { }, chakram.post))
-            .then(() => Crud.bad_request(access, [{ role: DATA.ERRORS.ENUM }], { role: '' }, chakram.post))
-            .then(() => Crud.bad_request(access, [{ role: DATA.ERRORS.ENUM }], { role: null }, chakram.post))
-            .then(() => Crud.bad_request(access, [{ role: DATA.ERRORS.ENUM }], { role: 123 }, chakram.post))
-            .then(() => Crud.bad_request(access, [{ role: DATA.ERRORS.ENUM }], { role: 'lorem' }, chakram.post));
-        });
-
-        it('disallows asking for coordinator keys without null context', () => {
-            return Promise.resolve()
-            .then(() => Crud.bad_request(access, [{ context: DATA.ERRORS.INVALID }], { ...coordinator, context: DATA.POLICY.ALLAREA.ID }, chakram.post))
-            .then(() => Crud.bad_request(access, [{ context: DATA.ERRORS.INVALID }], { ...coordinator, context: 'lorem' }, chakram.post))
-            .then(() => Crud.bad_request(access, [{ context: DATA.ERRORS.INVALID }], { ...coordinator, context: 123 }, chakram.post));
-        });
-
-        it('disallows asking for contributor keys with any context', () => {
-            return Promise.resolve()
-            .then(() => Crud.bad_request(access, [{ role: DATA.ERRORS.INVALID }], { role: 'contributor' }, chakram.post))
-            .then(() => Crud.bad_request(access, [{ role: DATA.ERRORS.INVALID }], { role: 'contributor', context: DATA.POLICY.ALLAREA.ID }, chakram.post))
-            .then(() => Crud.bad_request(access, [{ role: DATA.ERRORS.INVALID }], { role: 'contributor', context: 'lorem' }, chakram.post));
-        });
-
-        it('disallows asking for consumer keys with invalid contexts', () => {
-            return Promise.resolve()
-            .then(() => Crud.bad_request(access, [{ context: DATA.ERRORS.INVALID }], { role: 'consumer' }, chakram.post))
-            .then(() => Crud.bad_request(access, [{ context: DATA.ERRORS.INVALID }], { ...consumer, context: '' }, chakram.post))
-            .then(() => Crud.bad_request(access, [{ context: DATA.ERRORS.INVALID }], { ...consumer, context: null }, chakram.post))
-            .then(() => Crud.bad_request(access, [{ context: DATA.ERRORS.INVALID }], { ...consumer, context: 'lorem' }, chakram.post))
-            .then(() => Crud.bad_request(access, [{ context: DATA.ERRORS.INVALID }], { ...consumer, context: 123 }, chakram.post));
-        });
-
-        it('allows asking for coordinator keys with various valid contexts', () => {
-            return Promise.resolve()
-            .then(() => get_del_key(coordinator))
-            .then(() => get_del_key({ ...coordinator, context: null }))
-            .then(() => get_del_key({ ...coordinator, context: '' }))
-            .then(() => get_del_key({ ...coordinator, context: undefined }));
-        });
-
-        it('allows asking for contributor keys with various valid contexts', () => {
-            return Promise.resolve()
-            .then(() => get_del_key({ ...consumer, context: DATA.POLICY.ALLAREA.ID }))
-            .then(() => get_del_key({ ...consumer, context: DATA.POLICY.EXAMPLE.ID }));
-        });
-
-        it('disallows asking for refresh key with different values', () => {
-            return Crud.add(access, { ...consumer, context: DATA.POLICY.ALLAREA.ID }, URLs.access(uid, ++aid), (body) => {
-                expect(body).to.be.a('string');
-                expect(body).to.match(new RegExp(DATA.KEY.REGEX));
-            })
-            .then(() => Crud.bad_request(URLs.access(uid, aid), [{ access: DATA.ERRORS.MATCH }], { ...coordinator, context: DATA.POLICY.ALLAREA.ID }, chakram.put))
-            .then(() => Crud.bad_request(URLs.access(uid, aid), [{ access: DATA.ERRORS.MATCH }], { ...coordinator, context: DATA.POLICY.EXAMPLE.ID }, chakram.put))
-            .then(() => Crud.bad_request(URLs.access(uid, aid), [{ access: DATA.ERRORS.MATCH }], { ...consumer, context: DATA.POLICY.EXAMPLE.ID }, chakram.put));
-        });
-
-        it('can delete the second policy', () => {
-            return Crud.delete(URLs.policy(DATA.POLICY.EXAMPLE.ID));
-        });
-
-        it('can delete the first policy', () => {
-            return Crud.delete(URLs.policy(DATA.POLICY.ALLAREA.ID));
-        });
-
-        it('can delete the housing user', () => {
-            return Crud.delete(URLs.user(uid));
+            return Crud.delete(URLs.user(user2.id));
         });
     });
 });

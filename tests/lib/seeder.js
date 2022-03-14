@@ -187,9 +187,9 @@ module.exports = class Seeder {
             let user = users[i];
 
             for (let j = 0; j < user.access.length; j++) {
-                let access = user.access[j];
+                let policy = user.access[j];
                 let uid = this.uids[user.properties.email];
-                steps.push(Crud.add(URLs.access(uid), { role: 'consumer', context: access }));
+                steps.push(Crud.add(URLs.access(uid, policy)));
             }
         }
 
@@ -207,7 +207,7 @@ module.exports = class Seeder {
 
             if (user.coordinator) {
                 let uid = this.uids[user.properties.email];
-                steps.push(Crud.add(URLs.access(uid), { role: 'coordinator', context: null }));
+                steps.push(Crud.post(URLs.user_coordinator(uid)));
             }
         }
 

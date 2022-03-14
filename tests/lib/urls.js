@@ -61,7 +61,8 @@ class URLs {
     connector(eid, cid) { return this.rest('entity', eid, 'connector', cid); }
     user(uid) { return this.rest('user', uid); }
     user_email(email) { return this.rest('user', 'email', email); }
-    access(uid, aid) { return this.rest('user', uid, 'access', aid); }
+    user_coordinator(uid) { return this.rest('user', uid, 'coordinator'); }
+    access(uid, pid) { return this.rest('user', uid, 'access', pid); }
     policy(pid, resource) { return this.rest('policy', pid, resource); }
 
     session_open(cid, mode = 'stream') { return this.rest('connector', cid, 'session', 'open', mode); }

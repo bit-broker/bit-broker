@@ -51,7 +51,6 @@ class Shared {
     nuke() {
         return this.db('entity').delete()  // will auto cascade to connectors, catalog, etc
         .then(() => this.db('users').whereNot('id', 1).delete())  // not including the admin user
-        .then(() => this.db('access').where('user_id', 1).andWhereNot('role', 'coordinator').delete())  // nuke any admin non-coordinator keys, the rest cascade deleted themselves
         .then(() => this.db('policy').delete());
     }
 

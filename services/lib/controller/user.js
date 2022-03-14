@@ -28,6 +28,8 @@ all come via this model and never manipulate the domain entities directly.
 // --- dependancies
 
 const HTTP = require('http-status-codes');
+const CONST = require('../constants.js');
+const Permit = require('../model/permit.js');
 const failure = require('../errors.js');
 const model = require('../model/index.js');
 const view = require('../view/index.js');
@@ -169,6 +171,65 @@ module.exports = class User {
 
         .then(() => {
             log.info('user', uid, 'delete', 'complete');
+            res.status(HTTP.NO_CONTENT).send();
+        })
+
+        .catch(error => next(error));
+    }
+
+    // --- adds coordinator access to the given user
+
+    coordinator_add(req, res, next) {
+        log.info('user', req.params.uid, 'coordinator', 'add');
+        let uid = req.params.uid.toLowerCase();
+        let user = null;
+        let token = null;
+
+        model.user.find(uid)
+
+        .then(item => {
+            if (!item) throw new failure(HTTP.NOT_FOUND);
+            if (item.coordinator_key_id) throw new failure(HTTP.CONFLICT);
+            user = item;
+            return Permit.generate_token(CONST.ROLE.COORDINATOR, ''); // no token context for coordinator roles
+        })
+
+        .then(permit => {
+            token = permit.token;
+            return model.user.update(uid, { coordinator_key_id: permit.jti });
+        })
+
+        .then(() => {
+            log.info('user', uid, 'coordinator', 'add', 'complete');
+            res.status(HTTP.OK).send(token);
+        })
+
+        .catch(error => next(error));
+    }
+
+    // --- removes coordinator access from the given user
+
+    coordinator_del(req, res, next) {
+        log.info('user', req.params.uid, 'coordinator', 'del');
+        let uid = req.params.uid.toLowerCase();
+        let user = null;
+
+        model.user.find(uid)
+
+        .then(item => {
+            if (!item) throw new failure(HTTP.NOT_FOUND);
+            if (!item.coordinator_key_id) throw new failure(HTTP.CONFLICT);
+            // TODO: cant remove your own coordinator access
+            user = item;
+            return Permit.revoke_tokens([item.coordinator_key_id])
+        })
+
+        .then(() => {
+            return model.user.update(uid, { coordinator_key_id: null });
+        })
+
+        .then(() => {
+            log.info('user', uid, 'coordinator', 'del', 'complete');
             res.status(HTTP.NO_CONTENT).send();
         })
 

@@ -55,20 +55,20 @@ module.exports = class Access {
 
     get COLUMNS() {
         return [
-            'id',
-            'user_id',
-            'key_id',
-            'role',
-            'context',
-            'created_at',
-            'updated_at'
+            'access.id',
+            'access.user_id',
+            'access.key_id',
+            'policy.slug as policy_slug',
+            'policy.properties as policy_properties',
+            'access.created_at',
+            'access.updated_at'
         ];
     }
 
     // --- table read context
 
     get read() {
-        return this.db('access').select(this.COLUMNS);
+        return this.db('access').select(this.COLUMNS).join('policy', 'policy.id', 'access.policy_id');
     }
 
     // --- table rows by user context
@@ -89,17 +89,16 @@ module.exports = class Access {
         return this.rows.where({ id }).first();
     }
 
-    // --- find an access by role and context on the instance user
+    // --- find an access by policy_id
 
-    find_by_role_context(role, context) {
-        return this.rows.where({ role, context }).first();
+    find_by_policy(slug) {
+        return this.rows.where({ 'policy.slug': slug }).first();
     }
 
     // --- inserts a new access on the instance user type
 
     insert(values) {
-        return Permit.generate_token(values.role, values.context)
-
+        return Permit.generate_token(CONST.ROLE.CONSUMER, values.policy_id)
         .then (token => {
             values.user_id = this.user.id;
             values.key_id = token.jti;
@@ -113,7 +112,7 @@ module.exports = class Access {
 
     update(values) {
         return Permit.revoke_tokens([values.key_id])
-        .then (() => Permit.generate_token(values.role, values.context))
+        .then (() => Permit.generate_token(CONST.ROLE.CONSUMER, values.policy_id))
         .then (token => {
             return this.find(values.id).update({ key_id: token.jti }).returning('id')
             .then(id => id && id.length ? { id: id[0], token: token.token } : false);
@@ -122,9 +121,9 @@ module.exports = class Access {
 
     // --- deletes an access on the instance user type
 
-    delete(id, item) {
+    delete(item) {
         return Permit.revoke_tokens([item.key_id])
-        .then (() => this.find(id).delete().then(result => result.rowCount > 0));
+        .then (() => this.find(item.id).delete().then(result => result.rowCount > 0));
     }
 
     // --- revokes all keys for a given user id
@@ -135,10 +134,10 @@ module.exports = class Access {
         .then(keys => keys.length ? Permit.revoke_tokens(keys) : Promise.resolve());
     }
 
-    // --- revokes all keys for a given context
+    // --- revokes all keys for a given policy
 
-    revoke_by_context(context) {
-        return this.read.where({ context })
+    revoke_by_policy(slug) {
+        return this.read.where({ 'policy.slug': slug })
         .then(items => items.map(i => i.key_id))
         .then(keys => keys.length ? Permit.revoke_tokens(keys) : Promise.resolve());
     }

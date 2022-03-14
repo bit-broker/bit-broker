@@ -62,11 +62,12 @@ CREATE TABLE users
     id SERIAL PRIMARY KEY,
     email VARCHAR (256) UNIQUE NOT NULL,
     properties JSONB NOT NULL,
+    coordinator_key_id CHAR(36) UNIQUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO users (email, properties) VALUES ('noreply@bit-broker.io', '{ "name": "admin" }');
+INSERT INTO users (email, properties, coordinator_key_id) VALUES ('noreply@bit-broker.io', '{ "name": "admin" }', '012345678901234567890123456789012345');
 
 -- entity table
 
@@ -154,25 +155,21 @@ CREATE TABLE policy
 
 CREATE INDEX idx_policy_slug ON policy (slug);
 
--- access table
-
-CREATE TYPE access_roles AS ENUM ('coordinator', 'contributor', 'consumer');
+-- access table - users 0..* <---> policy 0..*
 
 CREATE TABLE access
 (
     id SERIAL PRIMARY KEY,
     user_id SERIAL REFERENCES users (id) ON DELETE CASCADE,
-    role ACCESS_ROLES NOT NULL,
-    context VARCHAR (32),
+    policy_id SERIAL REFERENCES policy (id) ON DELETE CASCADE,
     key_id CHAR(36) UNIQUE NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE (user_id, role, context)
+    UNIQUE (user_id, policy_id)
 );
 
-CREATE INDEX idx_access_user ON access (user_id, role);
-
-INSERT INTO access (user_id, role, key_id) VALUES (1, 'coordinator', '012345678901234567890123456789012345');
+CREATE INDEX idx_access_user ON access (user_id);
+CREATE INDEX idx_access_policy ON access (policy_id);
 
 -- grant permissions - TODO allocate more specific grants based on each user
 

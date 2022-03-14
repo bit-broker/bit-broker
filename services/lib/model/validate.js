@@ -32,7 +32,7 @@ const fs = require('fs');
 
 // --- scheme list
 
-const SCHEMES = [ 'id', 'slug', 'name', 'description', 'entity', 'connector', 'session', 'policy', 'user', 'user_addendum', 'access', 'paging', 'records' ]; // we name them here, rather than just iterate the directory
+const SCHEMES = [ 'id', 'slug', 'name', 'description', 'entity', 'connector', 'session', 'policy', 'user', 'user_addendum', 'paging', 'records' ]; // we name them here, rather than just iterate the directory
 
 // --- validate class (exported)
 
@@ -105,7 +105,6 @@ module.exports = class Validate {
 
     // --- complex property validators
 
-    access(properties) { return this.scheme(properties, 'access'); }
     connector(properties) { return this.scheme(properties, 'connector'); }
     policy(properties) { return this.scheme(properties, 'policy'); }
     user(properties) { return this.scheme(properties, 'user'); }

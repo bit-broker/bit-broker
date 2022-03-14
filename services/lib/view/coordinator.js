@@ -72,8 +72,11 @@ module.exports = class Coordinator extends View {
             url: this.rest(route, 'user', item.id),
             name: item.properties.name,
             email: item.email,
-            coordinator: item.coordinator,
-            accesses: item.accesses
+            coordinator: item.coordinator_key_id !== null,
+            accesses: item.accesses.map(a => ({
+                id: a,
+                url: this.rest(route, 'user', item.id, 'access', a)
+            }))
         };
 
         if (full) {
@@ -101,10 +104,12 @@ module.exports = class Coordinator extends View {
 
     static access(route, item, full = true) {
         let doc = {
-            id: item.id,
-            url: this.rest(route, 'user', item.user_id, 'access', item.id),
-            role: item.role,
-            context: item.context,
+            id: item.policy_slug,
+            url: this.rest(route, 'user', item.user_id, 'access', item.policy_slug),
+            policy: {
+                id: item.policy_slug,
+                url: this.rest(route, 'policy', item.policy_slug),
+            },
             created: item.created_at
         };
 

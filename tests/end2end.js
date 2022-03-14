@@ -49,13 +49,13 @@ describe('End-to-End Tests', function() {
 
     // --- setup test context
 
-    let admin = { id: 1, url: URLs.user(1), name: 'admin' };
+    let admin = { id: 1, url: URLs.user(1), name: 'admin', coordinator: true };
     let coordinator = Seeder.users.find(e => e.properties.name === 'alice');
     let consumer = Seeder.users.find(e => e.properties.name === 'bob');
     let country = Seeder.entities.find(e => e.slug === 'country');
     let site = Seeder.entities.find(e => e.slug === 'heritage-site');
 
-    // --- setup test expectations - keep these to teh first page of results based on insert order of seed data
+    // --- setup test expectations - keep these to the first page of results based on insert order of seed data
 
     let posit = {
         'country': [
@@ -109,9 +109,9 @@ describe('End-to-End Tests', function() {
     }
 
     function expectations(policy) {
-        return Crud.add(URLs.access(consumer.uid), { role: 'consumer', context: policy }, undefined, (token, location) => {
+        let url = URLs.access(consumer.uid, policy);
+        return Crud.add(url, undefined, url, token => {
             headers(token, policy);
-            consumer.aid = parseInt(location.match(/\d+$/).shift());
         })
         .then(() => {
             let tests = [];
@@ -131,7 +131,7 @@ describe('End-to-End Tests', function() {
 
                 // --- check entity instances in entity list
 
-                tests.push (Crud.get(URLs.consumer_entity(entity), (list) => {
+                tests.push (Crud.get(URLs.consumer_entity(entity), list => {
                     for (let i = 0 ; i < posited.length ; i++) {
                         expectation(list, policy, posited[i]);
                     }
@@ -140,15 +140,15 @@ describe('End-to-End Tests', function() {
                 // --- check entity instances in catalog
 
                 for (let i = 0 ; i < posited.length ; i++) {
-                    tests.push (Crud.get(URLs.consumer_catalog({ type: entity, name: posited[i].name }), (list) => {
+                    tests.push (Crud.get(URLs.consumer_catalog({ type: entity, name: posited[i].name }), list => {
                         expectation(list, policy, posited[i]);
                     }));
                 }
             }
 
             tests.push (Crud.verify_all(URLs.consumer_entity(), entities)); // check entity types
-            tests.push (new Promise((resolve) => { headers(coordinator.token); resolve(); })); // back to coordinator key
-            tests.push (Crud.delete(URLs.access(consumer.uid, consumer.aid))); // remove the key
+            tests.push (new Promise(resolve => { headers(coordinator.token); resolve(); })); // back to coordinator key
+            tests.push (Crud.delete(URLs.access(consumer.uid, policy))); // remove the key
 
             return Promise.all(tests);
         });
@@ -160,9 +160,9 @@ describe('End-to-End Tests', function() {
         let act = [];
         headers(consumer.token, policy);
 
-        return Crud.get(URLs.consumer_entity(entity), (list) => {
+        return Crud.get(URLs.consumer_entity(entity), list => {
             for (let i = 0 ; i < list.length ; i++) {
-                act.push(Crud.get(list[i].url, (item) => {
+                act.push(Crud.get(list[i].url, item => {
                     expect(item).to.be.an('object');
                     expect(item).to.have.property('entity');
 
@@ -189,9 +189,9 @@ describe('End-to-End Tests', function() {
             act = [];
             headers(consumer.token, policy);
 
-            return Crud.get(URLs.consumer_entity(entity), (list) => {
+            return Crud.get(URLs.consumer_entity(entity), list => {
                 for (let i = 0 ; i < list.length ; i++) {
-                    act.push(Crud.get(list[i].url, (item) => {
+                    act.push(Crud.get(list[i].url, item => {
                         expect(item).to.be.an('object');
                         expect(item).to.have.property('entity');
 
@@ -247,6 +247,8 @@ describe('End-to-End Tests', function() {
 
     // --- the tests themselves
 
+    it('--- pre-test checks ---------------------------------------------------\n', function () { console.log(); return true; });
+
     it('tests are in production mode', function () {
         return LOCAL ? this.skip() : true;
     });
@@ -272,6 +274,8 @@ describe('End-to-End Tests', function() {
         return Crud.verify_all(URLs.user(), [admin]);
     });
 
+    it('--- create the coordinator --------------------------------------------\n', function () { console.log(); return true; });
+
     it('create the coordinator user', function () {
         return Crud.add(URLs.user(), coordinator.properties, undefined, (body, location) => {
             coordinator.uid = parseInt(location.match(/\d+$/).shift());
@@ -279,7 +283,7 @@ describe('End-to-End Tests', function() {
     });
 
     it('generate a new key for the coordinator user', function () {
-        return Crud.add(URLs.access(coordinator.uid), { role: 'coordinator' }, undefined, (token) => {
+        return Crud.post(URLs.user_coordinator(coordinator.uid), undefined, token => {
             coordinator.token = token;
         });
     });
@@ -289,12 +293,14 @@ describe('End-to-End Tests', function() {
         return server_access(true, false, false).then (skipped => skipped ? this.skip() : true);
     });
 
+    it('--- create country records --------------------------------------------\n', function () { console.log(); return true; });
+
     it('create the country entity', function () {
         return Crud.add(URLs.entity(country.slug), country.properties);
     });
 
     it('create the country entity connector', function () {
-        return Crud.add(URLs.connector(country.slug, country.connectors[0].slug), country.connectors[0].properties, undefined, (details) => {
+        return Crud.add(URLs.connector(country.slug, country.connectors[0].slug), country.connectors[0].properties, undefined, details => {
             country.connectors[0].id = details.id;
             country.connectors[0].token = details.token;
         });
@@ -306,7 +312,7 @@ describe('End-to-End Tests', function() {
     });
 
     it('open a stream session on country', function () {
-        return Crud.get(URLs.session_open(country.connectors[0].id, 'stream'), (session) => {
+        return Crud.get(URLs.session_open(country.connectors[0].id, 'stream'), session => {
             country.connectors[0].session = session;
         });
     });
@@ -327,13 +333,15 @@ describe('End-to-End Tests', function() {
         return Crud.get(URLs.session_close(country.connectors[0].id, country.connectors[0].session, 'true'));
     });
 
+    it('--- create heritage-site records --------------------------------------\n', function () { console.log(); return true; });
+
     it('create the heritage-site entity', function () {
         headers(coordinator.token);
         return Crud.add(URLs.entity(site.slug), site.properties);
     });
 
     it('create the heritage-site entity connector', function () {
-        return Crud.add(URLs.connector(site.slug, site.connectors[0].slug), site.connectors[0].properties, undefined, (details) => {
+        return Crud.add(URLs.connector(site.slug, site.connectors[0].slug), site.connectors[0].properties, undefined, details => {
             site.connectors[0].id = details.id;
             site.connectors[0].token = details.token;
         });
@@ -341,7 +349,7 @@ describe('End-to-End Tests', function() {
 
     it('switch to the connector key and then open a stream session on heritage-site', function () {
         headers(site.connectors[0].token);
-        return Crud.get(URLs.session_open(site.connectors[0].id, 'stream'), (session) => {
+        return Crud.get(URLs.session_open(site.connectors[0].id, 'stream'), session => {
             site.connectors[0].session = session;
         });
     });
@@ -362,6 +370,8 @@ describe('End-to-End Tests', function() {
         return Crud.get(URLs.session_close(site.connectors[0].id, site.connectors[0].session, 'true'));
     });
 
+    it('--- create policies ---------------------------------------------------\n', function () { console.log(); return true; });
+
     it('add all the policies', function () {
         headers(coordinator.token);
 
@@ -375,6 +385,8 @@ describe('End-to-End Tests', function() {
         return Promise.all(act);
     });
 
+    it('--- create consumer ---------------------------------------------------\n', function () { console.log(); return true; });
+
     it('add the consumer user', function () {
         return Crud.add(URLs.user(), consumer.properties, undefined, (body, location) => {
             consumer.uid = parseInt(location.match(/\d+$/).shift());
@@ -382,9 +394,9 @@ describe('End-to-End Tests', function() {
     });
 
     it('generate a key for the consumer user for the "access-all-areas" policy', function () {
-        return Crud.add(URLs.access(consumer.uid), { role: 'consumer', context: 'access-all-areas' }, undefined, (token, location) => {
+        let url = URLs.access(consumer.uid, 'access-all-areas');
+        return Crud.add(url, undefined, url, token => {
             consumer.token = token;
-            consumer.aid = parseInt(location.match(/\d+$/).shift());
             consumer.policy = 'access-all-areas';
         });
     });
@@ -396,8 +408,10 @@ describe('End-to-End Tests', function() {
 
     it('delete the consumer key', function () {
         headers(coordinator.token);
-        return Crud.delete(URLs.access(consumer.uid, consumer.aid));
+        return Crud.delete(URLs.access(consumer.uid, consumer.policy));
     });
+
+    it('--- no per policy expectations ----------------------------------------\n', function () { console.log(); return true; });
 
     it('expectations met for policy "access-all-areas"', function () {
         return expectations('access-all-areas');
@@ -423,10 +437,12 @@ describe('End-to-End Tests', function() {
         return Crud.verify_all(URLs.access(consumer.uid), []);
     });
 
+    it('--- check field masking -----------------------------------------------\n', function () { console.log(); return true; });
+
     it('generate a consumer key on "british-isles"', function () {
-        return Crud.add(URLs.access(consumer.uid), { role: 'consumer', context: 'british-isles' }, undefined, (token, location) => {
+        let url = URLs.access(consumer.uid, 'british-isles');
+        return Crud.add(url, undefined, url, token => {
             consumer.token = token;
-            consumer.aid = parseInt(location.match(/\d+$/).shift());
             consumer.policy = 'british-isles';
         });
     });
@@ -439,17 +455,20 @@ describe('End-to-End Tests', function() {
     });
 
     it('delete consumer api key on "british-isles"', function () {
-        return Crud.delete(URLs.access(consumer.uid, consumer.aid));
+        return Crud.delete(URLs.access(consumer.uid, 'british-isles'));
     })
 
     it('there are no keys presents for the consumer user', function () {
         return Crud.verify_all(URLs.access(consumer.uid), []);
     });
 
+    it('--- check key refreshing ----------------------------------------------\n', function () { console.log(); return true; });
+
     it('generate a consumer key on "access-all-areas"', function () {
-        return Crud.add(URLs.access(consumer.uid), { role: 'consumer', context: 'access-all-areas' }, undefined, (token, location) => {
+        let url = URLs.access(consumer.uid, 'access-all-areas');
+        return Crud.add(url, undefined, url, token => {
             consumer.token = token;
-            consumer.aid = parseInt(location.match(/\d+$/).shift());
+            consumer.policy = 'access-all-areas';
         });
     });
 
@@ -460,7 +479,7 @@ describe('End-to-End Tests', function() {
 
     it('refresh consumer key on "access-all-areas"', function () {
         headers(coordinator.token);
-        return Crud.update(URLs.access(consumer.uid, consumer.aid), { role: 'consumer', context: 'access-all-areas' }, (token) =>
+        return Crud.update(URLs.access(consumer.uid, 'access-all-areas'), undefined, token =>
         {
             consumer.old_token = consumer.token;
             consumer.token = token;
@@ -479,7 +498,7 @@ describe('End-to-End Tests', function() {
 
     it('delete consumer api key on "access-all-areas"', function () {
         headers(coordinator.token);
-        return Crud.delete(URLs.access(consumer.uid, consumer.aid));
+        return Crud.delete(URLs.access(consumer.uid, 'access-all-areas'));
     });
 
     it('check consumer api is not accessible with the now deleted key', function () {
@@ -487,11 +506,14 @@ describe('End-to-End Tests', function() {
         return LOCAL ? this.skip() : Crud.forbidden(URLs.consumer_catalog());
     });
 
+    it('--- check policy deletion ---------------------------------------------\n', function () { console.log(); return true; });
+
     it('generate a new consumer key on "access-all-areas"', function () {
         headers(coordinator.token);
-        return Crud.add(URLs.access(consumer.uid), { role: 'consumer', context: 'access-all-areas' }, undefined, (token, location) => {
+        let url = URLs.access(consumer.uid, 'access-all-areas');
+        return Crud.add(url, undefined, url, token => {
             consumer.token = token;
-            consumer.aid = parseInt(location.match(/\d+$/).shift());
+            consumer.policy = 'access-all-areas';
         });
     });
 
@@ -510,11 +532,14 @@ describe('End-to-End Tests', function() {
         return LOCAL ? this.skip() : Crud.forbidden(URLs.consumer_catalog());
     });
 
+    it('--- check user deletion -----------------------------------------------\n', function () { console.log(); return true; });
+
     it('generate a consumer key on "all-countries"', function () {
         headers(coordinator.token);
-        return Crud.add(URLs.access(consumer.uid), { role: 'consumer', context: 'all-countries' }, undefined, (token, location) => {
+        let url = URLs.access(consumer.uid, 'all-countries');
+        return Crud.add(url, undefined, url, token => {
             consumer.token = token;
-            consumer.aid = parseInt(location.match(/\d+$/).shift());
+            consumer.policy = 'all-countries';
         });
     });
 
@@ -533,6 +558,8 @@ describe('End-to-End Tests', function() {
         return LOCAL ? this.skip() : Crud.forbidden(URLs.consumer_catalog());
     });
 
+    it('--- check connector deletion ------------------------------------------\n', function () { console.log(); return true; });
+
     it('switch to country connector key and then check can open stream session', function () {
         headers(country.connectors[0].token);
         return Crud.get(URLs.session_open(country.connectors[0].id));
@@ -547,6 +574,8 @@ describe('End-to-End Tests', function() {
         headers(country.connectors[0].token);
         return LOCAL ? this.skip() : Crud.forbidden(URLs.session_open(country.connectors[0].id));
     });
+
+    it('--- check entity deletion ---------------------------------------------\n', function () { console.log(); return true; });
 
     it('switch to heritage-site connector key and then check can open stream session', function () {
         headers(site.connectors[0].token);
@@ -563,6 +592,8 @@ describe('End-to-End Tests', function() {
         return LOCAL ? this.skip() : Crud.forbidden(URLs.session_open(site.connectors[0].id));
     });
 
+    it('--- check coordinator deletion ----------------------------------------\n', function () { console.log(); return true; });
+
     it('delete the coordinator user', function () {
         headers(coordinator.token);
         return Crud.delete(URLs.user(coordinator.uid));
@@ -572,12 +603,14 @@ describe('End-to-End Tests', function() {
         return LOCAL ? this.skip() : Crud.forbidden(URLs.entity());
     });
 
+    it('--- finish-up tests ---------------------------------------------------\n', function () { console.log(); return true; });
+
     it('switch back to the bootstrap key and delete remaining objects', function () {
         headers(process.env.TESTS_BOOTSTRAP_KEY);
 
         let act = [ Crud.delete(URLs.entity(country.slug)) ];
 
-        return Crud.get(URLs.policy(), (list) => {
+        return Crud.get(URLs.policy(), list => {
             for (let i = 0 ; i < list.length ; i++) {
                 act.push(Crud.delete(URLs.policy(list[i].id)));
             }
