@@ -1,4 +1,4 @@
-name: Manual Workflow
+name: Build and test
 on:
   pull_request:
     paths-ignore:
@@ -73,18 +73,18 @@ jobs:
           echo "POLICY_SERVICE_TIMEOUT=\"3\""            >>  .env_rate
 
       - name: install dependencies
-        working-directory: ./tests 
+        working-directory: tests 
         run: npm install
        
       - name: build docker-compose
-        working-directory: ./development/docker-compose
+        working-directory: development/docker-compose
         run: docker-compose up --build -d
 
       - name: run tests
-        working-directory: ./tests 
+        working-directory: tests 
         run: node all.js
 
       - name: Stop containers
         if: always()
-        working-directory: ./development/docker-compose
+        working-directory: development/docker-compose
         run: docker-compose down
