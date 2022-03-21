@@ -1,0 +1,90 @@
+name: Manual Workflow
+on:
+  pull_request:
+    paths-ignore:
+      - '**.md'
+  workflow_dispatch:
+
+jobs:
+   
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      
+      - name: checkout auth service
+        uses: actions/checkout@v2
+        with:
+          repository: bit-broker/auth-service
+
+      - name: checkout rate service
+        uses: actions/checkout@v2
+        with:
+          repository: bit-broker/rate-service
+
+      - name: Set up node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+          cache: 'npm'
+          cache-dependency-path: tests/package-lock.json
+
+      #update etc/hosts
+      - name: Add hosts to /etc/hosts
+        run: |
+          echo "10.0.2.15	bbk-coordinator" | sudo tee -a /etc/hosts
+          echo "10.0.2.15	bbk-contributor" | sudo tee -a /etc/hosts
+          echo "10.0.2.15	bbk-consumer" | sudo tee -a /etc/hosts
+          echo "10.0.2.15	bbk-database" | sudo tee -a /etc/hosts
+          echo "10.0.2.15	bbk-policy-cache" | sudo tee -a /etc/hosts
+          echo "10.0.2.15	bbk-auth-service" | sudo tee -a /etc/hosts
+          echo "10.0.2.15	bbk-rate-limit" | sudo tee -a /etc/hosts
+          echo "10.0.2.15	bbk-webhook" | sudo tee -a /etc/hosts
+
+       # set up env files required for deployment & test...
+
+      - name: Create .env file for docker
+        run: cp .env.example .env
+
+      - name: Create .env file for tests
+        run: cp .env.example ./tests/.env
+
+      - name: Create auth .env file for tests
+        run: |
+          echo "NODE_ENV=development" >   .env_auth
+          echo "LOG_LEVEL=debug"      >>  .env_auth
+          echo "SERVER_PORT=8080"     >>  .env_auth
+          echo "REDIS_ADDR=\"bbk-auth-service-cache:6381\"" >>  .env_auth
+          echo "REDIS_PASSWORD=\"\""  >>  .env_auth
+          echo "REDIS_DB=\"0\""       >>  .env_auth
+
+      - name: Create rate .env file for tests
+        run: |
+          echo "SERVER_HTTP_HOST=0.0.0.0:4000"  >   .env_rate
+          echo "SERVER_GRPC_HOST=0.0.0.0:7000"  >>  .env_rate
+          echo "GO_ENV=development"   >>  .env_rate
+          echo "LOG_LEVEL=InfoLevel"  >>  .env_rate
+          echo "REDIS_ADDR=\"bbk-rate-limit-cache:6380\""   >>  .env_rate
+          echo "REDIS_PASSWORD=\"\""  >>  .env_rate
+          echo "REDIS_DB=\"0\""       >>  .env_rate
+          echo "POLICY_SERVICE_ENDPOINT=\"http://bbk-coordinator:8001/v1\""  >>  .env_rate
+          echo "POLICY_SERVICE_AUTHORIZATION=\"\""       >>  .env_rate
+          echo "POLICY_SERVICE_TIMEOUT=\"3\""            >>  .env_rate
+
+      - name: install dependencies
+        working-directory: ./tests 
+        run: npm install
+       
+      - name: build docker-compose
+        working-directory: ./development/docker-compose
+        run: docker-compose up --build -d
+
+      - name: run tests
+        working-directory: ./tests 
+        run: node all.js
+
+      - name: Stop containers
+        if: always()
+        working-directory: ./development/docker-compose
+        run: docker-compose down
