@@ -7,7 +7,7 @@ on:
 
 jobs:
    
-  build-and-launch:
+  build-launch-test:
     runs-on: ubuntu-latest
     steps:
        
@@ -34,6 +34,21 @@ jobs:
       # set up env files required for deployment & test...
       - name: Create .env file for docker
         run: cp .env.example .env
+
+      - name: Create .env file for tests
+        run: cp .env.example ./tests/.env
+
+      - name: Set up node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+          cache: 'npm'
+          cache-dependency-path: tests/package-lock.json
+
+      # install test suite dependencies
+      - name: install dependencies
+        working-directory: tests 
+        run: npm install
        
       - name: build and run docker-compose
         working-directory: development/docker-compose
@@ -52,27 +67,6 @@ jobs:
           curl http://bbk-consumer:8003/v1
           curl http://bbk-auth-service:8080/api/v1
           curl http://bbk-rate-limit:4000/api/v1
-
-
-  run-tests:
-    needs: build-and-launch
-    runs-on: ubuntu-latest
-    steps:
-
-      - name: Create .env file for tests
-        run: cp .env.example ./tests/.env
-
-      - name: Set up node
-        uses: actions/setup-node@v2
-        with:
-          node-version: 16.x
-          cache: 'npm'
-          cache-dependency-path: tests/package-lock.json
-
-      # install test suite dependencies
-      - name: install dependencies
-        working-directory: tests 
-        run: npm install
 
       - name: run tests
         working-directory: tests 
