@@ -46,6 +46,11 @@ jobs:
       - name: install dependencies
         working-directory: tests 
         run: npm install
+
+      # install test suite dependencies
+      - name: install mocha
+        working-directory: tests 
+        run: npm install mocha -g
        
       - name: build and run docker-compose
         working-directory: development/docker-compose
