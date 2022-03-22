@@ -19,6 +19,10 @@ jobs:
         with:
           node-version: 16.x
 
+      # verify runner ip config
+      - name: check runner ip config
+        run: ifconfig
+
       #update etc/hosts to resolve service names
       - name: Add hosts to /etc/hosts
         run: |
@@ -33,10 +37,7 @@ jobs:
 
       # set up env files required for deployment & test...
       - name: Create .env file for docker
-        run: |
-          pwd
-          ls -la
-          cp .env.example .env
+        run: cp .env.example .env
 
       - name: Create .env file for tests
         run: cp .env.example ./tests/.env
@@ -52,7 +53,8 @@ jobs:
 
       - name: run tests
         working-directory: tests 
-        run: node all.js
+        run: |
+          mocha coordinator.js
 
       - name: Stop containers
         if: always()
