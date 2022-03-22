@@ -7,17 +7,12 @@ on:
 
 jobs:
    
-  build-test:
+  build-and-launch:
     runs-on: ubuntu-latest
     steps:
        
       - name: checkout
         uses: actions/checkout@v2
-
-      - name: Set up node
-        uses: actions/setup-node@v2
-        with:
-          node-version: 16.x
 
       # get & persist host IP
       - name: get host IP (eth0)
@@ -39,19 +34,6 @@ jobs:
       # set up env files required for deployment & test...
       - name: Create .env file for docker
         run: cp .env.example .env
-
-      - name: Create .env file for tests
-        run: cp .env.example ./tests/.env
-
-      # install test suite dependencies
-      - name: install dependencies
-        working-directory: tests 
-        run: npm install
-
-      # install test suite dependencies
-      # - name: install mocha
-      #   working-directory: tests 
-      #   run: npm install mocha -g
        
       - name: build and run docker-compose
         working-directory: development/docker-compose
@@ -62,14 +44,40 @@ jobs:
         run: sleep 10s
         shell: bash
 
+      # check services are alive
+      - name: Check Service endpoints
+        run: |
+          export "$(grep -vE "^(#.*|\s*)$" .env)"
+          curl $TESTS_COORDINATOR
+          curl $TESTS_CONTRIBUTOR
+          curl $TESTS_CONSUMER
+          curl $AUTH_SERVICE
+          curl $RATE_SERVICE
+
+
+  run-tests:
+    needs: build-and-launch
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Create .env file for tests
+        run: cp .env.example ./tests/.env
+
+      - name: Set up node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+          cache: 'npm'
+          cache-dependency-path: tests/package-lock.json
+
+      # install test suite dependencies
+      - name: install dependencies
+        working-directory: tests 
+        run: npm install
+
       - name: run tests
         working-directory: tests 
         run: node all.js
-
-      # - name: Log containers
-      #   if: always()
-      #   working-directory: development/docker-compose
-      #   run: docker-compose logs
 
       - name: Stop containers
         if: always()
