@@ -61,6 +61,10 @@ jobs:
         run: |
           mocha coordinator.js
 
+      - name: Log containers
+        working-directory: development/docker-compose
+        run: docker-compose logs
+
       - name: Stop containers
         if: always()
         working-directory: development/docker-compose
