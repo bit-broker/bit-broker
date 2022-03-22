@@ -62,6 +62,7 @@ jobs:
       - name: run tests
         working-directory: tests 
         run: |
+          cat .env
           mocha coordinator.js
 
       - name: Log containers
