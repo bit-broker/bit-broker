@@ -21,7 +21,9 @@ jobs:
 
       # get & persist host IP
       - name: get host IP (eth0)
-        run: echo "host_ip=$(ip addr show eth0 | grep -Po 'inet \K[\d.]+')" >> $GITHUB_ENV
+        run: |
+          ifconfig
+          echo "host_ip=$(ip addr show eth0 | grep -Po 'inet \K[\d.]+')" >> $GITHUB_ENV
 
       #update etc/hosts to resolve service names
       - name: Add hosts to /etc/hosts
@@ -34,6 +36,7 @@ jobs:
           echo "${{ env.host_ip }}	bbk-auth-service" | sudo tee -a /etc/hosts
           echo "${{ env.host_ip }}	bbk-rate-limit" | sudo tee -a /etc/hosts
           echo "${{ env.host_ip }}	bbk-webhook" | sudo tee -a /etc/hosts
+          cat /etc/hosts
 
       # set up env files required for deployment & test...
       - name: Create .env file for docker
@@ -64,7 +67,9 @@ jobs:
       - name: Log containers
         if: always()
         working-directory: development/docker-compose
-        run: docker-compose logs
+        run: |
+          docker ps
+          docker-compose logs
 
       - name: Stop containers
         if: always()
