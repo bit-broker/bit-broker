@@ -127,7 +127,7 @@ services:
       timeout: 4s
       retries: 4
 
-  # --- rate limit service stub
+  # --- auth limit service stub
   bbk-auth-service:
     build:
       context: ../..
