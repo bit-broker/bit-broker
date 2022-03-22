@@ -21,9 +21,7 @@ jobs:
 
       # get & persist host IP
       - name: get host IP (eth0)
-        run: |
-          ifconfig
-          echo "host_ip=$(ip addr show eth0 | grep -Po 'inet \K[\d.]+')" >> $GITHUB_ENV
+        run: echo "host_ip=$(ip addr show eth0 | grep -Po 'inet \K[\d.]+')" >> $GITHUB_ENV
 
       #update etc/hosts to resolve service names
       - name: Add hosts to /etc/hosts
@@ -51,31 +49,27 @@ jobs:
         run: npm install
 
       # install test suite dependencies
-      - name: install mocha
-        working-directory: tests 
-        run: npm install mocha -g
+      # - name: install mocha
+      #   working-directory: tests 
+      #   run: npm install mocha -g
        
       - name: build and run docker-compose
         working-directory: development/docker-compose
         run: docker-compose up --build -d
 
+      # let deployment settle...
       - name: Sleep for 10 seconds
         run: sleep 10s
         shell: bash
 
       - name: run tests
         working-directory: tests 
-        run: |
-          cat .env
-          curl http://bbk-consumer:8003/v1
-          mocha coordinator.js
+        run: node all.js
 
-      - name: Log containers
-        if: always()
-        working-directory: development/docker-compose
-        run: |
-          docker ps
-          docker-compose logs
+      # - name: Log containers
+      #   if: always()
+      #   working-directory: development/docker-compose
+      #   run: docker-compose logs
 
       - name: Stop containers
         if: always()
