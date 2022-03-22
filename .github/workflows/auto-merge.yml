@@ -1,0 +1,22 @@
+name: Auto-merge
+
+on:
+    workflow_run:
+        types:
+            - completed
+        workflows:
+            - 'Build and test'
+
+jobs:
+    merge-me:
+        name: Auto-Merge
+
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Auto-Merge!
+              if: ${{ github.event.workflow_run.conclusion == 'success' }}
+              uses: ridedott/merge-me-action@v2
+              with:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  PRESET: DEPENDABOT_MINOR
