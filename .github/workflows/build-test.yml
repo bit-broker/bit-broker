@@ -63,6 +63,7 @@ jobs:
         working-directory: tests 
         run: |
           cat .env
+          curl http://bbk-consumer:8003/v1
           mocha coordinator.js
 
       - name: Log containers
