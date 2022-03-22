@@ -35,7 +35,10 @@ jobs:
 
       # set up env files required for deployment & test...
       - name: Create .env file for docker
-        run: cp .env.example .env
+        run: |
+          pwd
+          ls -la
+          cp .env.example .env
 
       - name: Create .env file for tests
         run: cp .env.example ./tests/.env
