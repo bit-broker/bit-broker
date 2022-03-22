@@ -10,18 +10,23 @@ jobs:
   build-test:
     runs-on: ubuntu-latest
     steps:
+       
       - name: checkout
         uses: actions/checkout@v2
+        with:
+          path: main
       
-      # - name: checkout auth service
-      #   uses: actions/checkout@v2
-      #   with:
-      #     repository: bit-broker/auth-service
+      - name: checkout auth service
+        uses: actions/checkout@v2
+        with:
+          repository: bit-broker/auth-service
+          path: auth-service
 
-      # - name: checkout rate service
-      #   uses: actions/checkout@v2
-      #   with:
-      #     repository: bit-broker/rate-service
+      - name: checkout rate service
+        uses: actions/checkout@v2
+        with:
+          repository: bit-broker/rate-service
+          path: rate-service
 
       - name: Set up node
         uses: actions/setup-node@v2
