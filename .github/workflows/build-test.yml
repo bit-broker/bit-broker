@@ -1,0 +1,78 @@
+name: Build and test
+on:
+  pull_request:
+    paths-ignore:
+      - '**.md'
+  workflow_dispatch:
+
+jobs:
+   
+  build-launch-test:
+    runs-on: ubuntu-latest
+    steps:
+       
+      - name: checkout
+        uses: actions/checkout@v2
+
+      # get & persist host IP
+      - name: get host IP (eth0)
+        run: echo "host_ip=$(ip addr show eth0 | grep -Po 'inet \K[\d.]+')" >> $GITHUB_ENV
+
+      #update etc/hosts to resolve service names
+      - name: Add hosts to /etc/hosts
+        run: |
+          echo "${{ env.host_ip }}  bbk-coordinator" | sudo tee -a /etc/hosts
+          echo "${{ env.host_ip }}	bbk-contributor" | sudo tee -a /etc/hosts
+          echo "${{ env.host_ip }}	bbk-consumer" | sudo tee -a /etc/hosts
+          echo "${{ env.host_ip }}	bbk-database" | sudo tee -a /etc/hosts
+          echo "${{ env.host_ip }}	bbk-policy-cache" | sudo tee -a /etc/hosts
+          echo "${{ env.host_ip }}	bbk-auth-service" | sudo tee -a /etc/hosts
+          echo "${{ env.host_ip }}	bbk-rate-limit" | sudo tee -a /etc/hosts
+          echo "${{ env.host_ip }}	bbk-webhook" | sudo tee -a /etc/hosts
+          cat /etc/hosts
+
+      # set up env files required for deployment & test...
+      - name: Create .env file for docker
+        run: cp .env.example .env
+
+      - name: Create .env file for tests
+        run: cp .env.example ./tests/.env
+
+      - name: Set up node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+          cache: 'npm'
+          cache-dependency-path: tests/package-lock.json
+
+      # install test suite dependencies
+      - name: install dependencies
+        working-directory: tests 
+        run: npm install
+       
+      - name: build and run docker-compose
+        working-directory: development/docker-compose
+        run: docker-compose up --build -d
+
+      # let deployment settle...
+      - name: Sleep for 10 seconds
+        run: sleep 10s
+        shell: bash
+
+      # check services are alive
+      - name: Check Service endpoints
+        run: |
+          curl http://bbk-coordinator:8001/v1
+          curl http://bbk-contributor:8002/v1
+          curl http://bbk-consumer:8003/v1
+          curl http://bbk-auth-service:8080/api/v1
+          curl http://bbk-rate-limit:4000/api/v1
+
+      - name: run tests
+        working-directory: tests 
+        run: node all.js
+
+      - name: Stop containers
+        if: always()
+        working-directory: development/docker-compose
+        run: docker-compose down
