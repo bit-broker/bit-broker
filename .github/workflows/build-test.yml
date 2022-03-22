@@ -59,6 +59,10 @@ jobs:
         working-directory: development/docker-compose
         run: docker-compose up --build -d
 
+      - name: Sleep for 10 seconds
+        run: sleep 10s
+        shell: bash
+
       - name: run tests
         working-directory: tests 
         run: |
