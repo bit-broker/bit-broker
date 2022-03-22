@@ -19,21 +19,21 @@ jobs:
         with:
           node-version: 16.x
 
-      # verify runner ip config
-      - name: check runner ip config
-        run: ifconfig
+      # get & persist host IP
+      - name: get host IP (eth0)
+        run: echo "host_ip=$(ip addr show eth0 | grep -Po 'inet \K[\d.]+')" >> $GITHUB_ENV
 
       #update etc/hosts to resolve service names
       - name: Add hosts to /etc/hosts
         run: |
-          echo "172.17.0.1	bbk-coordinator" | sudo tee -a /etc/hosts
-          echo "172.17.0.1	bbk-contributor" | sudo tee -a /etc/hosts
-          echo "172.17.0.1	bbk-consumer" | sudo tee -a /etc/hosts
-          echo "172.17.0.1	bbk-database" | sudo tee -a /etc/hosts
-          echo "172.17.0.1	bbk-policy-cache" | sudo tee -a /etc/hosts
-          echo "172.17.0.1	bbk-auth-service" | sudo tee -a /etc/hosts
-          echo "172.17.0.1	bbk-rate-limit" | sudo tee -a /etc/hosts
-          echo "172.17.0.1	bbk-webhook" | sudo tee -a /etc/hosts
+          echo "${{ env.host_ip }}  bbk-coordinator" | sudo tee -a /etc/hosts
+          echo "${{ env.host_ip }}	bbk-contributor" | sudo tee -a /etc/hosts
+          echo "${{ env.host_ip }}	bbk-consumer" | sudo tee -a /etc/hosts
+          echo "${{ env.host_ip }}	bbk-database" | sudo tee -a /etc/hosts
+          echo "${{ env.host_ip }}	bbk-policy-cache" | sudo tee -a /etc/hosts
+          echo "${{ env.host_ip }}	bbk-auth-service" | sudo tee -a /etc/hosts
+          echo "${{ env.host_ip }}	bbk-rate-limit" | sudo tee -a /etc/hosts
+          echo "${{ env.host_ip }}	bbk-webhook" | sudo tee -a /etc/hosts
 
       # set up env files required for deployment & test...
       - name: Create .env file for docker
