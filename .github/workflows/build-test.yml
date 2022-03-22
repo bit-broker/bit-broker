@@ -47,12 +47,11 @@ jobs:
       # check services are alive
       - name: Check Service endpoints
         run: |
-          export "$(grep -vE "^(#.*|\s*)$" .env)"
-          curl $TESTS_COORDINATOR
-          curl $TESTS_CONTRIBUTOR
-          curl $TESTS_CONSUMER
-          curl $AUTH_SERVICE
-          curl $RATE_SERVICE
+          curl http://bbk-coordinator:8001/v1
+          curl http://bbk-contributor:8002/v1
+          curl http://bbk-consumer:8003/v1
+          curl http://bbk-auth-service:8080/api/v1
+          curl http://bbk-rate-limit:4000/api/v1
 
 
   run-tests:
