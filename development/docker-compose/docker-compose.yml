@@ -110,65 +110,35 @@ services:
       timeout: 4s
       retries: 4
 
-  # --- rate limit service
+  # --- rate limit service stub
   bbk-rate-limit:
     build:
-      context: ../../..
-      dockerfile: ./bit-broker/development/ancillary-services/rate-limit/Dockerfile
+      context: ../..
+      dockerfile: ./development/ancillary-services/rate-limit-stub/Dockerfile
     container_name: bbk-rate-limit
-    image: bbk-rate-limit
-    depends_on:
-      bbk-rate-limit-cache:
-        condition: service_healthy
+    image: bbk-rate-limit-stub
     ports:
       - 4000:4000
       - 7000:7000
+    env_file: ../../.env
     healthcheck:
       test: ["CMD-SHELL", "ls"]
       interval: 4s
       timeout: 4s
       retries: 4
-    env_file: ../../.env_rate
 
-  # --- rate limit cache
-  bbk-rate-limit-cache:
-    image: redis:6.2.3-alpine
-    container_name: bbk-rate-limit-cache
-    ports:
-      - 6380:6379
-    healthcheck:
-      test: ["CMD-SHELL", "redis-cli ping"]
-      interval: 4s
-      timeout: 4s
-      retries: 4
-
-  # --- auth service
+  # --- rate limit service stub
   bbk-auth-service:
     build:
-      context: ../../..
-      dockerfile: ./bit-broker/development/ancillary-services/auth-service/Dockerfile
+      context: ../..
+      dockerfile: ./development/ancillary-services/auth-service-stub/Dockerfile
     container_name: bbk-auth-service
-    image: bbk-auth-service
-    depends_on:
-      bbk-auth-cache:
-        condition: service_healthy
+    image: bbk-auth-service-stub
     ports:
       - 8080:8080
-    env_file: ../../.env_auth
+    env_file: ../../.env
     healthcheck:
       test: ["CMD-SHELL", "wget http://localhost:8080/api/v1 -q --spider"]
-      interval: 4s
-      timeout: 4s
-      retries: 4
-
-  # --- auth cache
-  bbk-auth-cache:
-    image: redis:6.2.3-alpine
-    container_name: bbk-auth-cache
-    ports:
-      - 6381:6379
-    healthcheck:
-      test: ["CMD-SHELL", "redis-cli ping"]
       interval: 4s
       timeout: 4s
       retries: 4
