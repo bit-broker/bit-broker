@@ -53,8 +53,8 @@ module.exports = class User {
             'id',
             'email',
             'properties',
-            this.db.raw("(SELECT COALESCE(JSON_OBJECT_AGG(access.id, access.context), '{}'::json) FROM access WHERE role = 'consumer' AND user_id = users.id) AS accesses"),
-            this.db.raw("(CASE WHEN EXISTS (SELECT id FROM access WHERE role = 'coordinator' AND user_id = users.id) THEN TRUE ELSE FALSE END) AS coordinator"),
+            'coordinator_key_id',
+            this.db.raw("(SELECT ARRAY(SELECT policy.slug FROM access, policy WHERE access.user_id = users.id AND access.policy_id = policy.id)) AS accesses"),
             'created_at',
             'updated_at'
         ];

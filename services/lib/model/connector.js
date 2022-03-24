@@ -134,6 +134,7 @@ module.exports = class Connector {
         return this.db.transaction((trx) => {
             return this.write.transacting(trx).where({ slug }).delete()
             .then(() => Limiter.delete(CONST.ROLE.CONTRIBUTOR, slug));
+            // TODO: revoke this connector's key (issue#54)
         });
     }
 

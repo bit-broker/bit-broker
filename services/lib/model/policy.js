@@ -51,6 +51,7 @@ module.exports = class Policy {
 
     get COLUMNS() {
         return [
+            'id',
             'slug',
             'properties',
             'created_at',
@@ -102,6 +103,7 @@ module.exports = class Policy {
         return this.db.transaction((trx) => {
             return this.find(slug).transacting(trx).delete()
             .then(() => Limiter.delete(CONST.ROLE.CONSUMER, slug));
+            // TODO: revoke all policy keys (issue#54)
         });
     }
 

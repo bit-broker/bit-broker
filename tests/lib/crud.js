@@ -94,10 +94,10 @@ module.exports = class Crud {
         });
     }
 
-    // --- attempts to add a duplicate resource
+    // --- attempts to action a duplicate resource
 
-    static duplicate(url, body) {
-        return chakram.post(url, body)
+    static duplicate(url, body = undefined, action = chakram.post) {
+        return action(url, body)
         .then(response => {
             this.check_error(response, HTTP.CONFLICT);
             return chakram.wait();

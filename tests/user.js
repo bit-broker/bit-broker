@@ -191,6 +191,111 @@ describe('User Tests', function() {
         });
     });
 
+    // --- user coordinator access tests
+
+    describe('user coordinator access tests', () => {
+
+        let uid = null; // will be filled in during the first test
+        let url = null;
+        let admin = { id: 1, url: URLs.user(1), name: 'admin', coordinator: true };
+        let values = { name: DATA.name(), email: DATA.pick(DATA.EMAIL.VALID) };
+        let all = URLs.user();
+
+        before(() => {
+            return Shared.empty();
+        });
+
+        after(() => {
+            return Shared.empty();
+        });
+
+        it('get the last user id sequence value', () => {
+            return Shared.last_id('users')
+            .then(last => {
+                uid = last + 1;
+                url = URLs.user(uid);
+            });
+        });
+
+        it('the user is not there to start with', () => {
+            return Crud.not_found(url);
+        });
+
+        it('can add a user', () => {
+            return Crud.add(all, values, url);
+        });
+
+        it('it is present in the user list', () => {
+            return Crud.verify_all(all, [
+                admin,
+                { id: uid, url: url, name: values.name, email: values.email, coordinator: false }
+            ]);
+        });
+
+        it('it is present when addressed directly', () => {
+            return Crud.verify(url, { id: uid, url: url, name: values.name, email: values.email, coordinator: false });
+        });
+
+        it('can promote user to coordinator', () => {
+            return Crud.post(URLs.user_coordinator(uid), undefined, body => {
+                expect(body).to.be.a('string');
+                expect(body).to.match(new RegExp(DATA.KEY.REGEX));
+            });
+        });
+
+        it('it is reflected in the user list', () => {
+            return Crud.verify_all(all, [
+                admin,
+                { id: uid, url: url, name: values.name, email: values.email, coordinator: true }
+            ]);
+        });
+
+        it('it is reflected when addressed directly', () => {
+            return Crud.verify(url, { id: uid, url: url, name: values.name, email: values.email, coordinator: true });
+        });
+
+        it('cannot re-promote user to coordinator', () => {
+            return Crud.duplicate(URLs.user_coordinator(uid));
+        });
+
+        it('cannot promote an unknown user to coordinator', () => {
+            return Crud.not_found(URLs.user_coordinator(uid + 1), undefined, chakram.post);
+        });
+
+        it('TODO: test getting a fresh coordinator token via a PUT');
+
+        it('can de-promote user as coordinator', () => {
+            return Crud.delete(URLs.user_coordinator(uid));
+        });
+
+        it('it is reflected in the user list', () => {
+            return Crud.verify_all(all, [
+                admin,
+                { id: uid, url: url, name: values.name, email: values.email, coordinator: false }
+            ]);
+        });
+
+        it('it is reflected when addressed directly', () => {
+            return Crud.verify(url, { id: uid, url: url, name: values.name, email: values.email, coordinator: false });
+        });
+
+        it('cannot re-de-promote user to coordinator', () => {
+            return Crud.duplicate(URLs.user_coordinator(uid), undefined, chakram.delete);
+        });
+
+        it('cannot de-promote an unknown user to coordinator', () => {
+            return Crud.not_found(URLs.user_coordinator(uid + 1), undefined, chakram.delete);
+        });
+
+        it('can delete the user', () => {
+            return Crud.delete(url);
+        });
+
+        it('the user list is empty, except for the admin user', () => {
+            return Crud.verify_all(all, [admin]);
+        });
+    });
+
     // --- user addendum manipulation tests
 
     describe('user addendum manipulation tests', () => {

@@ -108,7 +108,7 @@ const DATA = {
         return Math.floor(Math.random() * items.length);
     },
 
-    keys: function(records) { // TODO - needed?
+    keys: function(records) {
         let keys = [];
         records.forEach(record => keys.push(record.id));
         return keys;
@@ -195,7 +195,7 @@ const DATA = {
           ['ftp://foo.org', 'www.foo.org', 'foo.org', 'http:www.foo.com', 'http:/'] // regex non match
         ],
         NAME: 'Testing Webhook Server',
-        URL: 'http://localhost:8888/',
+        URL: 'http://bbk-webhook:8888/',
         HOOKS: [{ entity: 'country', connector: 'wikipedia' }] // these will have an active webhook
     },
 

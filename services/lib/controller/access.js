@@ -39,15 +39,6 @@ const log = require('../logger.js').Logger;
 
 module.exports = class Access {
 
-    // --- extracts a properties object from a req body, removes extraneous properties that maybe present and sets default values
-
-    static properties(body) {
-        return {
-            role: (body.role || '').toString().toLowerCase(),
-            context: body.context ? body.context.toString() : null // optional
-        };
-    }
-
     // --- lists all accesses for a given user
 
     list(req, res, next) {
@@ -71,13 +62,13 @@ module.exports = class Access {
 
     get(req, res, next) {
         let uid = req.params.uid.toLowerCase();
-        let aid = req.params.aid.toLowerCase();
+        let pid = req.params.pid.toLowerCase();
 
         model.user.access(uid)
 
         .then(accesses => {
             if (!accesses) throw new failure(HTTP.NOT_FOUND);
-            return accesses.find(aid);
+            return accesses.find_by_policy(pid);
         })
 
         .then(item => {
@@ -88,79 +79,39 @@ module.exports = class Access {
         .catch(error => next(error));
     }
 
-    // --- checks that the role and context pair are a valid combination
-
-    static check_role_context(role, context) {
-        let check = null;
-        let where = '';
-
-        switch (role) {
-            case CONST.ROLE.COORDINATOR:
-                check = Promise.resolve(context === null ? '' : locales.__('error.access-invalid-context', context));
-                where = 'context';
-            break;
-
-            case CONST.ROLE.CONTRIBUTOR:
-                check = Promise.resolve(locales.__('error.access-invalid-role', role));
-                where = 'role';
-            break;
-
-            case CONST.ROLE.CONSUMER:
-                check = model.policy.find(context).then (item => item ? '' : locales.__('error.access-invalid-context', context));
-                where = 'context';
-            break;
-
-            default:
-                check = Promise.resolve(locales.__('error.access-invalid-role', role));
-                where = 'role';
-            break;
-        }
-
-        return check.then(error => failure.response(where, error));
-    }
-
     // --- adds a new access for a given user
 
     insert(req, res, next) {
-        log.info('coordinator', 'user', req.params.uid, 'access', 'insert');
+        log.info('coordinator', 'user', req.params.uid, 'access', req.params.pid, 'insert');
 
         let uid = req.params.uid.toLowerCase();
-        let properties = Access.properties(req.body);
-        let errors = [];
+        let pid = req.params.pid.toLowerCase();
 
-        errors = errors.concat(model.validate.access(properties));
+        model.policy.find(pid)
 
-        if (errors.length) {
-            throw new failure(HTTP.BAD_REQUEST, errors);
-        }
+        .then (policy => {
+            if (!policy) throw new failure(HTTP.NOT_FOUND);
 
-        Access.check_role_context (properties.role, properties.context)  // extended checks on role and context pair
+            return model.user.access(uid)
 
-        .then (error => {
-            if (error.reason.length) {
-                throw new failure(HTTP.BAD_REQUEST, [ error ]); // bad_request always returns an array
-            }
+            .then(accesses => {
+                if (!accesses) throw new failure(HTTP.NOT_FOUND);
+                return accesses.find_by_policy(pid)
 
-            return model.user.access(uid);
-        })
+                .then(item => {
+                    if (item) {
+                        log.info('coordinator', 'user', uid, 'access', pid, 'insert', 'duplicate');
+                        throw new failure(HTTP.CONFLICT);
+                    }
 
-        .then(accesses => {
-            if (!accesses) throw new failure(HTTP.NOT_FOUND);
-            return accesses.find_by_role_context(properties.role, properties.context)
-
-            .then(item => {
-                if (item) {
-                    log.info('coordinator', 'user', uid, 'access', 'insert', properties.role, properties.context, 'duplicate');
-                    throw new failure(HTTP.CONFLICT);
-                }
-
-                return accesses.insert(properties);
-            });
+                    return accesses.insert({ policy_id: policy.id });
+                });
+            })
         })
 
         .then(result => {
-            log.info('coordinator', 'user', uid, 'access', 'insert', properties.role, properties.context, 'complete', result.id);
-            let href = `${ req.protocol }://${ req.get('host') }${ req.originalUrl.replace(/\/$/, '') }/${ result.id }`;
+            log.info('coordinator', 'user', uid, 'access', pid, 'insert', 'complete', result.id);
+            let href = `${ req.protocol }://${ req.get('host') }${ req.originalUrl.replace(/\/$/, '') }`;
             res.set({ 'Location': href }).status(HTTP.CREATED).send(result.token);
         })
 
@@ -170,32 +121,25 @@ module.exports = class Access {
     // --- updates an access by generating a fresh token
 
     update(req, res, next) {
-        log.info('coordinator', 'user', req.params.uid, 'access', req.params.aid, 'update');
+        log.info('coordinator', 'user', req.params.uid, 'access', req.params.pid, 'update');
 
         let uid = req.params.uid.toLowerCase();
-        let aid = req.params.aid.toLowerCase();
-        let properties = Access.properties(req.body);
+        let pid = req.params.pid.toLowerCase();
 
         model.user.access(uid)
 
         .then(accesses => {
             if (!accesses) throw new failure(HTTP.NOT_FOUND);
-            return accesses.find(aid)
+            return accesses.find_by_policy(pid)
 
             .then(item => {
                 if (!item) throw new failure(HTTP.NOT_FOUND);
-
-                if (item.role !== properties.role ||
-                    item.context !== properties.context) {
-                    throw new failure(HTTP.BAD_REQUEST, [ failure.response('access', locales.__('error.access-details-not-matched')) ]); // bad_request always returns an array
-                }
-
                 return accesses.update(item);
             })
         })
 
         .then(result => {
-            log.info('coordinator', 'user', uid, 'access', aid, 'update', 'complete');
+            log.info('coordinator', 'user', uid, 'access', pid, 'update', 'complete');
             res.status(HTTP.OK).send(result.token);
         })
 
@@ -205,25 +149,25 @@ module.exports = class Access {
     // --- deletes an access type
 
     delete(req, res, next) {
-        log.info('coordinator', 'user', req.params.uid, 'access', req.params.aid, 'delete');
+        log.info('coordinator', 'user', req.params.uid, 'access', req.params.pid, 'delete');
 
         let uid = req.params.uid.toLowerCase();
-        let aid = req.params.aid.toLowerCase();
+        let pid = req.params.pid.toLowerCase();
 
         model.user.access(uid)
 
         .then(accesses => {
             if (!accesses) throw new failure(HTTP.NOT_FOUND);
-            return accesses.find(aid)
+            return accesses.find_by_policy(pid)
 
             .then(item => {
                 if (!item) throw new failure(HTTP.NOT_FOUND);
-                return accesses.delete(aid, item);
+                return accesses.delete(item);
             });
         })
 
         .then(() => {
-            log.info('coordinator', 'user', uid, 'access', aid, 'delete', 'complete');
+            log.info('coordinator', 'user', uid, 'access', pid, 'delete', 'complete');
             res.status(HTTP.NO_CONTENT).send();
         })
 

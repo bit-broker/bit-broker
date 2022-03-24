@@ -26,9 +26,8 @@ Use the following command to generate a bootstrap coordinator access key
     --silent \
     --request POST \
     --header "Content-Type: application/json" \
-    --data "{\"role\":\"coordinator\"}" \
     --output bootstrap.key \
-    http://bbk-coordinator:8001/v1/user/1/access
+    http://bbk-coordinator:8001/v1/user/1/coordinator
 */
 
 'use strict'; // code assumes ECMAScript 6
@@ -86,14 +85,16 @@ api.router.get('/user/email/:email', controller.user.get_email);
 api.router.post('/user', controller.user.insert);
 api.router.put('/user/:uid', controller.user.update);
 api.router.delete('/user/:uid', controller.user.delete);  // rescinds all the user's keys
+api.router.post('/user/:uid/coordinator', controller.user.coordinator_add);
+api.router.delete('/user/:uid/coordinator', controller.user.coordinator_del);
 
 // --- access endpoints
 
 api.router.get('/user/:uid/access', controller.access.list);
-api.router.get('/user/:uid/access/:aid', controller.access.get);
-api.router.post('/user/:uid/access', controller.access.insert);
-api.router.put('/user/:uid/access/:aid', controller.access.update);
-api.router.delete('/user/:uid/access/:aid', controller.access.delete); // rescinds a single user key
+api.router.get('/user/:uid/access/:pid', controller.access.get);
+api.router.post('/user/:uid/access/:pid', controller.access.insert);
+api.router.put('/user/:uid/access/:pid', controller.access.update);
+api.router.delete('/user/:uid/access/:pid', controller.access.delete); // rescinds a single user key
 
 // --- start the server
 
