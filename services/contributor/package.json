@@ -17,7 +17,7 @@
     "express": "^4.17.1",
     "express-prom-bundle": "^6.3.6",
     "express-winston": "^4.1.0",
-    "http-errors": "^1.7.2",
+    "http-errors": "^2.0.0",
     "http-status-codes": "^2.2.0",
     "i18n": "^0.13.2",
     "ioredis": "^4.27.2",
