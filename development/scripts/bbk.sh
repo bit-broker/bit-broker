@@ -16,7 +16,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-ABS_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT="$HERE/../../"
 
 function error
 {
@@ -55,21 +56,21 @@ function status
 
 function logs
 {
-    tail -f "$ABS_PATH/bbk-coordinator.out" \
-            "$ABS_PATH/bbk-contributor.out" \
-            "$ABS_PATH/bbk-consumer.out"    \
-            "$ABS_PATH/bbk-rate-limit.out"  \
-            "$ABS_PATH/bbk-auth-service.out"
+    tail -f "$HERE/bbk-coordinator.out" \
+            "$HERE/bbk-contributor.out" \
+            "$HERE/bbk-consumer.out"    \
+            "$HERE/bbk-rate-limit.out"  \
+            "$HERE/bbk-auth-service.out"
 }
 
 function start
 {
     info "starting services..."
-    npm start bbk-coordinator     --prefix "$ABS_PATH/../../services/coordinator" > "$ABS_PATH/bbk-coordinator.out"  2>&1 &
-    npm start bbk-contributor     --prefix "$ABS_PATH/../../services/contributor" > "$ABS_PATH/bbk-contributor.out"  2>&1 &
-    npm start bbk-consumer        --prefix "$ABS_PATH/../../services/consumer"    > "$ABS_PATH/bbk-consumer.out"     2>&1 &
-    npm run rate bbk-rate-limit   --prefix "$ABS_PATH/../stubs"                   > "$ABS_PATH/bbk-rate-limit.out"   2>&1 &
-    npm run auth bbk-auth-service --prefix "$ABS_PATH/../stubs"                   > "$ABS_PATH/bbk-auth-service.out" 2>&1 &
+    npm start bbk-coordinator     --prefix "$ROOT/services/coordinator" > "$HERE/bbk-coordinator.out"  2>&1 &
+    npm start bbk-contributor     --prefix "$ROOT/services/contributor" > "$HERE/bbk-contributor.out"  2>&1 &
+    npm start bbk-consumer        --prefix "$ROOT/services/consumer"    > "$HERE/bbk-consumer.out"     2>&1 &
+    npm run rate bbk-rate-limit   --prefix "$HERE/../stubs"             > "$HERE/bbk-rate-limit.out"   2>&1 &
+    npm run auth bbk-auth-service --prefix "$HERE/../stubs"             > "$HERE/bbk-auth-service.out" 2>&1 &
     sleep 1
 }
 
@@ -83,21 +84,25 @@ function stop
 function wipe
 {
     info "wiping the database..."
-    psql -U postgres -a -f "$ABS_PATH/../../database/schema.sql" > /dev/null
+    psql -U postgres -a -f "$ROOT/database/schema.sql" > /dev/null
 }
 
 function unpack
 {
     info "creating .env from .env.example"
-    cp "$ABS_PATH/../../.env.example" "$ABS_PATH/../../.env" 2>&1
+    cp "$ROOT/.env.example" "$ROOT/.env" 2>&1
+
     info "installing service packages"
-    npm install --prefix "$ABS_PATH/../../services/coordinator" > "$ABS_PATH/bbk-coordinator.install.out" 2>&1
-    npm install --prefix "$ABS_PATH/../../services/contributor" > "$ABS_PATH/bbk-contributor.install.out" 2>&1
-    npm install --prefix "$ABS_PATH/../../services/consumer"    > "$ABS_PATH/bbk-consumer.install.out"    2>&1
+    npm install --prefix "$ROOT/services/coordinator" > "$HERE/bbk-coordinator.install.out" 2>&1
+    npm install --prefix "$ROOT/services/contributor" > "$HERE/bbk-contributor.install.out" 2>&1
+    npm install --prefix "$ROOT/services/consumer"    > "$HERE/bbk-consumer.install.out"    2>&1
+
     info "installing development packages"
-    npm install --prefix "$ABS_PATH/../../development/stubs"    > "$ABS_PATH/bbk-tests.install.stubs.out" 2>&1
+    npm install --prefix "$ROOT/development/stubs"    > "$HERE/bbk-tests.install.stubs.out" 2>&1
+
     info "installing test packages"
-    npm install --prefix "$ABS_PATH/../../tests"                > "$ABS_PATH/bbk-tests.install.out"       2>&1
+    npm install --prefix "$ROOT/tests"                > "$HERE/bbk-tests.install.out"       2>&1
+
     info "unpack complete"
 }
 
