@@ -86,9 +86,30 @@ function wipe
     psql -U postgres -a -f "$ABS_PATH/../../database/schema.sql" > /dev/null
 }
 
+function unpack
+{
+    info "creating .env from .env.example"
+    cp "$ABS_PATH/../../.env.example" "$ABS_PATH/../../.env" 2>&1
+    info "installing service packages"
+    npm install --prefix "$ABS_PATH/../../services/coordinator" > "$ABS_PATH/bbk-coordinator.install.out" 2>&1
+    npm install --prefix "$ABS_PATH/../../services/contributor" > "$ABS_PATH/bbk-contributor.install.out" 2>&1
+    npm install --prefix "$ABS_PATH/../../services/consumer"    > "$ABS_PATH/bbk-consumer.install.out"    2>&1
+    info "installing test packages"
+    npm install --prefix "$ABS_PATH/../../tests"                > "$ABS_PATH/bbk-tests.install.out"       2>&1
+    info "unpack complete"
+}
+
 echo
 
 case $1 in
+
+    unpack)
+        if [ $(count) -eq "0" ]; then
+            unpack
+        else
+            error "some services are already running - stop those first"
+        fi
+    ;;
 
     start)
         if [ $(count) -eq "0" ]; then
@@ -169,6 +190,7 @@ case $1 in
         echo
         echo "  command:"
         echo
+        echo "    unpack → prepares a fresh git clone"
         echo "    start  → starts bbk services"
         echo "    stop   → stops bbk services"
         echo "    status → show bbk service status"
