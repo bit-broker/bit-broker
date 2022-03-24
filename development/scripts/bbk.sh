@@ -94,6 +94,8 @@ function unpack
     npm install --prefix "$ABS_PATH/../../services/coordinator" > "$ABS_PATH/bbk-coordinator.install.out" 2>&1
     npm install --prefix "$ABS_PATH/../../services/contributor" > "$ABS_PATH/bbk-contributor.install.out" 2>&1
     npm install --prefix "$ABS_PATH/../../services/consumer"    > "$ABS_PATH/bbk-consumer.install.out"    2>&1
+    info "installing development packages"
+    npm install --prefix "$ABS_PATH/../../development/stubs"    > "$ABS_PATH/bbk-tests.install.stubs.out" 2>&1
     info "installing test packages"
     npm install --prefix "$ABS_PATH/../../tests"                > "$ABS_PATH/bbk-tests.install.out"       2>&1
     info "unpack complete"
