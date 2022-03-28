@@ -35,8 +35,11 @@ jobs:
       - name: Create .env file for docker
         run: cp .env.example .env
 
+      - name: update .env file for docker
+        run: sed -i~ '/^APP_SERVER_METRICS = /s/ =.*/ = true/' .env 
+
       - name: Create .env file for tests
-        run: cp .env.example ./tests/.env
+        run: cp .env ./tests/.env
 
       - name: Set up node
         uses: actions/setup-node@v2
@@ -71,6 +74,13 @@ jobs:
       - name: run tests
         working-directory: tests 
         run: node all.js
+
+      # check metrics endpoints
+      - name: Check Service Metrics endpoints
+        run: |
+          curl -s http://bbk-coordinator:8001/metrics | docker run -i --entrypoint='/bin/promtool'  prom/prometheus check metrics
+          curl -s http://bbk-contributor:8002/metrics | docker run -i --entrypoint='/bin/promtool'  prom/prometheus check metrics
+          curl -s http://bbk-consumer:8003/metrics | docker run -i --entrypoint='/bin/promtool'  prom/prometheus check metrics
 
       - name: Stop containers
         if: always()
