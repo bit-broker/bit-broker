@@ -26,7 +26,7 @@
     "knex": "^0.95.4",
     "mongo-query-to-postgres-jsonb": "^0.2.14",
     "node-fetch": "^2.6.7",
-    "pg": "^8.6.0",
+    "pg": "^8.7.3",
     "prom-client": "^14.0.1",
     "validator": "^13.7.0",
     "winston": "^3.6.0",
