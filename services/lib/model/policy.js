@@ -33,7 +33,7 @@ raw bindings.
 
 const CONST = require('../constants.js');
 const Limiter = require('./limiter.js');
-const cloneDeep = require('clone-deep');
+var _ = require('lodash');
 const log = require('../logger.js').Logger;
 
 // --- policy class (exported)
@@ -155,7 +155,7 @@ module.exports = class Policy {
     cacheWrite(slug, policy) {
 
         // strip out access_control info prior to caching...
-        let cachedPolicy = cloneDeep(policy);
+        let cachedPolicy=  _.cloneDeep(policy);
         if (cachedPolicy.hasOwnProperty('access_control')) {
             delete cachedPolicy.access_control;
         }
