@@ -15,7 +15,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Use latest stable node alpine image
-FROM node:16-alpine3.12
+FROM node:17-alpine3.12
 
 # Create bitbroker group and user
 RUN addgroup -S bitbroker -g 1999\
