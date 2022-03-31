@@ -25,3 +25,16 @@ updates:
     schedule:
       interval: "daily"
     open-pull-requests-limit: 10
+
+  - package-ecosystem: "docker"
+    directory: "/build/consumer"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "docker"
+    directory: "/build/contributor"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "docker"
+    directory: "/build/coordinator"
+    schedule:
+      interval: "daily"
