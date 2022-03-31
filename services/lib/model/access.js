@@ -86,7 +86,7 @@ module.exports = class Access {
     // --- find an access by id on the instance user
 
     find(id) {
-        return this.rows.where({ id }).first();
+        return this.rows.where({ 'access.id': id }).first();
     }
 
     // --- find an access by policy_id
@@ -103,8 +103,7 @@ module.exports = class Access {
             values.user_id = this.user.id;
             values.key_id = token.jti;
             return this.rows.insert(values).returning('id')
-
-            .then(id => id && id.length ? { id: id, token: token.token } : false);
+            .then(id => id && id.length ? { token: token.token } : false);
         });
     }
 
@@ -115,7 +114,7 @@ module.exports = class Access {
         .then (() => Permit.generate_token(CONST.ROLE.CONSUMER, values.policy_id))
         .then (token => {
             return this.find(values.id).update({ key_id: token.jti }).returning('id')
-            .then(id => id && id.length ? { id: id[0], token: token.token } : false);
+            .then(id => id && id.length ? { token: token.token } : false);
         });
     }
 
