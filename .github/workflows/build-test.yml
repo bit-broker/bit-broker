@@ -28,7 +28,7 @@ jobs:
           echo "${{ env.host_ip }}	bbk-policy-cache" | sudo tee -a /etc/hosts
           echo "${{ env.host_ip }}	bbk-auth-service" | sudo tee -a /etc/hosts
           echo "${{ env.host_ip }}	bbk-rate-limit" | sudo tee -a /etc/hosts
-          echo "${{ env.host_ip }}	bbk-webhook" | sudo tee -a /etc/hosts
+          echo "${{ env.host_ip }}	bbkt-webhook" | sudo tee -a /etc/hosts
           cat /etc/hosts
 
       # set up env files required for deployment & test...
