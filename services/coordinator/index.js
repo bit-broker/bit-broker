@@ -96,6 +96,10 @@ api.router.post('/user/:uid/access/:pid', controller.access.insert);
 api.router.put('/user/:uid/access/:pid', controller.access.update);
 api.router.delete('/user/:uid/access/:pid', controller.access.delete); // rescinds a single user key
 
+// --- bootstrap the user - add other bootstraps here
+
+controller.user.bootstrap();
+
 // --- start the server
 
 api.listen(() => {

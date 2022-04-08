@@ -48,6 +48,34 @@ module.exports = class User {
             addendum: body.addendum || {}
         };
     }
+    
+    // --- bootstraps the user service
+
+    bootstrap() {
+        model.user.virgin()
+
+        .then(virgin => {
+            log.info('user', 'bootstrap', virgin ? 'insert' : 'not required');
+            let complete = Promise.resolve();
+
+            if (virgin) {
+                let name = process.env.BOOTSTRAP_USER_NAME;
+                let email = process.env.BOOTSTRAP_USER_EMAIL;
+                let coordinator_key_id = process.env.BOOTSTRAP_USER_KEY_ID;
+                let user = { email, coordinator_key_id, properties: { name, addendum: {} }};
+
+                complete = model.user.insert(user).then(id => {
+                    log.info('user', 'bootstrap', 'insert', 'complete', id);
+                });
+            }
+
+            return complete;
+        })
+
+        .catch(error => {
+            log.error('user', 'bootstrap', error);
+        });
+    }
 
     // --- lists all users
 
