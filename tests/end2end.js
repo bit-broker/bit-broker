@@ -49,7 +49,7 @@ describe('End-to-End Tests', function() {
 
     // --- setup test context
 
-    let admin = { id: 1, url: URLs.user(1), name: 'admin', coordinator: true };
+    let admin = { id: 1, url: URLs.user(1), name: process.env.BOOTSTRAP_USER_NAME, coordinator: true };
     let coordinator = Seeder.users.find(e => e.properties.name === 'alice');
     let consumer = Seeder.users.find(e => e.properties.name === 'bob');
     let country = Seeder.entities.find(e => e.slug === 'country');

@@ -60,6 +60,12 @@ module.exports = class User {
         ];
     }
 
+    // --- virgin - NOTE could move to a base class, if we use the same on other tables too
+
+    virgin() {
+        return this.db('users_id_seq').select('is_called').first().then(result => !result.is_called);
+    }
+    
     // --- table read context
 
     get rows() {

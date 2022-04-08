@@ -69,6 +69,30 @@ describe('Coordinator Service Tests', function() {
         });
     });
 
+    // --- bootstrap tests
+
+    describe('bootstrap tests', () => {
+        before(() => {
+            return Shared.empty();
+        });
+
+        after(() => {
+            return Shared.empty();
+        });
+
+        it('the bootstrap user is present', () => {
+            let id = 1;
+            let url = URLs.user(id);
+            let name = process.env.BOOTSTRAP_USER_NAME;
+            let email = process.env.BOOTSTRAP_USER_EMAIL;
+            let coordinator = true;
+            let addendum = {};
+            let accesses = {};
+
+            return Crud.verify(url, { id, url, name, email, coordinator, accesses, addendum });
+        });
+    });
+
     // --- entity manipulation tests
 
     describe('entity manipulation tests', () => {

@@ -77,7 +77,7 @@ describe('User Tests', function() {
         let id2 = null;
         let user1 = null; // will be filled in during the first test
         let user2 = null;
-        let admin = { id: 1, url: URLs.user(1), name: 'admin' };
+        let admin = { id: 1, url: URLs.user(1), name: process.env.BOOTSTRAP_USER_NAME };
         let values1 = { name: DATA.name(), email: DATA.pluck(DATA.EMAIL.VALID) };  // pluck to ensure different emails
         let values2 = { name: DATA.name(), email: DATA.pluck(DATA.EMAIL.VALID) };
         let update1 = { name: DATA.name() };
@@ -197,7 +197,7 @@ describe('User Tests', function() {
 
         let uid = null; // will be filled in during the first test
         let url = null;
-        let admin = { id: 1, url: URLs.user(1), name: 'admin', coordinator: true };
+        let admin = { id: 1, url: URLs.user(1), name: process.env.BOOTSTRAP_USER_NAME, coordinator: true };
         let values = { name: DATA.name(), email: DATA.pick(DATA.EMAIL.VALID) };
         let all = URLs.user();
 
@@ -301,7 +301,7 @@ describe('User Tests', function() {
     describe('user addendum manipulation tests', () => {
 
         let user = { id: null, name: DATA.name(), email: DATA.pick(DATA.EMAIL.VALID), addendum: { foo: DATA.text() } };
-        let admin = { id: 1, url: URLs.user(1), name: 'admin' };
+        let admin = { id: 1, url: URLs.user(1), name: process.env.BOOTSTRAP_USER_NAME };
         let url = null;
         let all = URLs.user();
         let addendums = [  // update in the order given
