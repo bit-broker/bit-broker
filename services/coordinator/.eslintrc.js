@@ -1,1 +1,1 @@
-/Users/chidumgaizuzu/Documents/bit-broker/.eslintrc.js
+../../.eslintrc.js
