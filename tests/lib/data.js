@@ -196,7 +196,10 @@ const DATA = {
         ],
         NAME: 'Testing Webhook Server',
         URL: 'http://bbkt-webhook:8888/',
-        HOOKS: [{ entity: 'country', connector: 'wikipedia' }] // these will have an active webhook
+        HOOKS: [  // these connectors will have an active webhook
+            { entity: 'country', connector: 'wikipedia' },
+            { entity: 'country', connector: 'cia' } // TODO: remove requirement for all connectors on an entity type being present here - see consumer.js - entity_each
+        ]
     },
 
     RECORDS: {
