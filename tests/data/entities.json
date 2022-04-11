@@ -15,6 +15,15 @@
                     "webhook": null,
                     "cache": 0
                 }
+            },
+            {
+                "slug": "cia",
+                "properties": {
+                    "name": "CIA World Fact Book",
+                    "description": "Country information from the CIA",
+                    "webhook": null,
+                    "cache": 0
+                }
             }
         ]
     },

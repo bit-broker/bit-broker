@@ -100,48 +100,71 @@ module.exports = class Seeder {
 
                 connector.properties.webhook = webhook ? webhook.url : null; // add a webhook if specified in parameters
 
-                steps.push(Crud.add(URLs.connector(entity.slug, connector.slug), connector.properties, null, result => {
-                    this.cids[`${ entity.slug }/${ connector.slug }`] = `${ entity.slug }/${ result.id }`;  // stash the connector id for later bbk mapping
-                }));
+                let add = Crud.add(URLs.connector(entity.slug, connector.slug), connector.properties, null, result => {
+                    this.cids[connector.slug] = result.id;  // stash the connector id for later bbk mapping
+                });
+
+                steps.push(add);
             }
         }
 
         return Promise.all(steps);
     }
 
-    // --- maps bbk links by adding in the contributor id - only for top level strings on the entity object
+    // --- returns a bbk link for the given params
 
-    static map_bbk_links(records) {
-        for (let i = 0 ; i < records.length ; i++) {
-            for (let j in records[i].entity) {
-                if (typeof records[i].entity[j] === 'string') {
-                    for (let k in this.cids) {
-                        records[i].entity[j] = records[i].entity[j].replace(`bbk://${ k }`, `bbk://${ this.cids[k] }`);
-                    }
-                }
-            }
-        }
+    static bbk(routes) {
+        return `bbk://${ routes.join('/') }`;
     }
 
     // --- adds all the seed data
 
     static add_seed_data() {
+        let bbks = {};  // built up as we go on, be careful of ordering of operations
+        let items = [];
         let steps = [];
         let entities = Seeder.entities;
 
         for (let i = 0; i < entities.length; i++) {
             let entity = entities[i];
+            let records = Seeder.records(entity.slug);
+            let share = Math.floor(records.length / entity.connectors.length);
 
             for (let j = 0; j < entity.connectors.length; j++) {
                 let connector = entity.connectors[j];
-                let records = Seeder.records(entity.slug);
+                let cid = this.cids[connector.slug];
+                let last = j === entity.connectors.length - 1;
+                let subset = records.splice(0, last ? records.length : share);
 
-                this.map_bbk_links(records);
-                steps.push(Session.records(entity.slug, connector.slug, records, 'stream', 'upsert', true));
+                // --- associate bbk links to this connector
+
+                subset.forEach(r => {
+                    let from = Seeder.bbk([entity.slug, '{cid}', r.id]);
+                    let to = Seeder.bbk([entity.slug, cid, r.id]);
+                    bbks[from] = to;
+                    items.push({ entity: entity.slug, name: r.name, connector: { slug: connector.slug, id: cid }, ids: { internal: r.id, public: null }});
+                });
+
+                // --- rebase bbk links to connector - only for top level strings on the entity object
+
+                subset.forEach(r => {
+                    for (let key in r.entity) {
+                        if (bbks[r.entity[key]]) {
+                            r.entity[key] = bbks[r.entity[key]];
+                        }
+                    }
+                });
+
+                steps.push(Session.records(entity.slug, connector.slug, subset, 'stream', 'upsert', true).then(report => {
+                     Object.keys(report).forEach(k => {
+                          let item = items.find(i => i.entity === entity.slug && i.ids.internal === k);
+                          item.ids.public = report[k];
+                     });
+                }));
             }
         }
 
-        return Promise.all(steps);
+        return Promise.all(steps).then(() => items);
     }
 
     // --- adds the policies

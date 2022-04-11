@@ -71,6 +71,7 @@ module.exports = class Session {
 
     static action(cid, sid, action, data, page = DATA.RECORDS.MAXIMUM) {
         let actions = Promise.resolve();
+        let items = {};
 
         for (let i = 0 ; i < data.length ; i += page) {
             let start = i;
@@ -80,6 +81,8 @@ module.exports = class Session {
                 return chakram.post(URLs.session_action(cid, sid, action), data.slice(start, end))
                 .then(response => {
                     expect(response.body).to.be.an('object');
+                    items = { ...items,  ...response.body };
+
                     for (let j = start; j < end; j++) {
                         let key = action === 'upsert' ? data[j].id : data[j];
                         expect(response.body[key]).to.a('string');
@@ -92,7 +95,7 @@ module.exports = class Session {
             });
         };
 
-        return actions;
+        return actions.then(() => items);
     }
 
     // --- test for a known bad sessions action
@@ -114,10 +117,18 @@ module.exports = class Session {
 
     // --- an end-to-end open -> action -> close step
 
-    static records(entity, connector, records, mode, action, commit) {
+    static records(entity, connector, records, mode, action, commit, report) {
         let session = {};
+
         return Session.open(entity, connector, mode, (info => session = info))
-        .then(() => Session.action(session.cid, session.sid, action, records))
-        .then(() => Session.close(session.cid, session.sid, commit));
+
+        .then(() => {
+            return Session.action(session.cid, session.sid, action, records);
+        })
+
+        .then(report => {
+            Session.close(session.cid, session.sid, commit);
+            return report;
+        });
     }
 }
