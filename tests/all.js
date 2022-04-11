@@ -42,6 +42,14 @@ mocha.addFile('./consumer.js');
 mocha.addFile('./policy.js');
 mocha.addFile('./user.js');
 mocha.addFile('./access.js');
+
+/* NOTE: The tests below here are materially different from earlier ones.
+         They are end2end test designed to be run on a complete deployed
+         system. They will still work on a development system, but here
+         many tests cases will be skipped. Use the .env setting
+         process.env.TESTS_LOCAL_MODE to state you are test in development
+         mode only. */
+         
 mocha.addFile('./end2end.js');
 
 // --- run the tests
