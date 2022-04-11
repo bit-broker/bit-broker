@@ -176,6 +176,12 @@ module.exports = class Crud {
         });
     }
 
+    // --- check a resource exists
+
+    static exists(url) {
+        return chakram.get(url).then(response => OK_CODES.includes(response.response.statusCode));
+    }
+
     // --- post a resource
 
     static post(url, body, checker) {
