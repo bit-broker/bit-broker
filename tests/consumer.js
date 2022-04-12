@@ -725,7 +725,7 @@ describe('Consumer Tests', function() {
             let max = [];
 
             for (let i = 0 ; i < DATA.CATALOG.MAX_CONNECTORS + 1; i++) {
-                max.push(DATA.name());
+                max.push(crypto.randomUUID());
             }
 
             return present(item, true, max);
