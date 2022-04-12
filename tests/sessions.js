@@ -54,6 +54,10 @@ describe('Connector Session Tests', function() {
         return Crud.add(URLs.connector(entity, connector), DATA.some_info());
     });
 
+    it('can make the housing connector live', () => {
+        return Crud.post(URLs.connector_live(entity, connector));
+    });
+    
     it('can create the policy', () => {
         return Crud.add(URLs.policy(DATA.POLICY.ALLAREA.ID), DATA.POLICY.ALLAREA.DETAIL);
     });

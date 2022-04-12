@@ -102,7 +102,8 @@ module.exports = class Seeder {
 
                 let add = Crud.add(URLs.connector(entity.slug, connector.slug), connector.properties, null, result => {
                     this.cids[connector.slug] = result.id;  // stash the connector id for later bbk mapping
-                });
+                })
+                .then(() => Crud.post(URLs.connector_live(entity.slug, connector.slug)));
 
                 steps.push(add);
             }

@@ -93,6 +93,10 @@ describe('Contributor Tests', function() {
             return Crud.add(URLs.connector(entity, connector), DATA.some_info(), URLs.connector(entity, connector));
         });
 
+        it('can make the housing connector live', () => {
+            return Crud.post(URLs.connector_live(entity, connector),);
+        });
+
         it('can open a session', () => {
             return Session.open(entity, connector, 'stream', (info => session = info));
         });
@@ -156,6 +160,10 @@ describe('Contributor Tests', function() {
 
         it('can create the housing connector', () => {
             return Crud.add(URLs.connector(entity, connector), DATA.some_info(), URLs.connector(entity, connector));
+        });
+
+        it('can make the housing connector live', () => {
+            return Crud.post(URLs.connector_live(entity, connector),);
         });
 
         it('cannot open a session with an unknown contribution id', () => {
@@ -240,6 +248,10 @@ describe('Contributor Tests', function() {
             return Crud.add(URLs.connector(entity, connector), DATA.some_info(), URLs.connector(entity, connector));
         });
 
+        it('can make the housing connector live', () => {
+            return Crud.post(URLs.connector_live(entity, connector),);
+        });
+
         it('can now open a session', () => {
             return Session.open(entity, connector, 'stream', (info => session = info));
         });
@@ -292,6 +304,10 @@ describe('Contributor Tests', function() {
 
         it('can create the housing connector', () => {
             return Crud.add(URLs.connector(entity, connector), DATA.some_info(), URLs.connector(entity, connector));
+        });
+
+        it('can make the housing connector live', () => {
+            return Crud.post(URLs.connector_live(entity, connector),);
         });
 
         it('can now open a session', () => {

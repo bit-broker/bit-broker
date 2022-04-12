@@ -52,6 +52,7 @@ module.exports = class Contributor extends View {
                 contribution_id: item.contribution_id,
                 webhook: item.properties.webhook,
                 cache: item.properties.cache,
+                is_live: item.is_live,
                 in_session: item.session_id !== null
             });
         }

@@ -54,7 +54,7 @@ module.exports = class User {
             'email',
             'properties',
             'coordinator_key_id',
-            this.db.raw("(SELECT ARRAY(SELECT policy.slug FROM access, policy WHERE access.user_id = users.id AND access.policy_id = policy.id)) AS accesses"),
+            this.db.raw("(SELECT ARRAY(SELECT policy.slug FROM access, policy WHERE access.user_id = users.id AND access.policy_id = policy.id)) AS accesses"),  // TODO - we should get rid of raw SQL here, in favour of knex
             'created_at',
             'updated_at'
         ];
@@ -65,7 +65,7 @@ module.exports = class User {
     virgin() {
         return this.db('users_id_seq').select('is_called').first().then(result => !result.is_called);
     }
-    
+
     // --- table read context
 
     get rows() {

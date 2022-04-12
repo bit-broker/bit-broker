@@ -28,6 +28,23 @@ required presence check has been completed by the controller.
 NOTE: Never use strings manipulation via knex.raw, as this will introduce
 SQL injection vulnerabilities. Also use either native knex methods or knex
 raw bindings.
+
+==========================================================================
+            AN IMPORTANT NOTE ON APPLICATION WIDE SECURITY
+--------------------------------------------------------------------------
+
+ This is the place that hackers will come to circumvent the policy data
+ segment. If you modify this file in any way, please ensure that you pay
+ close attention to the security implications of your changes. This is
+ especially true of the 'rows' function, which picks rows inside the
+ policy data segment only. Do nothing to compromise this selection. Only
+ ever add to this via an AND clause and never an OR clause. This is what
+ the method 'query' does. Never use bare or raw SQL and instead use the
+ functional components which Knex offers. Knex will escape all paramters
+ automatically to avoid SQL Injection style attacks.
+
+==========================================================================
+
 */
 
 'use strict'; // code assumes ECMAScript 6
@@ -73,12 +90,15 @@ module.exports = class Catalog {
 
     // --- table read context - ALL read queries MUST go via this to ensure blanket policy enforcement
 
-    rows(segment, full = true) {
+    rows(segment, connectors, full = true) {  // ===== SEE VITAL POINT ABOUT SECURITY IN FILE HEADER =====
         return this.db('catalog')
         .select(full ? this.COLUMNS_CATALOG : this.COLUMNS_TYPE)
         .join('connector', 'connector.id', 'catalog.connector_id')
         .join('entity', 'entity.id', 'connector.entity_id')
-        .whereRaw(Query.process(segment).where);
+        .whereRaw(Query.process(segment).where)
+        .andWhere(function() {
+            this.whereIn('connector.contribution_id', connectors).orWhere('connector.is_live', true);
+        });
     }
 
     // --- table write context
@@ -89,28 +109,28 @@ module.exports = class Catalog {
 
     // --- a catalog query
 
-    query(segment, query) {
+    query(segment, connectors, query) { // ===== SEE VITAL POINT ABOUT SECURITY IN FILE HEADER =====
         let subset = Query.process(query).where;
         if (subset === 'TRUE') subset = 'FALSE';  // by convention, no query = no records on bare catalog calls
-        return this.rows(segment).whereRaw(subset);
+        return this.rows(segment, connectors).whereRaw(subset);
     }
 
     // --- list of entity types
 
-    types(segment) {
-        return this.rows(segment, false).distinct('entity.slug').orderBy('entity.slug');
+    types(segment, connectors) {
+        return this.rows(segment, connectors, false).distinct('entity.slug').orderBy('entity.slug');
     }
 
     // --- list of entity instances for a given entity type
 
-    list(segment, type) {
-        return this.rows(segment).where({ 'entity.slug': type });
+    list(segment, connectors, type) {
+        return this.rows(segment, connectors).where({ 'entity.slug': type });
     }
 
     // --- find an entity instances by id for a given entity type
 
-    find(segment, type, id) {
-        return this.list(segment, type).where({ 'catalog.public_id': id }).first();
+    find(segment, connectors, type, id) {
+        return this.list(segment, connectors, type).where({ 'catalog.public_id': id }).first();
     }
 
     // --- upserts a new catalog record

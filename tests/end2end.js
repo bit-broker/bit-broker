@@ -32,6 +32,7 @@ const Shared = require('./lib/shared.js');  // include first for dotenv
 const Crud = require('./lib/crud.js');
 const Seeder = require('./lib/seeder.js');
 const URLs = require('./lib/urls.js');
+const util = require('util');
 const chakram = require('chakram');
 const expect = chakram.expect;
 
@@ -54,6 +55,8 @@ describe('End-to-End Tests', function() {
     let consumer = Seeder.users.find(e => e.properties.name === 'bob');
     let country = Seeder.entities.find(e => e.slug === 'country');
     let site = Seeder.entities.find(e => e.slug === 'heritage-site');
+    let insertions = []; // insert reports - will be filled out during tests
+    let staged = []; // live / stage items - will be filled out during tests
 
     // --- setup test expectations - keep these to the first page of results based on insert order of seed data
 
@@ -72,12 +75,23 @@ describe('End-to-End Tests', function() {
 
     // --- helper to make the access headers
 
-    function headers(token, policy) {
+    function headers(token, policy, connectors) {
         let header = {};
 
         header['x-bbk-auth-token'] = token;
-        if (LOCAL) Object.assign(header, Shared.policy_header(policy));
+        if (connectors) header['x-bbk-connectors'] = connectors.join(',');
+        if (LOCAL) Object.assign(header, Shared.policy_header(policy, connectors));
+
         Crud.headers(header);
+    }
+
+    // --- helper to store details of insertion of records
+
+    function store_insert(report, all, context) {
+        Object.keys(report).forEach(k => {
+            let record = all.find(r => r.id === k);
+            insertions.push({ ...context, name: record.name, ids: { internal: record.id, public: report[k] }} );
+        });
     }
 
     // --- helpers to check expected server access
@@ -221,6 +235,28 @@ describe('End-to-End Tests', function() {
         });
     }
 
+    // --- helper to count returns from the catalog and entity api
+
+    function count_items(candidates, count) {
+        let checks = [];
+        let found = { entity: 0, catalog: 0 };
+
+        for (let i = 0 ; i < candidates.length ; i++) {
+            let url_entity = URLs.consumer_entity(candidates[i].entity, candidates[i].ids.public);
+            checks.push(Crud.exists(url_entity).then(exists => found.entity += exists ? 1 : 0));
+
+            let url_catalog = URLs.consumer_catalog({ 'type': candidates[i].entity, 'name': candidates[i].name });
+            checks.push(Crud.get(url_catalog, body => found.catalog += body.length));
+        }
+
+        return Promise.all(checks)
+
+        .then(() => {
+            expect(found.entity).to.be.eq(count);
+            expect(found.catalog).to.be.eq(count);
+        });
+    }
+
     // -- resets the whole system back to factory defaults via API calls
 
     /*
@@ -299,14 +335,18 @@ describe('End-to-End Tests', function() {
         return Crud.add(URLs.entity(country.slug), country.properties);
     });
 
-    it('create the country entity connector', function () {
+    it('create the first country entity connector', function () {
         return Crud.add(URLs.connector(country.slug, country.connectors[0].slug), country.connectors[0].properties, undefined, details => {
             country.connectors[0].id = details.id;
             country.connectors[0].token = details.token;
         });
     });
 
-    it('switch to country connector key and check server access rules are met (coor: false, cont: true, cons: false)', function () {
+    it('make the first country entity connector live', function () {
+        return Crud.post(URLs.connector_live(country.slug, country.connectors[0].slug));
+    });
+
+    it('switch to first country connector key and check server access rules are met (coor: false, cont: true, cons: false)', function () {
         headers(country.connectors[0].token);
         return server_access(false, true, false).then (skipped => skipped ? this.skip() : true);
     });
@@ -320,17 +360,65 @@ describe('End-to-End Tests', function() {
     it('upsert the country records into the session', function () {
         let act = Promise.resolve();
         let url = URLs.session_action(country.connectors[0].id, country.connectors[0].session, 'upsert');
-        let all = Seeder.records(country.slug);
+        let all = Seeder.records(country.slug).filter(r => r.entity.continent === 'Asia');
 
         for (let i = 0 ; i < all.length ; i += PAGE) {
-            act = act.then(() => Crud.post(url, all.slice(i, i + PAGE)));
-        };
+            act = act.then(() => Crud.post(url, all.slice(i, i + PAGE), report => {
+                store_insert(report, all, {
+                    entity: country.slug,
+                    connector: { slug: country.connectors[0].slug, id: country.connectors[0].id },
+                });
+            }));
+        }
 
         return act;
     });
 
     it('close the stream session on country', function () {
         return Crud.get(URLs.session_close(country.connectors[0].id, country.connectors[0].session, 'true'));
+    });
+
+    it('create the second country entity connector', function () {
+        return Crud.add(URLs.connector(country.slug, country.connectors[1].slug), country.connectors[1].properties, undefined, details => {
+            country.connectors[1].id = details.id;
+            country.connectors[1].token = details.token;
+        });
+    });
+
+    it('make the second country entity connector live', function () {
+        return Crud.post(URLs.connector_live(country.slug, country.connectors[1].slug));
+    });
+
+    it('switch to second country connector key and check server access rules are met (coor: false, cont: true, cons: false)', function () {
+        headers(country.connectors[1].token);
+        return server_access(false, true, false).then (skipped => skipped ? this.skip() : true);
+    });
+
+    it('open a stream session on country', function () {
+        return Crud.get(URLs.session_open(country.connectors[1].id, 'stream'), session => {
+            country.connectors[1].session = session;
+        });
+    });
+
+    it('upsert the country records into the session', function () {
+        let act = Promise.resolve();
+        let url = URLs.session_action(country.connectors[1].id, country.connectors[1].session, 'upsert');
+        let all = Seeder.records(country.slug).filter(r => r.entity.continent !== "Asia");  // disjoint from first connector
+
+        for (let i = 0 ; i < all.length ; i += PAGE) {
+            act = act.then(() => Crud.post(url, all.slice(i, i + PAGE), report => {
+                store_insert(report, all, {
+                    entity: country.slug,
+                    connector: { slug: country.connectors[1].slug, id: country.connectors[1].id },
+                });
+            }));
+        }
+
+        return act;
+    });
+
+    it('close the stream session on country', function () {
+        return Crud.get(URLs.session_close(country.connectors[1].id, country.connectors[1].session, 'true'));
     });
 
     it('--- create heritage-site records --------------------------------------\n', function () { console.log(); return true; });
@@ -347,6 +435,10 @@ describe('End-to-End Tests', function() {
         });
     });
 
+    it('make the heritage-site entity connector live', function () {
+        return Crud.post(URLs.connector_live(site.slug, site.connectors[0].slug));
+    });
+
     it('switch to the connector key and then open a stream session on heritage-site', function () {
         headers(site.connectors[0].token);
         return Crud.get(URLs.session_open(site.connectors[0].id, 'stream'), session => {
@@ -360,8 +452,13 @@ describe('End-to-End Tests', function() {
         let all = Seeder.records(site.slug);
 
         for (let i = 0 ; i < all.length ; i += PAGE) {
-            act = act.then(() => Crud.post(url, all.slice(i, i + PAGE)));
-        };
+            act = act.then(() => Crud.post(url, all.slice(i, i + PAGE), report => {
+                store_insert(report, all, {
+                    entity: site.slug,
+                    connector: { slug: site.connectors[0].slug, id: site.connectors[0].id },
+                });
+            }));
+        }
 
         return act;
     });
@@ -462,9 +559,96 @@ describe('End-to-End Tests', function() {
         return Crud.verify_all(URLs.access(consumer.uid), []);
     });
 
+    it('--- check live / stage connectors --------------------------------------\n', function () { console.log(); return true; });
+
+    it('prepare live / stage test records', () => {
+        let connectors = [...new Set(insertions.map(i => i.connector.id))]; // unique list of connectors
+        connectors.forEach(c => staged.push(insertions.find(i => i.connector.id === c))); // one record for each connector
+        staged = staged.slice(0, 3); // three connectors needed for tests case
+
+        expect(staged.length).to.be.eq(3);
+    });
+
+    it('generate a key for the consumer user for the "access-all-areas" policy', function () {
+    /*  TODO: Currently gives HTTP/409 conflict
+
+        headers(coordinator.token);
+        let url = URLs.access(consumer.uid, 'access-all-areas');
+        return Crud.add(url, undefined, url, token => {
+            consumer.token = token;
+            consumer.policy = 'access-all-areas';
+        });  */
+    });
+
+    it('check all items are present', () => {
+        headers(consumer.token, 'access-all-areas');
+        return count_items(staged, 3);
+    });
+
+    it('make first connector not live', () => {
+        headers(coordinator.token);
+        return Crud.delete(URLs.connector_live(staged[0].entity, staged[0].connector.slug));
+    });
+
+    it('check only two items are present', () => {
+        headers(consumer.token, 'access-all-areas');
+        return count_items(staged, 2);
+    });
+
+    it('check all items are present via connectors header', () => {
+        headers(consumer.token, 'access-all-areas', [ staged[0].connector.id ]);
+        return count_items(staged, 3);
+    });
+
+    it('make second connector not live', () => {
+        headers(coordinator.token);
+        return Crud.delete(URLs.connector_live(staged[1].entity, staged[1].connector.slug));
+    });
+
+    it('check only one item is present', () => {
+        headers(consumer.token, 'access-all-areas');
+        return count_items(staged, 1);
+    });
+
+    it('check all items are present via connectors header', () => {
+        headers(consumer.token, 'access-all-areas', [ staged[0].connector.id, staged[1].connector.id ]);
+        return count_items(staged, 3);
+    });
+
+    it('make last connector not live', () => {
+        headers(coordinator.token);
+        return Crud.delete(URLs.connector_live(staged[2].entity, staged[2].connector.slug));
+    });
+
+    it('check no entity items are present', () => {
+        headers(consumer.token, 'access-all-areas');
+        return count_items(staged, 0);
+    });
+
+    it('check all items are present via connectors header', () => {
+        headers(consumer.token, 'access-all-areas', [ staged[0].connector.id, staged[1].connector.id, staged[2].connector.id ]);
+        return count_items(staged, 3);
+    });
+
+    it('make two connectors live again', () => {
+        let actions = [];
+
+        headers(coordinator.token);
+        actions.push(Crud.post(URLs.connector_live(staged[0].entity, staged[0].connector.slug)));
+        actions.push(Crud.post(URLs.connector_live(staged[2].entity, staged[2].connector.slug)));
+
+        return Promise.all(actions);
+    });
+
+    it('check two entity items are present', () => {
+        headers(consumer.token, 'access-all-areas');
+        return count_items(staged, 2);
+    });
+
     it('--- check key refreshing ----------------------------------------------\n', function () { console.log(); return true; });
 
     it('generate a consumer key on "access-all-areas"', function () {
+        headers(coordinator.token);
         let url = URLs.access(consumer.uid, 'access-all-areas');
         return Crud.add(url, undefined, url, token => {
             consumer.token = token;

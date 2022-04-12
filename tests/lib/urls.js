@@ -59,6 +59,7 @@ class URLs {
 
     entity(eid) { return this.rest('entity', eid); }
     connector(eid, cid) { return this.rest('entity', eid, 'connector', cid); }
+    connector_live(eid, cid) { return this.rest('entity', eid, 'connector', cid, 'live'); }
     user(uid) { return this.rest('user', uid); }
     user_email(email) { return this.rest('user', 'email', email); }
     user_coordinator(uid) { return this.rest('user', uid, 'coordinator'); }

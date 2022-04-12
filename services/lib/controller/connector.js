@@ -193,4 +193,37 @@ module.exports = class Connector {
 
         .catch(error => next(error));
     }
+
+    // --- add or remove live status of a connector
+
+    static live(req, res, next, is_live) {
+        log.info('entity', req.params.eid, 'connector', req.params.cid, 'live', is_live ? 'add' : 'delete');
+
+        let eid = req.params.eid.toLowerCase();
+        let cid = req.params.cid.toLowerCase();
+
+        model.entity.connector(eid)
+
+        .then(connectors => {
+            if (!connectors) throw new failure(HTTP.NOT_FOUND);
+            return connectors.find(cid)
+
+            .then(item => {
+                if (!item) throw new failure(HTTP.NOT_FOUND);
+                return connectors.update(cid, { is_live }); // no error if already in the desired state
+            });
+        })
+
+        .then(() => {
+            log.info('entity', req.params.eid, 'connector', req.params.cid, 'live', is_live ? 'add' : 'delete', 'complete');
+            res.status(HTTP.NO_CONTENT).send();
+        })
+
+        .catch(error => next(error));
+    }
+
+    // --- live status handlers
+
+    live_add(req, res, next) { Connector.live(req, res, next, true ) };
+    live_del(req, res, next) { Connector.live(req, res, next, false) };
 }

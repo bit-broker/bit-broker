@@ -459,6 +459,98 @@ describe('Coordinator Service Tests', function() {
         });
     });
 
+    // --- connector live / staging tests - for the data imapacts of live / stage there is a whole seperate test suite
+
+    describe('connector live / staging tests', () => {
+        let entity = DATA.pick(DATA.SLUG.VALID);
+        let connector = DATA.pick(DATA.SLUG.VALID);
+        let url = {
+            entity: URLs.entity(entity),
+            connector: URLs.connector(entity, connector),
+            connector_live: URLs.connector_live(entity, connector)
+        };
+
+        before(() => {
+            return Shared.empty();
+        });
+
+        after(() => {
+            return Shared.empty();
+        });
+
+        it('can create the entity', () => {
+            return Crud.add(url.entity, DATA.some_info(), URLs.entity(entity));
+        });
+
+        it('can create the connector', () => {
+            return Crud.add(url.connector, DATA.some_info(), url.connector);
+        });
+
+        it('the connector is not live', () => {
+            return Crud.verify(url.connector, { id: connector, is_live: false });
+        });
+
+        it('can make the connector live', () => {
+            return Crud.post(url.connector_live);
+        });
+
+        it('the connector is now live', () => {
+            return Crud.verify(url.connector, { id: connector, is_live: true });
+        });
+
+        it('can re-make the connector live', () => {
+            return Crud.post(url.connector_live,);
+        });
+
+        it('the connector is still live', () => {
+            return Crud.verify(url.connector, { id: connector, is_live: true });
+        });
+
+        it('can update the connector', () => {
+            return Crud.update(url.connector, DATA.some_info());
+        });
+
+        it('the connector is still live', () => {
+            return Crud.verify(url.connector, { id: connector, is_live: true });
+        });
+
+        it('can unmake the connector live', () => {
+            return Crud.delete(url.connector_live,);
+        });
+
+        it('the connector is now not live', () => {
+            return Crud.verify(url.connector, { id: connector, is_live: false });
+        });
+
+        it('can re-unmake the connector live', () => {
+            return Crud.delete(url.connector_live,);
+        });
+
+        it('the connector is still not live', () => {
+            return Crud.verify(url.connector, { id: connector, is_live: false });
+        });
+
+        it('can update the connector', () => {
+            return Crud.update(url.connector, DATA.some_info());
+        });
+
+        it('the connector is still not live', () => {
+            return Crud.verify(url.connector, { id: connector, is_live: false });
+        });
+
+        it('can make the connector live', () => {
+            return Crud.post(url.connector_live,);
+        });
+
+        it('the connector is now live', () => {
+            return Crud.verify(url.connector, { id: connector, is_live: true });
+        });
+
+        it('can delete the entity type and all hence its connectors', () => {
+            return Crud.delete(url.entity);
+        });
+    });
+
     // --- connector validation tests - here we test invalid entries only, on add and update
 
     describe('connector validation tests', () => {
