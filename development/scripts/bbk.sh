@@ -17,7 +17,7 @@
 
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT="$HERE/../../"
+ROOT="$HERE/../.."
 
 function error
 {
@@ -84,7 +84,10 @@ function stop
 function wipe
 {
     info "wiping the database..."
-    psql -U postgres -a -f "$ROOT/database/schema.sql" > /dev/null
+
+    for i in $(ls $ROOT/database/*.sql | sort); do
+        psql -U postgres -a -f "$i" > /dev/null
+    done;
 }
 
 function unpack
