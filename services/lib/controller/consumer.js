@@ -36,6 +36,10 @@ const view = require('../view/index.js');
 const log = require('../logger.js').Logger;
 const fetch = require('node-fetch');
 
+// --- constants - not deployment configurable
+
+const MAX_CONNECTORS = 16;
+
 // --- timeseries class (embedded)
 
 class Timeseries {
@@ -70,6 +74,16 @@ module.exports = class Consumer {
         this.timeseries = new Timeseries();
     }
 
+    // --- extracts the call context from the request header
+
+    static context(req) {
+        let policy = req.header(CONST.POLICY.HEADER);
+        let connectors = (req.header(CONST.POLICY.CONNECTORS) || ''); // optional header
+
+        connectors = connectors.split(',').map(i => i.trim()).filter(i => i.length).slice(0, MAX_CONNECTORS);
+        return { policy, connectors };
+    }
+
     // --- within the context of an active policy
 
     static with_policy(slug) {
@@ -88,19 +102,20 @@ module.exports = class Consumer {
     // --- performs a catalog query
 
     catalog(req, res, next) {
-        let q = req.query.q || '{}';
+        let query = req.query.q || '{}';
+        let context = Consumer.context(req);
         let errors = [];
 
-        errors = errors.concat(model.validate.query(q));
+        errors = errors.concat(model.validate.query(query));
 
         if (errors.length) {
             throw new failure(HTTP.BAD_REQUEST, errors);
         }
 
-        Consumer.with_policy(req.header(CONST.POLICY.HEADER))
+        Consumer.with_policy(context.policy)
 
         .then(policy => {
-            return model.catalog.query(policy.data_segment.segment_query, JSON.parse(q))
+            return model.catalog.query(policy.data_segment.segment_query, context.connectors, JSON.parse(query))
 
             .then(items => {
                 res.json(view.consumer.instances(req.originalRoute, items, policy.legal_context));
@@ -113,11 +128,12 @@ module.exports = class Consumer {
     // --- lists all the entity types
 
     types(req, res, next) {
+        let context = Consumer.context(req);
 
-        Consumer.with_policy(req.header(CONST.POLICY.HEADER))
+        Consumer.with_policy(context.policy)
 
         .then(policy => {
-            return model.catalog.types(policy.data_segment.segment_query)
+            return model.catalog.types(policy.data_segment.segment_query, context.connectors)
 
             .then(items => {
                 res.json(view.consumer.entities(req.originalRoute, items, policy.legal_context)); // can be empty
@@ -131,19 +147,20 @@ module.exports = class Consumer {
 
     list(req, res, next) {
         let type = req.params.type.toLowerCase();
-        let limit = req.params.limit || 50;
+        let limit = req.params.limit || 50;  // TODO
         let offset = req.params.offset || 0;
+        let context = Consumer.context(req);
 
-        Consumer.with_policy(req.header(CONST.POLICY.HEADER))
+        Consumer.with_policy(context.policy)
 
         .then(policy => {
-            return model.catalog.types(policy.data_segment.segment_query) // TODO: Calling this first is a heavy price to pay for returning HTTP/404 vs []
+            return model.catalog.types(policy.data_segment.segment_query, context.connectors) // TODO: Calling this first is a heavy price to pay for returning HTTP/404 vs []
 
             .then(types => {
                 let slugs = types.map(t => t.entity_slug);
           //      if (!slugs.includes(type)) throw new failure(HTTP.NOT_FOUND);  // the entity type is either not present or not in policy
 
-                return model.catalog.list(policy.data_segment.segment_query, type)
+                return model.catalog.list(policy.data_segment.segment_query, context.connectors, type)
 
                 .then(items => {
                     res.json(view.consumer.instances(req.originalRoute, items, policy.legal_context)); // can be empty
@@ -159,11 +176,12 @@ module.exports = class Consumer {
     get(req, res, next) {
         let type = req.params.type.toLowerCase();
         let id = req.params.id.toLowerCase();
+        let context = Consumer.context(req);
 
-        Consumer.with_policy(req.header(CONST.POLICY.HEADER))
+        Consumer.with_policy(context.policy)
 
         .then(policy => {
-            return model.catalog.find(policy.data_segment.segment_query, type, id)
+            return model.catalog.find(policy.data_segment.segment_query, context.connectors, type, id)
 
             .then(item => {
                 if (!item) throw new failure(HTTP.NOT_FOUND);

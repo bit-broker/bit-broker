@@ -92,6 +92,7 @@ CREATE TABLE connector
     properties JSONB NOT NULL,
     contribution_id CHAR(36) UNIQUE,
     contribution_key_id CHAR(36) UNIQUE NOT NULL,
+    is_live BOOLEAN NOT NULL DEFAULT FALSE,  
     session_id CHAR(36) UNIQUE,
     session_mode SESSION_MODES,
     session_started TIMESTAMP,

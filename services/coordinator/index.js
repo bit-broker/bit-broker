@@ -67,6 +67,8 @@ api.router.get('/entity/:eid/connector/:cid', controller.connector.get);
 api.router.post('/entity/:eid/connector/:cid', controller.connector.insert);
 api.router.put('/entity/:eid/connector/:cid', controller.connector.update);
 api.router.delete('/entity/:eid/connector/:cid', controller.connector.delete);
+api.router.post('/entity/:eid/connector/:cid/live', controller.connector.live_add);
+api.router.delete('/entity/:eid/connector/:cid/live', controller.connector.live_del);
 
 // --- policy endpoints
 

@@ -43,6 +43,10 @@ describe('Consumer Tests', function() {
 
     this.timeout(0); // we are not interested in non-functional tests here
 
+    // --- test wide variables
+
+    let insertions = []; // will be filled in by seeder adding data
+
     // --- callback function to add extra data via a webhook
 
     function webhook_callback(type, id) {
@@ -121,13 +125,23 @@ describe('Consumer Tests', function() {
         });
 
         it('add all the seed data', () => {
-            return Seeder.add_seed_data();
+            return Seeder.add_seed_data().then(report => {
+                 insertions = report;  // store for later test cases
+            });
         });
 
         it('create the policies', () => {
             return Seeder.add_policies();
         });
     });
+
+    /*
+
+    NOTE: Much more extensive testing of the entity api is done in the
+          end2end test. This test is just to check the basic mechanics of
+          the process. In end2end we test every combination in detail.
+
+    */
 
     // --- the test cases
 
@@ -312,6 +326,14 @@ describe('Consumer Tests', function() {
             return test;
         });
     });
+
+    /*
+
+    NOTE: Much more extensive testing of catalog queries are done in the
+          end2end test. This test is just to check the basic mechanics of
+          the process. In end2end we test every combination in detail.
+
+    */
 
     describe('catalog api tests', function() {
 
@@ -551,7 +573,6 @@ describe('Consumer Tests', function() {
         });
 
 /*
-
         TODO: Issue #62
 
         it('str » $contains » M', () => {
@@ -633,6 +654,85 @@ describe('Consumer Tests', function() {
                 query: { 'type': 'country', '$or': [{ 'name': 'United Kingdom' }, { 'entity.calling_code': CALLING_CODE.IN }] },
                 yields: ['United Kingdom', 'India']
             });
+        });
+    });
+
+    /*
+
+    NOTE: Much more extensive testing of connector headers is done in the
+          end2end test. This test is just to check the basic mechanics of
+          the process. In end2end we test every combination in detail.
+
+    */
+
+    describe('catalog connector header tests', function() {
+
+        let item = null; // filled at in first test
+
+        function present(candidate, exists, connectors) {
+            let checks = [];
+            let found = 0;
+            let url = {
+                entity: URLs.consumer_entity(candidate.entity, candidate.ids.public),
+                catalog: URLs.consumer_catalog({ 'type': candidate.entity, 'name': candidate.name })
+            };
+
+            let headers = Shared.policy_header(DATA.POLICY.ALLAREA.ID);
+            if (connectors) headers['x-bbk-connectors'] = connectors.join(',');
+            Crud.headers(headers);
+
+            checks.push(Crud.exists(url.entity).then(exists => found += exists ? 1 : 0));
+            checks.push(Crud.get(url.catalog, body => { found += body.length }));
+
+            return Promise.all(checks)
+
+            .then(() => expect(found).to.be.eq(exists ? 2 : 0)); // i.e. both places or nowhere
+        }
+
+        it('prepare the test item', () => {
+            item = DATA.pick(insertions);
+        });
+
+        it('check the item is present', () => {
+            return present(item, true);
+        });
+
+        it('make the connector not live', () => {
+            return Crud.delete(URLs.connector_live(item.entity, item.connector.slug));
+        });
+
+        it('check the item is not present', () => {
+            return present(item, false);
+        });
+
+        it('check the item is present via connector headers', () => {
+            return present(item, true, [ item.connector.id ]);
+        });
+
+        it('make the connector live again', () => {
+            return Crud.post(URLs.connector_live(item.entity, item.connector.slug));
+        });
+
+        it('check the item is present', () => {
+            return present(item, true);
+        });
+
+        it('check the item is still present via connector headers', () => {
+            return present(item, true, [ item.connector.id ]);
+        });
+
+        it('check max connector headers', () => {
+            let max = [];
+
+            for (let i = 0 ; i < DATA.CATALOG.MAX_CONNECTORS + 1; i++) {
+                max.push(DATA.name());
+            }
+
+            return present(item, true, max);
+        });
+
+        it('check empty connector headers', () => {
+            return present(item, true, []);
         });
     });
 });
