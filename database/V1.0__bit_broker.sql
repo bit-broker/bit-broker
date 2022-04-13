@@ -21,10 +21,6 @@ constrains, enums, users, roles, grants, etc.
 
 \connect bit_broker
 
--- extensions
-
-CREATE EXTENSION postgis;
-
 -- user table
 
 CREATE TABLE users
