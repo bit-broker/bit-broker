@@ -15,4 +15,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 FROM flyway/flyway:8.5.5
+
+# Add migration files except V0.0
 ADD ./database /flyway/sql
+
+# Remove psql commands
+RUN cd /flyway/sql && ls | xargs -I% sed -i '/connect bit_broker/d' %
