@@ -19,36 +19,6 @@ The bit-broker database creation script. Contains all tables, keys, indexes,
 constrains, enums, users, roles, grants, etc.
 */
 
-\connect postgres
-
--- clean up any previous assets - for development only
-
-DROP DATABASE IF EXISTS bit_broker;
-
-DROP USER IF EXISTS bbk_admin;
-DROP USER IF EXISTS bbk_coordinator;
-DROP USER IF EXISTS bbk_contributor;
-DROP USER IF EXISTS bbk_consumer;
-
-DROP ROLE IF EXISTS bbk_reader;
-DROP ROLE IF EXISTS bbk_writer;
-
--- create the user and role assets
-
-CREATE ROLE bbk_reader;
-CREATE ROLE bbk_writer;
-
-CREATE USER bbk_admin WITH ENCRYPTED PASSWORD 'bbk_admin_pwd';
-CREATE USER bbk_coordinator WITH ENCRYPTED PASSWORD 'bbk_coordinator_pwd';
-CREATE USER bbk_contributor WITH ENCRYPTED PASSWORD 'bbk_contributor_pwd';
-CREATE USER bbk_consumer WITH ENCRYPTED PASSWORD 'bbk_consumer_pwd';
-
-GRANT bbk_reader TO bbk_consumer;
-GRANT bbk_writer TO bbk_admin, bbk_coordinator, bbk_contributor;
-
--- create the database
-
-CREATE DATABASE bit_broker WITH ENCODING = 'UTF8' OWNER = bbk_admin;
 \connect bit_broker
 
 -- extensions
@@ -92,7 +62,7 @@ CREATE TABLE connector
     properties JSONB NOT NULL,
     contribution_id CHAR(36) UNIQUE,
     contribution_key_id CHAR(36) UNIQUE NOT NULL,
-    is_live BOOLEAN NOT NULL DEFAULT FALSE,  
+    is_live BOOLEAN NOT NULL DEFAULT FALSE,
     session_id CHAR(36) UNIQUE,
     session_mode SESSION_MODES,
     session_started TIMESTAMP,
