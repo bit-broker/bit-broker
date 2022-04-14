@@ -125,8 +125,17 @@ module.exports = class Server {
         this.app.use((req, res, next) => {
             let proto = req.header('x-forwarded-scheme') || req.header('x-forwarded-proto') || DEFAULT_PROTOCOL;
             let host = req.header('host');
-            let base = this.base.length ? `/${ this.base }` : '';
-            req.originalRoute = `${ proto }://${ host }${ base }`;
+            req.originalRoute = `${ proto }://${ host }`;
+
+            if (this.base.length) {
+                let path = req.originalUrl; // use this and not req.url
+                let pos = path.indexOf(this.base);
+                let prefix = path.substr(0, Math.max(1, pos)); // path elements which prefix the version base
+
+                req.originalRoute += prefix;
+                req.originalRoute += this.base;
+            }
+
             next();
         });
 
@@ -154,6 +163,12 @@ module.exports = class Server {
 
         this.app.use((err, req, res, next) => {
             this.error(res, err);
+        });
+
+        // --- error testing route
+
+        this.router.get('/error/test', (req, res) => {
+            throw 'test error message - please ignore'; // used to ensure that development errors are not sent to clients in production
         });
 
         // --- announce presence on base route
