@@ -50,7 +50,7 @@ describe('End-to-End Tests', function() {
 
     // --- setup test context
 
-    let admin = { id: 1, url: URLs.user(1), name: process.env.BOOTSTRAP_USER_NAME, coordinator: true };
+    let admin = { id: 1, url: URLs.user(1), name: process.env.BOOTSTRAP_USER_NAME, email: process.env.BOOTSTRAP_USER_EMAIL, coordinator: true };
     let coordinator = Seeder.users.find(e => e.properties.name === 'alice');
     let consumer = Seeder.users.find(e => e.properties.name === 'bob');
     let country = Seeder.entities.find(e => e.slug === 'country');
@@ -379,6 +379,7 @@ describe('End-to-End Tests', function() {
     });
 
     it('create the second country entity connector', function () {
+        headers(coordinator.token);
         return Crud.add(URLs.connector(country.slug, country.connectors[1].slug), country.connectors[1].properties, undefined, details => {
             country.connectors[1].id = details.id;
             country.connectors[1].token = details.token;
@@ -485,6 +486,7 @@ describe('End-to-End Tests', function() {
     it('--- create consumer ---------------------------------------------------\n', function () { console.log(); return true; });
 
     it('add the consumer user', function () {
+        headers(coordinator.token);
         return Crud.add(URLs.user(), consumer.properties, undefined, (body, location) => {
             consumer.uid = parseInt(location.match(/\d+$/).shift());
         });
