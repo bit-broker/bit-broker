@@ -19,7 +19,7 @@
     "http-errors": "^2.0.0",
     "http-status-codes": "^2.2.0",
     "i18n": "^0.14.2",
-    "ioredis": "^5.0.3",
+    "ioredis": "^5.0.4",
     "json-keys-sort": "^2.1.0",
     "jsonschema": "^1.4.0",
     "knex": "^1.0.7",
