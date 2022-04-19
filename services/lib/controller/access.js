@@ -104,7 +104,7 @@ module.exports = class Access {
                         throw new failure(HTTP.CONFLICT);
                     }
 
-                    return accesses.insert({ policy_id: policy.id });
+                    return accesses.insert(pid, { user_id: uid, policy_id: policy.id });
                 });
             })
         })
@@ -134,7 +134,7 @@ module.exports = class Access {
 
             .then(item => {
                 if (!item) throw new failure(HTTP.NOT_FOUND);
-                return accesses.update(item);
+                return accesses.update(pid, item);
             })
         })
 
