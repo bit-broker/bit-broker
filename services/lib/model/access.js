@@ -97,10 +97,9 @@ module.exports = class Access {
 
     // --- inserts a new access on the instance user type
 
-    insert(values) {
-        return Permit.generate_token(CONST.ROLE.CONSUMER, values.policy_id)
+    insert(slug, values) {
+        return Permit.generate_token(CONST.ROLE.CONSUMER, slug)
         .then (token => {
-            values.user_id = this.user.id;
             values.key_id = token.jti;
             return this.rows.insert(values).returning('id')
             .then(id => id && id.length ? { token: token.token } : false);
@@ -109,9 +108,9 @@ module.exports = class Access {
 
     // --- generates a fresh access token for the given context
 
-    update(values) {
+    update(slug, values) {
         return Permit.revoke_tokens([values.key_id])
-        .then (() => Permit.generate_token(CONST.ROLE.CONSUMER, values.policy_id))
+        .then (() => Permit.generate_token(CONST.ROLE.CONSUMER, slug))
         .then (token => {
             return this.find(values.id).update({ key_id: token.jti }).returning('id')
             .then(id => id && id.length ? { token: token.token } : false);
