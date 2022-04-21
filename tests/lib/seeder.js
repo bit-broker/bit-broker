@@ -60,7 +60,17 @@ module.exports = class Seeder {
     // --- returns record data for the given name
 
     static records(name) {
-        return JSON.parse(fs.readFileSync(`./data/${ name }.json`));
+        let items = JSON.parse(fs.readFileSync(`./data/${ name }.json`));
+
+        if (Array.isArray(items)) {
+            items.forEach(item => {
+                for (let k in item) {
+                    if (k.startsWith('_')) delete item[k];  // we don't send these properties to bbk
+                }
+            });
+        }
+
+        return items;
     }
 
     // --- returns a record for the given name and id

@@ -88,7 +88,15 @@ const DATA = {
     },
 
     items: function() {
-        return JSON.parse(fs.readFileSync('./data/country.json'));
+        let items = JSON.parse(fs.readFileSync(`./data/country.json`));
+
+        items.forEach(item => {
+            for (let k in item) {
+                if (k.startsWith('_')) delete item[k]; // we don't send these properties to bbk
+            }
+        });
+
+        return items;
     },
 
     record: function(index) {
