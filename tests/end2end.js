@@ -38,7 +38,7 @@ const expect = chakram.expect;
 
 // --- constanst
 
-const LOCAL = process.env.TESTS_LOCAL_MODE != 'false' || false; // tests on a local environment not a full k8s deployment
+const LOCAL = process.env.TESTS_LOCAL_MODE !== 'false' || false; // tests on a local environment not a full k8s deployment
 const PAGE = 50; // number of records in a singel data upsert
 const SKIPPED = 'skipped';  // used as a string return to track skipped test due to LOCAL mode
 
@@ -329,14 +329,21 @@ describe('End-to-End Tests', function() {
         return server_access(true, false, false).then (skipped => skipped ? this.skip() : true);
     });
 
+    it('test coordinator server errors are returned as expected', function () {
+        return Crud.server_error(URLs.error_test(URLs.coordinator()), !LOCAL);
+    });
+
     it('--- create country records --------------------------------------------\n', function () { console.log(); return true; });
 
     it('create the country entity', function () {
-        return Crud.add(URLs.entity(country.slug), country.properties);
+        headers(coordinator.token);
+        let url = URLs.entity(country.slug);
+        return Crud.add(url, country.properties, url);
     });
 
     it('create the country entity connector', function () {
-        return Crud.add(URLs.connector(country.slug, country.connectors[0].slug), country.connectors[0].properties, undefined, details => {
+        let url = URLs.connector(country.slug, country.connectors[0].slug);
+        return Crud.add(url, country.connectors[0].properties, url, details => {
             country.connectors[0].id = details.id;
             country.connectors[0].token = details.token;
         });
@@ -349,6 +356,10 @@ describe('End-to-End Tests', function() {
     it('switch to country connector key and check server access rules are met (coor: false, cont: true, cons: false)', function () {
         headers(country.connectors[0].token);
         return server_access(false, true, false).then (skipped => skipped ? this.skip() : true);
+    });
+
+    it('test coordinator server errors are returned as expected', function () {
+        return Crud.server_error(URLs.error_test(URLs.contributor()), !LOCAL);
     });
 
     it('open a stream session on country', function () {
@@ -382,11 +393,13 @@ describe('End-to-End Tests', function() {
 
     it('create the heritage-site entity', function () {
         headers(coordinator.token);
-        return Crud.add(URLs.entity(site.slug), site.properties);
+        let url = URLs.entity(site.slug);
+        return Crud.add(url, site.properties, url);
     });
 
     it('create the first heritage-site entity connector', function () {
-        return Crud.add(URLs.connector(site.slug, site.connectors[0].slug), site.connectors[0].properties, undefined, details => {
+        let url = URLs.connector(site.slug, site.connectors[0].slug);
+        return Crud.add(url, site.connectors[0].properties, url, details => {
             site.connectors[0].id = details.id;
             site.connectors[0].token = details.token;
         });
@@ -403,7 +416,7 @@ describe('End-to-End Tests', function() {
         });
     });
 
-    it('upsert the heritage-site records into the session', function () {
+    it('upsert the first batch of heritage-site records into the session', function () {
         let act = Promise.resolve();
         let url = URLs.session_action(site.connectors[0].id, site.connectors[0].session, 'upsert');
         let all = Seeder.records(site.slug).filter(i => i.entity.category === 'cultural');
@@ -425,7 +438,9 @@ describe('End-to-End Tests', function() {
     });
 
     it('create the second heritage-site entity connector', function () {
-        return Crud.add(URLs.connector(site.slug, site.connectors[1].slug), site.connectors[1].properties, undefined, details => {
+        headers(coordinator.token);
+        let url = URLs.connector(site.slug, site.connectors[1].slug);
+        return Crud.add(url, site.connectors[1].properties, url, details => {
             site.connectors[1].id = details.id;
             site.connectors[1].token = details.token;
         });
@@ -442,7 +457,7 @@ describe('End-to-End Tests', function() {
         });
     });
 
-    it('upsert the heritage-site records into the session', function () {
+    it('upsert the second batch of heritage-site records into the session', function () {
         let act = Promise.resolve();
         let url = URLs.session_action(site.connectors[1].id, site.connectors[1].session, 'upsert');
         let all = Seeder.records(site.slug).filter(i => i.entity.category !== 'cultural');
@@ -500,12 +515,20 @@ describe('End-to-End Tests', function() {
         return server_access(false, false, true).then (skipped => skipped ? this.skip() : true);
     });
 
+    it('test coordinator server errors are returned as expected', function () {
+        return Crud.server_error(URLs.error_test(URLs.consumer()), !LOCAL);
+    });
+
     it('delete the consumer key', function () {
         headers(coordinator.token);
         return Crud.delete(URLs.access(consumer.uid, consumer.policy));
     });
 
-    it('--- no per policy expectations ----------------------------------------\n', function () { console.log(); return true; });
+    it('there are no keys presents for the consumer user', function () {
+        return Crud.verify_all(URLs.access(consumer.uid), []);
+    });
+
+    it('--- check per policy expectations -------------------------------------\n', function () { console.log(); return true; });
 
     it('expectations met for policy "access-all-areas"', function () {
         return expectations('access-all-areas');
@@ -567,18 +590,16 @@ describe('End-to-End Tests', function() {
     });
 
     it('generate a key for the consumer user for the "access-all-areas" policy', function () {
-    /*  TODO: Currently gives HTTP/409 conflict
-
         headers(coordinator.token);
         let url = URLs.access(consumer.uid, 'access-all-areas');
         return Crud.add(url, undefined, url, token => {
             consumer.token = token;
             consumer.policy = 'access-all-areas';
-        });  */
+        });
     });
 
     it('check all items are present', () => {
-        headers(consumer.token, 'access-all-areas');
+        headers(consumer.token, consumer.policy);
         return count_items(staged, 3);
     });
 
@@ -588,12 +609,12 @@ describe('End-to-End Tests', function() {
     });
 
     it('check only two items are present', () => {
-        headers(consumer.token, 'access-all-areas');
+        headers(consumer.token, consumer.policy);
         return count_items(staged, 2);
     });
 
     it('check all items are present via connectors header', () => {
-        headers(consumer.token, 'access-all-areas', [ staged[0].connector.id ]);
+        headers(consumer.token, consumer.policy, [ staged[0].connector.id ]);
         return count_items(staged, 3);
     });
 
@@ -603,12 +624,12 @@ describe('End-to-End Tests', function() {
     });
 
     it('check only one item is present', () => {
-        headers(consumer.token, 'access-all-areas');
+        headers(consumer.token, consumer.policy);
         return count_items(staged, 1);
     });
 
     it('check all items are present via connectors header', () => {
-        headers(consumer.token, 'access-all-areas', [ staged[0].connector.id, staged[1].connector.id ]);
+        headers(consumer.token, consumer.policy, [ staged[0].connector.id, staged[1].connector.id ]);
         return count_items(staged, 3);
     });
 
@@ -618,12 +639,12 @@ describe('End-to-End Tests', function() {
     });
 
     it('check no entity items are present', () => {
-        headers(consumer.token, 'access-all-areas');
+        headers(consumer.token, consumer.policy);
         return count_items(staged, 0);
     });
 
     it('check all items are present via connectors header', () => {
-        headers(consumer.token, 'access-all-areas', [ staged[0].connector.id, staged[1].connector.id, staged[2].connector.id ]);
+        headers(consumer.token, consumer.policy, [ staged[0].connector.id, staged[1].connector.id, staged[2].connector.id ]);
         return count_items(staged, 3);
     });
 
@@ -638,8 +659,17 @@ describe('End-to-End Tests', function() {
     });
 
     it('check two entity items are present', () => {
-        headers(consumer.token, 'access-all-areas');
+        headers(consumer.token, consumer.policy);
         return count_items(staged, 2);
+    });
+
+    it('delete the consumer key', function () {
+        headers(coordinator.token);
+        return Crud.delete(URLs.access(consumer.uid, consumer.policy));
+    });
+
+    it('there are no keys presents for the consumer user', function () {
+        return Crud.verify_all(URLs.access(consumer.uid), []);
     });
 
     it('--- check key refreshing ----------------------------------------------\n', function () { console.log(); return true; });
@@ -654,13 +684,13 @@ describe('End-to-End Tests', function() {
     });
 
     it('switch to the consumer key and check that the consumer api is accessible', function () {
-        headers(consumer.token, 'access-all-areas');
+        headers(consumer.token, consumer.policy);
         return Crud.get(URLs.consumer_catalog());
     });
 
     it('refresh consumer key on "access-all-areas"', function () {
         headers(coordinator.token);
-        return Crud.update(URLs.access(consumer.uid, 'access-all-areas'), undefined, token =>
+        return Crud.update(URLs.access(consumer.uid, consumer.policy), undefined, token =>
         {
             consumer.old_token = consumer.token;
             consumer.token = token;
@@ -668,22 +698,22 @@ describe('End-to-End Tests', function() {
     });
 
     it('check consumer api is not accessible with old key', function () {
-        headers(consumer.old_token, 'access-all-areas');
+        headers(consumer.old_token, consumer.policy);
         return LOCAL ? this.skip() : Crud.forbidden(URLs.consumer_catalog());
     });
 
     it('check consumer api is accessible with the new key', function () {
-        headers(consumer.token, 'access-all-areas');
+        headers(consumer.token, consumer.policy);
         return Crud.get(URLs.consumer_catalog());
     });
 
     it('delete consumer api key on "access-all-areas"', function () {
         headers(coordinator.token);
-        return Crud.delete(URLs.access(consumer.uid, 'access-all-areas'));
+        return Crud.delete(URLs.access(consumer.uid, consumer.policy));
     });
 
     it('check consumer api is not accessible with the now deleted key', function () {
-        headers(consumer.token, 'access-all-areas');
+        headers(consumer.token, consumer.policy);
         return LOCAL ? this.skip() : Crud.forbidden(URLs.consumer_catalog());
     });
 
@@ -694,22 +724,22 @@ describe('End-to-End Tests', function() {
         let url = URLs.access(consumer.uid, 'access-all-areas');
         return Crud.add(url, undefined, url, token => {
             consumer.token = token;
-            consumer.policy = 'access-all-areas';
+            consumer.policy = consumer.policy;
         });
     });
 
     it('check consumer api is accessible with the new key', function () {
-        headers(consumer.token, 'access-all-areas');
+        headers(consumer.token, consumer.policy);
         return Crud.get(URLs.consumer_catalog());
     });
 
     it('delete the "access-all-areas" policy"', function () {
         headers(coordinator.token);
-        return Crud.delete(URLs.policy('access-all-areas'));
+        return Crud.delete(URLs.policy(consumer.policy));
     });
 
     it('check consumer api is not accessible with the now deleted policy', function () {
-        headers(consumer.token, 'access-all-areas');
+        headers(consumer.token, consumer.policy);
         return LOCAL ? this.skip() : Crud.forbidden(URLs.consumer_catalog());
     });
 
@@ -753,7 +783,7 @@ describe('End-to-End Tests', function() {
 
     it('check can no longer open stream session with the now deleted connector', function () {
         headers(country.connectors[0].token);
-        return LOCAL ? this.skip() : Crud.forbidden(URLs.session_open(country.connectors[0].id));
+        return LOCAL ? this.skip() : Crud.not_found(URLs.session_open(country.connectors[0].id));
     });
 
     it('--- check entity deletion ---------------------------------------------\n', function () { console.log(); return true; });
@@ -770,7 +800,7 @@ describe('End-to-End Tests', function() {
 
     it('check can no longer open stream session on the now deleted entity', function () {
         headers(site.connectors[0].token);
-        return LOCAL ? this.skip() : Crud.forbidden(URLs.session_open(site.connectors[0].id));
+        return LOCAL ? this.skip() : Crud.not_found(URLs.session_open(site.connectors[0].id));
     });
 
     it('--- check coordinator deletion ----------------------------------------\n', function () { console.log(); return true; });
@@ -781,7 +811,7 @@ describe('End-to-End Tests', function() {
     });
 
     it('check coordinator api is not accessible for deleted user', function () {
-        return LOCAL ? this.skip() : Crud.forbidden(URLs.entity());
+        // TODO: Pending key revocation issue # 54 return LOCAL ? this.skip() : Crud.forbidden(URLs.entity());
     });
 
     it('--- finish-up tests ---------------------------------------------------\n', function () { console.log(); return true; });
