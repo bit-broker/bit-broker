@@ -57,6 +57,8 @@ class URLs {
     contributor() { return process.env.TESTS_CONTRIBUTOR; }
     consumer() { return process.env.TESTS_CONSUMER; }
 
+    error_test(server) { return server + '/error/test' }
+
     entity(eid) { return this.rest('entity', eid); }
     connector(eid, cid) { return this.rest('entity', eid, 'connector', cid); }
     connector_live(eid, cid) { return this.rest('entity', eid, 'connector', cid, 'live'); }
@@ -71,7 +73,7 @@ class URLs {
     session_close(cid, sid, commit = true) { return this.rest('connector', cid, 'session', sid, 'close', commit ? 'true' : 'false'); }
 
     consumer_entity(eid, iid) { return this.consumer() + '/entity' + (eid ? `/${eid}` : '') + (iid ? `/${iid}` : ''); }
-    consumer_catalog(q) { return this.consumer() + '/catalog' + (q ? `?q=${ JSON.stringify(q) }` : ''); }
+    consumer_catalog(q) { return this.consumer() + '/catalog' + (q ? `?q=${ encodeURIComponent(JSON.stringify(q)) }` : ''); }
 }
 
 // --- exported classes

@@ -165,6 +165,22 @@ module.exports = class Crud {
             return chakram.wait();
         });
     }
+
+    // --- a server error state
+
+    static server_error(url, production, error = HTTP.INTERNAL_SERVER_ERROR) {
+        return chakram.get(url)
+        .then(response => {
+            expect(response).to.have.status(error);
+            expect(response.body).to.be.an('object');
+            expect(response.body.error).to.be.an('object');
+            expect(response.body.error.code).to.be.eq(error);
+            expect(response.body.error.status).to.be.eq(HTTP.getReasonPhrase(error));
+            if (production) expect(response.body.error.message.length).to.be.eq(0); // no error message bodies in production
+            return chakram.wait();
+        });
+    }
+
     // --- gets a resource
 
     static get(url, checker) {
