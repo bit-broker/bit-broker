@@ -1106,7 +1106,7 @@
         "name": "Pyrénées - Mont Perdu",
         "entity": {
             "area": 30639,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/FR",
             "description": "This outstanding mountain landscape, which spans the contemporary national borders of France and Spain, is centred around the peak of Mount Perdu, a calcareous massif that rises to 3,352 m. The site, with a total area of 30,639 ha, includes two of Europe's largest and deepest canyons on the Spanish side and three major cirque walls on the more abrupt northern slopes with France, classic presentations of these geological landforms. The site is also a pastoral landscape reflecting an agricultural way of life that was once widespread in the upland regions of Europe but now survives only in this part of the Pyrénées. Thus it provides exceptional insights into past European society through its landscape of villages, farms, fields, upland pastures and mountain roads.",
             "inscribed": 1997,
@@ -1505,7 +1505,7 @@
         "name": "Río Abiseo National Park",
         "entity": {
             "area": 272407.95,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/PE",
             "description": "The park was created in 1983 to protect the fauna and flora of the rainforests that are characteristic of this region of the Andes. There is a high level of endemism among the fauna and flora found in the park. The yellow-tailed woolly monkey, previously thought extinct, is found only in this area. Research undertaken since 1985 has already uncovered 36 previously unknown archaeological sites at altitudes of between 2,500 and 4,000 m, which give a good picture of pre-Inca society.",
             "inscribed": 1990,
@@ -1828,7 +1828,7 @@
         "name": "Hierapolis-Pamukkale",
         "entity": {
             "area": 1077,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/TR",
             "description": "Deriving from springs in a cliff almost 200 m high overlooking the plain, calcite-laden waters have created at Pamukkale (Cotton Palace) an unreal landscape, made up of mineral forests, petrified waterfalls and a series of terraced basins. At the end of the 2nd century B.C. the dynasty of the Attalids, the kings of Pergamon, established the thermal spa of Hierapolis. The ruins of the baths, temples and other Greek monuments can be seen at the site.",
             "inscribed": 1988,
@@ -1999,7 +1999,7 @@
         "name": "Mount Emei Scenic Area, including Leshan Giant Buddha Scenic Area",
         "entity": {
             "area": 15400,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/CN",
             "description": "The first Buddhist temple in China was built here in Sichuan Province in the 1st century A.D. in the beautiful surroundings of the summit Mount Emei. The addition of other temples turned the site into one of Buddhism's holiest sites. Over the centuries, the cultural treasures grew in number. The most remarkable is the Giant Buddha of Leshan, carved out of a hillside in the 8th century and looking down on the confluence of three rivers. At 71 m high, it is the largest Buddha in the world. Mount Emei is also notable for its exceptionally diverse vegetation, ranging from subtropical to subalpine pine forests. Some of the trees there are more than 1,000 years old.",
             "inscribed": 1996,
@@ -3935,7 +3935,7 @@
         "name": "Tongariro National Park",
         "entity": {
             "area": 79596,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/NZ",
             "description": "In 1993 Tongariro became the first property to be inscribed on the World Heritage List under the revised criteria describing cultural landscapes. The mountains at the heart of the park have cultural and religious significance for the Maori people and symbolize the spiritual links between this community and its environment. The park has active and extinct volcanoes, a diverse range of ecosystems and some spectacular landscapes.",
             "inscribed": 1990,
@@ -4068,7 +4068,7 @@
         "name": "Mount Athos",
         "entity": {
             "area": 33042.3,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/GR",
             "description": "An Orthodox spiritual centre since 1054, Mount Athos has enjoyed an autonomous statute since Byzantine times. The 'Holy Mountain', which is forbidden to women and children, is also a recognized artistic site. The layout of the monasteries (about 20 of which are presently inhabited by some 1,400 monks) had an influence as far afield as Russia, and its school of painting influenced the history of Orthodox art.",
             "inscribed": 1988,
@@ -4334,7 +4334,7 @@
         "name": "Willandra Lakes Region",
         "entity": {
             "area": 240000,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/AU",
             "description": "The fossil remains of a series of lakes and sand formations that date from the Pleistocene can be found in this region, together with archaeological evidence of human occupation dating from 45–60,000 years ago. It is a unique landmark in the study of human evolution on the Australian continent. Several well-preserved fossils of giant marsupials have also been found here.",
             "inscribed": 1981,
@@ -4657,7 +4657,7 @@
         "name": "Tasmanian Wilderness",
         "entity": {
             "area": 1584233,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/AU",
             "description": "In a region that has been subjected to severe glaciation, these parks and reserves, with their steep gorges, covering an area of over 1 million ha, constitute one of the last expanses of temperate rainforest in the world. Remains found in limestone caves attest to the human occupation of the area for more than 20,000 years.",
             "inscribed": 1982,
@@ -4828,7 +4828,7 @@
         "name": "Ecosystem and Relict Cultural Landscape of Lopé-Okanda",
         "entity": {
             "area": 491291,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/GA",
             "description": "The Ecosystem and Relict Cultural Landscape of Lopé-Okanda demonstrates an unusual interface between dense and well-conserved tropical rainforest and relict savannah environments with a great diversity of species, including endangered large mammals, and habitats. The site illustrates ecological and biological processes in terms of species and habitat adaptation to post-glacial climatic changes. It contains evidence of the successive passages of different peoples who have left extensive and comparatively well-preserved remains of habitation around hilltops, caves and shelters, evidence of iron-working and a remarkable collection of some 1,800 petroglyphs (rock carvings). The property’s collection of Neolithic and Iron Age sites, together with the rock art found there, reflects a major migration route of Bantu and other peoples from West Africa along the River Ogooué valley to the north of the dense evergreen Congo forests and to central east and southern Africa, that has shaped the development of the whole of sub-Saharan Africa.",
             "inscribed": 2007,
@@ -6214,7 +6214,7 @@
         "name": "Cliff of Bandiagara (Land of the Dogons)",
         "entity": {
             "area": 327390,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/ML",
             "description": "The Bandiagara site is an outstanding landscape of cliffs and sandy plateaux with some beautiful architecture (houses, granaries, altars, sanctuaries and Togu Na, or communal meeting-places). Several age-old social traditions live on in the region (masks, feasts, rituals, and ceremonies involving ancestor worship). The geological, archaeological and ethnological interest, together with the landscape, make the Bandiagara plateau one of West Africa's most impressive sites.",
             "inscribed": 1989,
@@ -6594,7 +6594,7 @@
         "name": "Tassili n'Ajjer",
         "entity": {
             "area": 7200000,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/DZ",
             "description": "Located in a strange lunar landscape of great geological interest, this site has one of the most important groupings of prehistoric cave art in the world. More than 15,000 drawings and engravings record the climatic changes, the animal migrations and the evolution of human life on the edge of the Sahara from 6000 BC to the first centuries of the present era. The geological formations are of outstanding scenic interest, with eroded sandstones forming ‘forests of rock’.",
             "inscribed": 1982,
@@ -7392,7 +7392,7 @@
         "name": "Kakadu National Park",
         "entity": {
             "area": 1980994.92,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/AU",
             "description": "This unique archaeological and ethnological reserve, located in the Northern Territory, has been inhabited continuously for more than 40,000 years. The cave paintings, rock carvings and archaeological sites record the skills and way of life of the region’s inhabitants, from the hunter-gatherers of prehistoric times to the Aboriginal people still living there. It is a unique example of a complex of ecosystems, including tidal flats, floodplains, lowlands and plateaux, and provides a habitat for a wide range of rare or endemic species of plants and animals.",
             "inscribed": 1981,
@@ -8037,7 +8037,7 @@
         "name": "Rock Islands Southern Lagoon",
         "entity": {
             "area": 100200,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/PW",
             "description": "Rock Islands Southern Lagoon covers 100,200 ha and includes 445 uninhabited limestone islands of volcanic origin. Many of them display unique mushroom-like shapes in turquoise lagoons surrounded by coral reefs. The aesthetic beauty of the site is heightened by a complex reef system featuring over 385 coral species and different types of habitat. They sustain a large diversity of plants, birds and marine life including dugong and at least thirteen shark species. The site harbours the highest concentration of marine lakes anywhere, isolated bodies of seawater separated from the ocean by land barriers. They are among the islands’ distinctive features and sustain high endemism of populations which continue to yield new species discoveries. The remains of stonework villages, as well as burial sites and rock art, bear testimony to the organization of small island communities over some three millennia. The abandonment of the villages in the 17th and 18th centuries illustrates the consequences of climate change, population growth and subsistence behaviour on a society living in a marginal marine environment.",
             "inscribed": 2012,
@@ -8569,7 +8569,7 @@
         "name": "Historic Sanctuary of Machu Picchu",
         "entity": {
             "area": 38160.87,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/PE",
             "description": "Machu Picchu stands 2,430 m above sea-level, in the middle of a tropical mountain forest, in an extraordinarily beautiful setting. It was probably the most amazing urban creation of the Inca Empire at its height; its giant walls, terraces and ramps seem as if they have been cut naturally in the continuous rock escarpments. The natural setting, on the eastern slopes of the Andes, encompasses the upper Amazon basin with its rich diversity of flora and fauna.",
             "inscribed": 1983,
@@ -8607,7 +8607,7 @@
         "name": "Mount Huangshan",
         "entity": {
             "area": 16060,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/CN",
             "description": "Huangshan, known as 'the loveliest mountain of China', was acclaimed through art and literature during a good part of Chinese history (e.g. the Shanshui 'mountain and water' style of the mid-16th century). Today it holds the same fascination for visitors, poets, painters and photographers who come on pilgrimage to the site, which is renowned for its magnificent scenery made up of many granite peaks and rocks emerging out of a sea of clouds.",
             "inscribed": 1990,
@@ -9670,7 +9670,7 @@
         "name": "Göreme National Park and the Rock Sites of Cappadocia",
         "entity": {
             "area": 9883.81,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/TR",
             "description": "In a spectacular landscape, entirely sculpted by erosion, the Göreme valley and its surroundings contain rock-hewn sanctuaries that provide unique evidence of Byzantine art in the post-Iconoclastic period. Dwellings, troglodyte villages and underground towns – the remains of a traditional human habitat dating back to the 4th century – can also be seen there.",
             "inscribed": 1985,
@@ -10582,7 +10582,7 @@
         "name": "The Ahwar of Southern Iraq: Refuge of Biodiversity and the Relict Landscape of the Mesopotamian Cities",
         "entity": {
             "area": 211544,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/IQ",
             "description": "The Ahwar is made up of seven sites: three archaeological sites and four wetland marsh areas in southern Iraq. The archaeological cities of Uruk and Ur and the Tell Eridu archaeological site form part of the remains of the Sumerian cities and settlements that developed in southern Mesopotamia between the 4th and the 3rd millennium BCE in the marshy delta of the Tigris and Euphrates rivers. The Ahwar of Southern Iraq – also known as the Iraqi Marshlands – are unique, as one of the world’s largest inland delta systems, in an extremely hot and arid environment.",
             "inscribed": 2016,
@@ -10980,7 +10980,7 @@
         "name": "Trang An Landscape Complex",
         "entity": {
             "area": 6172,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/VN",
             "description": "Situated near the southern margin of the Red River Delta, the Trang An Landscape Complex is a spectacular landscape of limestone karst peaks permeated with valleys, many of them partly submerged and surrounded by steep, almost vertical cliffs. Exploration of caves at different altitudes has revealed archaeological traces of human activity over a continuous period of more than 30,000 years. They illustrate the occupation of these mountains by seasonal hunter-gatherers and how they adapted to major climatic and environmental changes, especially the repeated inundation of the landscape by the sea after the last ice age. The story of human occcupation continues through the Neolithic and Bronze Ages to the historical era. Hoa Lu, the ancient capital of Viet Nam, was strategically established here in the 10th and 11th centuries AD. The property also contains temples, pagodas, paddy-fields and small villages.",
             "inscribed": 2014,
@@ -12346,7 +12346,7 @@
         "name": "Papahānaumokuākea",
         "entity": {
             "area": 36207499,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/US",
             "description": "Papahānaumokuākea is a vast and isolated linear cluster of small, low lying islands and atolls, with their surrounding ocean, roughly 250 km to the northwest of the main Hawaiian Archipelago and extending over some 1931 km. The area has deep cosmological and traditional significance for living Native Hawaiian culture, as an ancestral environment, as an embodiment of the Hawaiian concept of kinship between people and the natural world, and as the place where it is believed that life originates and to where the spirits return after death. On two of the islands, Nihoa and Makumanamana, there are archaeological remains relating to pre-European settlement and use. Much of the monument is made up of pelagic and deepwater habitats, with notable features such as seamounts and submerged banks, extensive coral reefs and lagoons. It is one of the largest marine protected areas (MPAs) in the world.",
             "inscribed": 2010,
@@ -12895,7 +12895,7 @@
         "name": "Maloti-Drakensberg Park",
         "entity": {
             "area": 249313,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/ZA",
             "description": "The Maloti-Drakensberg Park is a transboundary site composed of the uKhahlamba Drakensberg National Park in South Africa and the Sehlathebe National Park in Lesotho. The site has exceptional natural beauty in its soaring basaltic buttresses, incisive dramatic cutbacks, and golden sandstone ramparts as well as visually spectacular sculptured arches, caves, cliffs, pillars and rock pools. The site's diversity of habitats protects a high level of endemic and globally important plants. The site harbors endangered species such as the Cape vulture (Gyps coprotheres) and the bearded vulture (Gypaetus barbatus). Lesotho’s Sehlabathebe National Park also harbors the Maloti minnow (Pseudobarbus quathlambae), a critically endangered fish species only found in this park. This spectacular natural site contains many caves and rock-shelters with the largest and most concentrated group of paintings in Africa south of the Sahara. They represent the spiritual life of the San people, who lived in this area over a period of 4,000 years.",
             "inscribed": 2000,
@@ -14509,7 +14509,7 @@
         "name": "Khangchendzonga National Park",
         "entity": {
             "area": 178400,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/IN",
             "description": "Located at the heart of the Himalayan range in northern India (State of Sikkim), the Khangchendzonga National Park includes a unique diversity of plains, valleys, lakes, glaciers and spectacular, snow-capped mountains covered with ancient forests, including the world’s third highest peak, Mount Khangchendzonga. Mythological stories are associated with this mountain and with a great number of natural elements (e.g. caves, rivers, lakes, etc.) that are the object of worship by the indigenous people of Sikkim. The sacred meanings of these stories and practices have been integrated with Buddhist beliefs and constitute the basis for Sikkimese identity.",
             "inscribed": 2016,
@@ -14832,7 +14832,7 @@
         "name": "Ibiza, Biodiversity and Culture",
         "entity": {
             "area": 11231,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/ES",
             "description": "Ibiza provides an excellent example of the interaction between the marine and coastal ecosystems. The dense prairies of oceanic Posidonia (seagrass), an important endemic species found only in the Mediterranean basin, contain and support a diversity of marine life. Ibiza preserves considerable evidence of its long history. The archaeological sites at Sa Caleta (settlement) and Puig des Molins (necropolis) testify to the important role played by the island in the Mediterranean economy in protohistory, particularly during the Phoenician-Carthaginian period. The fortified Upper Town (Alta Vila) is an outstanding example of Renaissance military architecture; it had a profound influence on the development of fortifications in the Spanish settlements of the New World.",
             "inscribed": 1999,
@@ -16442,7 +16442,7 @@
         "name": "Ennedi Massif: Natural and Cultural Landscape",
         "entity": {
             "area": 2441200,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/TD",
             "description": "In the northeast of the country, the sandstone Ennedi Massif has been sculpted by water and wind erosion over time into a plateau featuring canyons and valleys that present a spectacular landscape marked by cliffs, natural arches and pitons. In the largest canyons, the permanent presence of water plays an essential role in the Massif’s ecosystem, sustaining flora and fauna as well as human life. Thousands of images have been painted and carved into the rock surface of caves, canyons and shelters, presenting one of the largest ensembles of rock art in the Sahara.",
             "inscribed": 2016,
@@ -16613,7 +16613,7 @@
         "name": "Wadi Rum Protected Area",
         "entity": {
             "area": 74179.7,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/JO",
             "description": "The 74,000-hectare property, inscribed as a mixed natural and cultural site, is situated in southern Jordan, near the border with Saudi Arabia. It features a varied desert landscape consisting of a range of narrow gorges, natural arches, towering cliffs, ramps, massive landslides and caverns. Petroglyphs, inscriptions and archaeological remains in the site testify to 12,000 years of human occupation and interaction with the natural environment. The combination of 25,000 rock carvings with 20,000 inscriptions trace the evolution of human thought and the early development of the alphabet. The site illustrates the evolution of pastoral, agricultural and urban activity in the region.",
             "inscribed": 2011,
@@ -16689,7 +16689,7 @@
         "name": "Ancient Maya City and Protected Tropical Forests of Calakmul, Campeche",
         "entity": {
             "area": 331397,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/MX",
             "description": "The site is located in the central/southern portion of the Yucatán Peninsula, in southern Mexico and includes the remains of the important Maya city Calakmul, set deep in the tropical forest of the Tierras Bajas. The city played a key role in the history of this region for more than twelve centuries and is characterized by well-preserved structures providing a vivid picture of life in an ancient Maya capital. The property also falls within the Mesoamerica biodiversity hotspot, the third largest in the world, encompassing all subtropical and tropical ecosystems from central Mexico to the Panama Canal.",
             "inscribed": 2002,
@@ -17411,7 +17411,7 @@
         "name": "Tikal National Park",
         "entity": {
             "area": 57600,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/GT",
             "description": "In the heart of the jungle, surrounded by lush vegetation, lies one of the major sites of Mayan civilization, inhabited from the 6th century B.C. to the 10th century A.D. The ceremonial centre contains superb temples and palaces, and public squares accessed by means of ramps. Remains of dwellings are scattered throughout the surrounding countryside.",
             "inscribed": 1979,
@@ -17430,7 +17430,7 @@
         "name": "Meteora",
         "entity": {
             "area": 271.87,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/GR",
             "description": "In a region of almost inaccessible sandstone peaks, monks settled on these 'columns of the sky' from the 11th century onwards. Twenty-four of these monasteries were built, despite incredible difficulties, at the time of the great revival of the eremetic ideal in the 15th century. Their 16th-century frescoes mark a key stage in the development of post-Byzantine painting.",
             "inscribed": 1988,
@@ -17525,7 +17525,7 @@
         "name": "Mount Wuyi",
         "entity": {
             "area": 99975,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/CN",
             "description": "Mount Wuyi is the most outstanding area for biodiversity conservation in south-east China and a refuge for a large number of ancient, relict species, many of them endemic to China. The serene beauty of the dramatic gorges of the Nine Bend River, with its numerous temples and monasteries, many now in ruins, provided the setting for the development and spread of neo-Confucianism, which has been influential in the cultures of East Asia since the 11th century. In the 1st century B.C. a large administrative capital was built at nearby Chengcun by the Han dynasty rulers. Its massive walls enclose an archaeological site of great significance.",
             "inscribed": 1999,
@@ -17734,7 +17734,7 @@
         "name": "Ngorongoro Conservation Area",
         "entity": {
             "area": 809440,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/TZ",
             "description": "The Ngorongoro Conservation Area spans vast expanses of highland plains, savanna, savanna woodlands and forests. Established in 1959 as a multiple land use area, with wildlife coexisting with semi-nomadic Maasai pastoralists practicing traditional livestock grazing, it includes the spectacular Ngorongoro Crater, the world’s largest caldera. The property has global importance for biodiversity conservation due to the presence of globally threatened species, the density of wildlife inhabiting the area, and the annual migration of wildebeest, zebra, gazelles and other animals into the northern plains. Extensive archaeological research has also yielded a long sequence of evidence of human evolution and human-environment dynamics, including early hominid footprints dating back 3.6 million years.",
             "inscribed": 1979,
@@ -17943,7 +17943,7 @@
         "name": "Ulu<U>r</U>u-Kata Tju<U>t</U>a National Park",
         "entity": {
             "area": 132566,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/AU",
             "description": "This park, formerly called Uluru (Ayers Rock – Mount Olga) National Park, features spectacular geological formations that dominate the vast red sandy plain of central Australia. Uluru, an immense monolith, and Kata Tjuta, the rock domes located west of Uluru, form part of the traditional belief system of one of the oldest human societies in the world. The traditional owners of Uluru-Kata Tjuta are the Anangu Aboriginal people.",
             "inscribed": 1987,
@@ -17962,7 +17962,7 @@
         "name": "Mount Taishan",
         "entity": {
             "area": 25000,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/CN",
             "description": "The sacred Mount Tai ('shan' means 'mountain') was the object of an imperial cult for nearly 2,000 years, and the artistic masterpieces found there are in perfect harmony with the natural landscape. It has always been a source of inspiration for Chinese artists and scholars and symbolizes ancient Chinese civilizations and beliefs.",
             "inscribed": 1987,
@@ -18209,7 +18209,7 @@
         "name": "Blue and John Crow Mountains",
         "entity": {
             "area": 26251.6,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/JM",
             "description": "The site encompasses a rugged and extensively forested mountainous region in the south-east of Jamaica, which provided refuge first for the indigenous Tainos fleeing slavery and then for Maroons (former enslaved peoples). They resisted the European colonial system in this isolated region by establishing a network of trails, hiding places and settlements, which form the Nanny Town Heritage Route. The forests offered the Maroons everything they needed for their survival. They developed strong spiritual connections with the mountains, still manifest through the intangible cultural legacy of, for example, religious rites, traditional medicine and dances. The site is also a biodiversity hotspot for the Caribbean Islands with a high proportion of endemic plant species, especially lichens, mosses and certain flowering plants.",
             "inscribed": 2015,
@@ -18550,7 +18550,7 @@
         "name": "Laponian Area",
         "entity": {
             "area": 940000,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/SE",
             "description": "The Arctic Circle region of northern Sweden is the home of the Saami, or Lapp people. It is the largest area in the world (and one of the last) with an ancestral way of life based on the seasonal movement of livestock. Every summer, the Saami lead their huge herds of reindeer towards the mountains through a natural landscape hitherto preserved, but now threatened by the advent of motor vehicles. Historical and ongoing geological processes can be seen in the glacial moraines and changing water courses.",
             "inscribed": 1996,
@@ -19082,7 +19082,7 @@
         "name": "St Kilda",
         "entity": {
             "area": 24201.4004,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/GB",
             "description": "This volcanic archipelago, with its spectacular landscapes, is situated off the coast of the Hebrides and comprises the islands of Hirta, Dun, Soay and Boreray. It has some of the highest cliffs in Europe, which have large colonies of rare and endangered species of birds, especially puffins and gannets. The archipelago, uninhabited since 1930, bears the evidence of more than 2,000 years of human occupation in the extreme conditions prevalent in the Hebrides. Human vestiges include built structures and field systems, the cleits and the traditional Highland stone houses. They feature the vulnerable remains of a subsistence economy based on the products of birds, agriculture and sheep farming.",
             "inscribed": 1986,
@@ -19101,7 +19101,7 @@
         "name": "Natural and Cultural Heritage of the Ohrid region",
         "entity": {
             "area": 83350,
-            "category": "Mixed",
+            "category": "mixed",
             "country": "bbk://country/{cid}/MK",
             "description": "Situated on the shores of Lake Ohrid, the town of Ohrid is one of the oldest human settlements in Europe. Built mainly between the 7th and 19th centuries, it has the oldest Slav monastery (St Pantelejmon) and more than 800 Byzantine-style icons dating from the 11th to the end of the 14th century. After those of the Tretiakov Gallery in Moscow, this is considered to be the most important collection of icons in the world",
             "inscribed": 1979,
