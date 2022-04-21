@@ -82,6 +82,11 @@ jobs:
           curl -s http://bbk-contributor:8002/metrics | docker run -i --entrypoint='/bin/promtool'  prom/prometheus check metrics
           curl -s http://bbk-consumer:8003/metrics | docker run -i --entrypoint='/bin/promtool'  prom/prometheus check metrics
 
+      - name: Dump logs
+        if: always()
+        working-directory: development/docker-compose
+        run: docker-compose logs
+
       - name: Stop containers
         if: always()
         working-directory: development/docker-compose
