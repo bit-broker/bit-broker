@@ -335,18 +335,18 @@ describe('End-to-End Tests', function() {
         return Crud.add(URLs.entity(country.slug), country.properties);
     });
 
-    it('create the first country entity connector', function () {
+    it('create the country entity connector', function () {
         return Crud.add(URLs.connector(country.slug, country.connectors[0].slug), country.connectors[0].properties, undefined, details => {
             country.connectors[0].id = details.id;
             country.connectors[0].token = details.token;
         });
     });
 
-    it('make the first country entity connector live', function () {
+    it('make the country entity connector live', function () {
         return Crud.post(URLs.connector_live(country.slug, country.connectors[0].slug));
     });
 
-    it('switch to first country connector key and check server access rules are met (coor: false, cont: true, cons: false)', function () {
+    it('switch to country connector key and check server access rules are met (coor: false, cont: true, cons: false)', function () {
         headers(country.connectors[0].token);
         return server_access(false, true, false).then (skipped => skipped ? this.skip() : true);
     });
@@ -360,7 +360,7 @@ describe('End-to-End Tests', function() {
     it('upsert the country records into the session', function () {
         let act = Promise.resolve();
         let url = URLs.session_action(country.connectors[0].id, country.connectors[0].session, 'upsert');
-        let all = Seeder.records(country.slug).filter(r => r.entity.continent === 'Asia');
+        let all = Seeder.records(country.slug);
 
         for (let i = 0 ; i < all.length ; i += PAGE) {
             act = act.then(() => Crud.post(url, all.slice(i, i + PAGE), report => {
@@ -378,50 +378,6 @@ describe('End-to-End Tests', function() {
         return Crud.get(URLs.session_close(country.connectors[0].id, country.connectors[0].session, 'true'));
     });
 
-    it('create the second country entity connector', function () {
-        headers(coordinator.token);
-        return Crud.add(URLs.connector(country.slug, country.connectors[1].slug), country.connectors[1].properties, undefined, details => {
-            country.connectors[1].id = details.id;
-            country.connectors[1].token = details.token;
-        });
-    });
-
-    it('make the second country entity connector live', function () {
-        return Crud.post(URLs.connector_live(country.slug, country.connectors[1].slug));
-    });
-
-    it('switch to second country connector key and check server access rules are met (coor: false, cont: true, cons: false)', function () {
-        headers(country.connectors[1].token);
-        return server_access(false, true, false).then (skipped => skipped ? this.skip() : true);
-    });
-
-    it('open a stream session on country', function () {
-        return Crud.get(URLs.session_open(country.connectors[1].id, 'stream'), session => {
-            country.connectors[1].session = session;
-        });
-    });
-
-    it('upsert the country records into the session', function () {
-        let act = Promise.resolve();
-        let url = URLs.session_action(country.connectors[1].id, country.connectors[1].session, 'upsert');
-        let all = Seeder.records(country.slug).filter(r => r.entity.continent !== "Asia");  // disjoint from first connector
-
-        for (let i = 0 ; i < all.length ; i += PAGE) {
-            act = act.then(() => Crud.post(url, all.slice(i, i + PAGE), report => {
-                store_insert(report, all, {
-                    entity: country.slug,
-                    connector: { slug: country.connectors[1].slug, id: country.connectors[1].id },
-                });
-            }));
-        }
-
-        return act;
-    });
-
-    it('close the stream session on country', function () {
-        return Crud.get(URLs.session_close(country.connectors[1].id, country.connectors[1].session, 'true'));
-    });
-
     it('--- create heritage-site records --------------------------------------\n', function () { console.log(); return true; });
 
     it('create the heritage-site entity', function () {
@@ -429,18 +385,18 @@ describe('End-to-End Tests', function() {
         return Crud.add(URLs.entity(site.slug), site.properties);
     });
 
-    it('create the heritage-site entity connector', function () {
+    it('create the first heritage-site entity connector', function () {
         return Crud.add(URLs.connector(site.slug, site.connectors[0].slug), site.connectors[0].properties, undefined, details => {
             site.connectors[0].id = details.id;
             site.connectors[0].token = details.token;
         });
     });
 
-    it('make the heritage-site entity connector live', function () {
+    it('make the first heritage-site entity connector live', function () {
         return Crud.post(URLs.connector_live(site.slug, site.connectors[0].slug));
     });
 
-    it('switch to the connector key and then open a stream session on heritage-site', function () {
+    it('switch to the first connector key and then open a stream session on heritage-site', function () {
         headers(site.connectors[0].token);
         return Crud.get(URLs.session_open(site.connectors[0].id, 'stream'), session => {
             site.connectors[0].session = session;
@@ -450,7 +406,7 @@ describe('End-to-End Tests', function() {
     it('upsert the heritage-site records into the session', function () {
         let act = Promise.resolve();
         let url = URLs.session_action(site.connectors[0].id, site.connectors[0].session, 'upsert');
-        let all = Seeder.records(site.slug);
+        let all = Seeder.records(site.slug).filter(i => i.entity.category === 'cultural');
 
         for (let i = 0 ; i < all.length ; i += PAGE) {
             act = act.then(() => Crud.post(url, all.slice(i, i + PAGE), report => {
@@ -466,6 +422,45 @@ describe('End-to-End Tests', function() {
 
     it('close the stream session on heritage-site', function () {
         return Crud.get(URLs.session_close(site.connectors[0].id, site.connectors[0].session, 'true'));
+    });
+
+    it('create the second heritage-site entity connector', function () {
+        return Crud.add(URLs.connector(site.slug, site.connectors[1].slug), site.connectors[1].properties, undefined, details => {
+            site.connectors[1].id = details.id;
+            site.connectors[1].token = details.token;
+        });
+    });
+
+    it('make the second heritage-site entity connector live', function () {
+        return Crud.post(URLs.connector_live(site.slug, site.connectors[1].slug));
+    });
+
+    it('switch to the second connector key and then open a stream session on heritage-site', function () {
+        headers(site.connectors[1].token);
+        return Crud.get(URLs.session_open(site.connectors[1].id, 'stream'), session => {
+            site.connectors[1].session = session;
+        });
+    });
+
+    it('upsert the heritage-site records into the session', function () {
+        let act = Promise.resolve();
+        let url = URLs.session_action(site.connectors[1].id, site.connectors[1].session, 'upsert');
+        let all = Seeder.records(site.slug).filter(i => i.entity.category !== 'cultural');
+
+        for (let i = 0 ; i < all.length ; i += PAGE) {
+            act = act.then(() => Crud.post(url, all.slice(i, i + PAGE), report => {
+                store_insert(report, all, {
+                    entity: site.slug,
+                    connector: { slug: site.connectors[1].slug, id: site.connectors[1].id },
+                });
+            }));
+        }
+
+        return act;
+    });
+
+    it('close the stream session on heritage-site', function () {
+        return Crud.get(URLs.session_close(site.connectors[1].id, site.connectors[1].session, 'true'));
     });
 
     it('--- create policies ---------------------------------------------------\n', function () { console.log(); return true; });

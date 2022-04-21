@@ -15,15 +15,6 @@
                     "webhook": null,
                     "cache": 0
                 }
-            },
-            {
-                "slug": "cia",
-                "properties": {
-                    "name": "CIA World Fact Book",
-                    "description": "Country information from the CIA",
-                    "webhook": null,
-                    "cache": 0
-                }
             }
         ]
     },
@@ -36,10 +27,19 @@
         },
         "connectors": [
             {
-                "slug": "unesco",
+                "slug": "unesco-culture",
                 "properties": {
                     "name": "UNESCO",
-                    "description": "World Heritage Sites information from UNESCO",
+                    "description": "Cultural World Heritage Sites information from UNESCO",
+                    "webhook": null,
+                    "cache": 0
+                }
+            },
+            {
+                "slug": "unesco-nature",
+                "properties": {
+                    "name": "UNESCO",
+                    "description": "Natural World Heritage Sites information from UNESCO",
                     "webhook": null,
                     "cache": 0
                 }
