@@ -111,8 +111,7 @@ module.exports = class Access {
 
         .then(result => {
             log.info('coordinator', 'user', uid, 'access', pid, 'insert', 'complete');
-            let href = `${ req.protocol }://${ req.get('host') }${ req.originalUrl.replace(/\/$/, '') }`;
-            res.set({ 'Location': href }).status(HTTP.CREATED).send(result.token);
+            res.set({ 'Location': req.originalResource }).status(HTTP.CREATED).send(result.token);
         })
 
         .catch(error => next(error));
