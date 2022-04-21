@@ -127,6 +127,7 @@ module.exports = class Server {
             let host = req.header('host');
             let base = this.base.length ? `/${ this.base }` : '';
             req.originalRoute = `${ proto }://${ host }${ base }`;
+            req.originalResource = `${ proto }://${ host }${ req.originalUrl.replace(/\/$/, '') }`;
             next();
         });
 

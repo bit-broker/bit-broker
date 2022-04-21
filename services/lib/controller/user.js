@@ -48,7 +48,7 @@ module.exports = class User {
             addendum: body.addendum || {}
         };
     }
-    
+
     // --- bootstraps the user service
 
     bootstrap() {
@@ -147,7 +147,7 @@ module.exports = class User {
 
         .then(id => {
             log.info('user', properties.email, 'insert', 'complete', id);
-            let href = `${ req.protocol }://${ req.get('host') }${ req.originalUrl.replace(/\/$/, '') }/${ id }`;
+            let href = `${ req.originalResource }/${ id }`;
             res.set({ 'Location': href }).status(HTTP.CREATED).send();
         })
 
