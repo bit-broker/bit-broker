@@ -49,7 +49,7 @@ module.exports = class View {
         if (object) {
             for (var key in object) {
                 if (typeof object[key] === 'object') {
-                    this.each_value(object[key], cb);
+                    this.each_value(route, object[key], cb);
                 } else {
                     object[key] = cb(route, object[key]);
                 }
