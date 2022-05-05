@@ -453,6 +453,15 @@ describe('User Tests', function() {
             .then(() => Crud.bad_request(user, [{ addendum: DATA.ERRORS.TYPE }], { ...values, addendum: [1] }, chakram.put));
         });
 
+        it('cannot use a non-interger user id', () => {
+            return Promise.resolve()
+            .then(() => Crud.not_found(URLs.user('1.1'), undefined, chakram.get))
+            .then(() => Crud.not_found(URLs.user('1.1'), undefined, chakram.put))
+            .then(() => Crud.not_found(URLs.user('1.1'), undefined, chakram.delete))
+            .then(() => Crud.not_found(URLs.user_coordinator('1.1'), undefined, chakram.post))
+            .then(() => Crud.not_found(URLs.user_coordinator('1.1'), undefined, chakram.delete));
+        });
+
         it('can delete the first user', () => {
             return Crud.delete(user);
         });
