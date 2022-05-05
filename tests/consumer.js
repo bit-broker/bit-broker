@@ -605,6 +605,35 @@ describe('Consumer Tests', function() {
             });
         });
 
+        it('geo » $near (alt order 1)', () => {
+            return catalog({
+                query: { 'type': 'country', 'entity.location': { '$near': { '$min': 0, '$max': 750000, '$geometry': GEOGRAPHY.BIG_BEN } } },
+                yields: ['United Kingdom', 'Ireland', 'Netherlands']
+            });
+        });
+
+        it('geo » $near (alt order 2)', () => {
+            return catalog({
+                query: { 'type': 'country', 'entity.location': { '$near': { '$max': 750000, '$min': 0, '$geometry': GEOGRAPHY.BIG_BEN } } },
+                yields: ['United Kingdom', 'Ireland', 'Netherlands']
+            });
+        });
+
+        it('geo » $near (min only)', () => {
+            return catalog({
+                query: { 'type': 'country', 'entity.location': { '$near': { '$geometry': GEOGRAPHY.BIG_BEN, '$min': 750000 } } },
+                yields: THE_WORLD,
+                except: ['United Kingdom', 'Ireland', 'Netherlands']
+            });
+        });
+
+        it('geo » $near (max only)', () => {
+            return catalog({
+                query: { 'type': 'country', 'entity.location': { '$near': { '$geometry': GEOGRAPHY.BIG_BEN, '$max': 500000 } } },
+                yields: ['United Kingdom', 'Ireland']
+            });
+        });
+
         it('geo » $within', () => {
             return catalog({
                 query: { 'type': 'country', 'entity.location': { '$within': { '$geometry': GEOGRAPHY.BRITISH_ISLES } } },
@@ -653,6 +682,20 @@ describe('Consumer Tests', function() {
             return catalog({
                 query: { 'type': 'country', '$or': [{ 'name': 'United Kingdom' }, { 'entity.calling_code': CALLING_CODE.IN }] },
                 yields: ['United Kingdom', 'India']
+            });
+        });
+
+        it('escaped single quotes', () => {
+            return catalog({
+                query: { 'entity.capital': "Saint George's" },
+                yields: ['Grenada']
+            });
+        });
+
+        it('escaped double quotes', () => {
+            return catalog({
+                query: { 'entity.capital': "Saint George\"s" },
+                yields: []  // basically does not fail
             });
         });
     });

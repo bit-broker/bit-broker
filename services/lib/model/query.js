@@ -65,11 +65,25 @@ const ALLOWED = [ 'and', 'contains', 'eq', 'geometry', 'gt', 'gte', 'in', 'lt', 
 
 module.exports = class Query {
 
+    // --- deep iterates every item in an object
+
+    static each_value(object, cb) {
+        if (object) {
+            for (var key in object) {
+                if (typeof object[key] === 'object') {
+                    this.each_value(object[key], cb);
+                } else {
+                    object[key] = cb(object[key]);
+                }
+            }
+        }
+    }
+
     // --- checks all functions are in scope for what is supported in the allowed list
 
     static scoped(query) { // query as received as a string
         let scoped = true;
-        let keys = query.matchAll(/"\$(\w+)"/g);  // all actionable keys of the form "$xxx"
+        let keys = query.matchAll(/"\$(\w+)"/g);  // all actionable keys of the form "$xxx" - TODO what if a user's value string starts with a '$'?
 
         for (let key of keys) {
             if (!ALLOWED.includes(key[1])) { // 1 = the regex matching group
@@ -90,12 +104,21 @@ module.exports = class Query {
         return text;
     }
 
+    // --- escapes all quotes in all strings
+
+    static escape_strings(query) {
+        Query.each_value(query, item => {
+            return typeof item === 'string' ? item.replace(/'/g, "''").replace(/\"/g, "\\\"") : item;
+        });
+    }
+
     // --- convert a query string to a postgres where clause (via mongo query syntax)
 
     static process(query, column = 'record') {
         let result = { valid: true, where: 'FALSE' };
 
         try {
+            Query.escape_strings(query);
             query = keys.sort(query); // we must use sort for regex matching to be in a consistent order
             query = JSON.stringify(query);
             query = Query.modify(query, MODS_BEFORE);
