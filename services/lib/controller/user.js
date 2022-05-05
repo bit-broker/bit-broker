@@ -95,6 +95,10 @@ module.exports = class User {
     get(req, res, next) {
         let uid = req.params.uid.toLowerCase();
 
+        if (model.validate.user_id(uid).length) {  // the user id is not a valid form
+            throw new failure(HTTP.NOT_FOUND);
+        }
+
         model.user.find(uid)
 
         .then(item => {
@@ -159,6 +163,11 @@ module.exports = class User {
     update(req, res, next) {
         log.info('user', req.params.uid, 'update');
         let uid = req.params.uid.toLowerCase();
+
+        if (model.validate.user_id(uid).length) {  // the user id is not a valid form
+            throw new failure(HTTP.NOT_FOUND);
+        }
+
         let properties = User.properties(req.body);
         let errors = [];
 
@@ -190,6 +199,10 @@ module.exports = class User {
         log.info('user', req.params.uid, 'delete');
         let uid = req.params.uid.toLowerCase();
 
+        if (model.validate.user_id(uid).length) {  // the user id is not a valid form
+            throw new failure(HTTP.NOT_FOUND);
+        }
+
         model.user.find(uid)
 
         .then(item => {
@@ -212,6 +225,10 @@ module.exports = class User {
         let uid = req.params.uid.toLowerCase();
         let user = null;
         let token = null;
+
+        if (model.validate.user_id(uid).length) {  // the user id is not a valid form
+            throw new failure(HTTP.NOT_FOUND);
+        }
 
         model.user.find(uid)
 
@@ -242,6 +259,10 @@ module.exports = class User {
         let uid = req.params.uid.toLowerCase();
         let user = null;
 
+        if (model.validate.user_id(uid).length) {  // the user id is not a valid form
+            throw new failure(HTTP.NOT_FOUND);
+        }
+        
         model.user.find(uid)
 
         .then(item => {
