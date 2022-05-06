@@ -62,9 +62,18 @@ module.exports = class User {
                 let name = process.env.BOOTSTRAP_USER_NAME;
                 let email = process.env.BOOTSTRAP_USER_EMAIL;
                 let coordinator_key_id = process.env.BOOTSTRAP_USER_KEY_ID;
-                let user = { email, coordinator_key_id, properties: { name, addendum: {} }};
+                let addendum = {};
+                let errors = model.validate.user({ name, email, addendum });
 
-                complete = model.user.insert(user).then(id => {
+                if (errors.length) {
+                    for (let i = 0 ; i < errors.length ; i++) {
+                        log.error('user', 'bootstrap', 'validation', `${ errors[i].name } ${ errors[i].reason }`);
+                    }
+
+                    throw 'validation errors';
+                }
+
+                complete = model.user.insert({ email, coordinator_key_id, properties: { name, addendum }}).then(id => {
                     log.info('user', 'bootstrap', 'insert', 'complete', id);
                 });
             }
@@ -262,7 +271,7 @@ module.exports = class User {
         if (model.validate.user_id(uid).length) {  // the user id is not a valid form
             throw new failure(HTTP.NOT_FOUND);
         }
-        
+
         model.user.find(uid)
 
         .then(item => {
