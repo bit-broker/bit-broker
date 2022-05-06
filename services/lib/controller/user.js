@@ -59,9 +59,9 @@ module.exports = class User {
             let complete = Promise.resolve();
 
             if (virgin) {
-                let name = process.env.BOOTSTRAP_USER_NAME;
-                let email = process.env.BOOTSTRAP_USER_EMAIL;
-                let coordinator_key_id = process.env.BOOTSTRAP_USER_KEY_ID;
+                let name = process.env.BOOTSTRAP_USER_NAME || '';
+                let email = process.env.BOOTSTRAP_USER_EMAIL || '';
+                let coordinator_key_id = process.env.BOOTSTRAP_USER_KEY_ID || '';
                 let addendum = {};
                 let errors = model.validate.user({ name, email, addendum });
 
