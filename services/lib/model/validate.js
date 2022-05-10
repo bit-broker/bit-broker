@@ -114,7 +114,7 @@ module.exports = class Validate {
         let errors = this.scheme(properties, 'entity');
 
         if (!this.is_valid_json_schema(properties.schema)) {
-             errors.push(locales.__('error.entity-invalid-schema'));
+             errors.push(failure.response('schema', locales.__('error.entity-invalid-schema')));
         }
 
         return errors;

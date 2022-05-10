@@ -255,6 +255,15 @@ describe('Coordinator Service Tests', function() {
             .then(() => Crud.bad_request(some_name(), [{ description: DATA.ERRORS.MAX }], { ...values, description: DATA.text(DATA.DESCRIPTION.LONGEST + 1) }, chakram.post));
         });
 
+        it('disallows various invalid schemas', () => {
+            return Promise.resolve()
+            .then(() => Crud.bad_request(some_name(), [{ schema: DATA.ERRORS.TYPE }], { ...values, schema: []}, chakram.post))
+            .then(() => Crud.bad_request(some_name(), [{ schema: DATA.ERRORS.TYPE }], { ...values, schema: 1}, chakram.post))
+            .then(() => Crud.bad_request(some_name(), [{ schema: DATA.ERRORS.TYPE }], { ...values, schema: true}, chakram.post))
+            .then(() => Crud.bad_request(some_name(), [{ schema: DATA.ERRORS.TYPE }], { ...values, schema: DATA.text()}, chakram.post))
+            .then(() => Crud.bad_request(some_name(), [{ schema: DATA.ERRORS.INVALID }], { ...values, schema: DATA.text()}, chakram.post));
+        });
+
         it('create update test entity', () => {
             return Crud.add(entity, values, entity);
         });
@@ -285,6 +294,15 @@ describe('Coordinator Service Tests', function() {
             .then(() => Crud.bad_request(entity, [{ description: DATA.ERRORS.MIN }], { ...values, description: '' }, chakram.put))
             .then(() => Crud.bad_request(entity, [{ description: DATA.ERRORS.MIN }], { ...values, description: null }, chakram.put))
             .then(() => Crud.bad_request(entity, [{ description: DATA.ERRORS.MAX }], { ...values, description: DATA.text(DATA.DESCRIPTION.LONGEST + 1) }, chakram.put));
+        });
+
+        it('disallows update of various invalid schemas', () => {
+            return Promise.resolve()
+            .then(() => Crud.bad_request(some_name(), [{ schema: DATA.ERRORS.TYPE }], { ...values, schema: []}, chakram.put))
+            .then(() => Crud.bad_request(some_name(), [{ schema: DATA.ERRORS.TYPE }], { ...values, schema: 1}, chakram.put))
+            .then(() => Crud.bad_request(some_name(), [{ schema: DATA.ERRORS.TYPE }], { ...values, schema: true}, chakram.put))
+            .then(() => Crud.bad_request(some_name(), [{ schema: DATA.ERRORS.TYPE }], { ...values, schema: DATA.text()}, chakram.put))
+            .then(() => Crud.bad_request(some_name(), [{ schema: DATA.ERRORS.INVALID }], { ...values, schema: DATA.text()}, chakram.put));
         });
 
         it('delete update test entity', () => {
