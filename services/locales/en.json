@@ -1,5 +1,5 @@
 {
-    "error.entity-invalid-schema": "Entity schema is not valid JSON schema",
+    "error.entity-invalid-schema": "is not valid JSON schema",
     "error.query-cannot-be-parse": "Catalog query cannot be parsed",
     "error.query-has-unrecognised-operations": "Catalog query contains unrecognised operations",
     "error.query-is-not-valid-json": "Catalog query is not valid json"
