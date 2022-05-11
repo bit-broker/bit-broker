@@ -99,10 +99,10 @@ module.exports = class Session {
             if (session.id != sid) throw new failure(HTTP.UNAUTHORIZED);
 
             if (action === CONST.ACTION.UPSERT) {
-                let scheme = session.connector.entity_properties.schema;
+                let entity = session.connector.entity_properties;
 
-                if (Object.keys(scheme).length) {
-                    errors = model.validate.records_entity(records, scheme);
+                if (Object.keys(entity.schema).length) {
+                    errors = model.validate.records_entity(records, entity.schema);
 
                     if (errors.length) {
                         throw new failure(HTTP.BAD_REQUEST, errors);

@@ -88,7 +88,7 @@ const DATA = {
     },
 
     items: function() {
-        let items = JSON.parse(fs.readFileSync(`./data/country.json`));
+        let items = JSON.parse(fs.readFileSync('./data/heritage-site.json')); // records without a timeseries
 
         items.forEach(item => {
             for (let k in item) {
