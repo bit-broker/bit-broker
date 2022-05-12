@@ -25,9 +25,13 @@ Add seed data to the system via the published APIs
 // -- dependancies
 
 const Shared = require('./shared.js');  // include first for dotenv
+const DATA = require('./data.js');
 const URLs = require('./urls.js');
 const Crud = require('./crud.js');
 const Session = require('./session.js');
+const Webhook = require('./webhook.js');
+const crypto = require('crypto');
+const moment = require('moment');
 const fs = require('fs');
 
 // --- seeder class (exported)
@@ -38,6 +42,7 @@ module.exports = class Seeder {
 
     static cids = {};
     static uids = {};
+    static verbose = false;
 
     // --- returns entity seed data
 
@@ -59,10 +64,10 @@ module.exports = class Seeder {
 
     // --- returns record data for the given name
 
-    static records(name) {
+    static records(name, clean = true) {
         let items = JSON.parse(fs.readFileSync(`./data/${ name }.json`));
 
-        if (Array.isArray(items)) {
+        if (clean && Array.isArray(items)) {
             items.forEach(item => {
                 for (let k in item) {
                     if (k.startsWith('_')) delete item[k];  // we don't send these properties to bbk
@@ -77,6 +82,12 @@ module.exports = class Seeder {
 
     static record(name, id) {
         return this.records(name).find(i => i.id === id);
+    }
+
+    // --- returns an uncleaned record for the given name and id
+
+    static raw_record(name, id) {
+        return this.records(name, false).find(i => i.id === id);
     }
 
     // --- adds the housing entities
@@ -108,7 +119,7 @@ module.exports = class Seeder {
                 let connector = entity.connectors[j];
                 let webhook = webhooks.find(i => i.entity === entity.slug && i.connector == connector.slug);
 
-                connector.properties.webhook = webhook ? webhook.url : null; // add a webhook if specified in parameters
+                connector.properties.webhook = webhook ? webhook.url : connector.properties.webhook ; // override the webhook if specified in parameters
 
                 let add = Crud.add(URLs.connector(entity.slug, connector.slug), connector.properties, null, result => {
                     this.cids[connector.slug] = result.id;  // stash the connector id for later bbk mapping
@@ -246,5 +257,64 @@ module.exports = class Seeder {
         }
 
         return Promise.all(steps);
+    }
+
+    // --- entity callback function for the seeder webhook
+
+    static cb_entity(type, id) {
+        if (Seeder.verbose) console.log(`callback | entity | ${ type } | ${ id }`);
+
+        /* This function makes a deterministic set of extra data to add via
+           the webhook server. It always add an extra item to the
+           entity object, but it 50/50 adds another extra item to the
+           instance object. It needs to be deterministic, so that it can
+           be used for unit testing. */
+
+        let record = Seeder.raw_record(type, id);
+
+        let hash1 = crypto.createHash('sha256').update(`${ record.name }`).digest('hex');
+        let hash2 = crypto.createHash('sha256').update(`${ type }${ id }`).digest('hex');
+
+        let extra = { entity: { foo: hash1 } };
+        if (hash2[0] >= '0' && hash2[0] <= '7') extra.instance = { bar: hash2 };  // fifty fifty chance of including instance data
+
+        return extra;
+    }
+
+    // --- timeseries callback function for the seeder webhook
+
+    static cb_timeseries(type, id, tsid, paging) {
+        if (Seeder.verbose) console.log(`callback | timeseries | ${ type } | ${ id } | ${ tsid } | ${ JSON.stringify(paging) }`);
+
+        let record = Seeder.raw_record(type, id);
+        let tskey  = `_${ tsid }`; // stored in test data with a leading underscore
+        let timeseries = record[tskey] || [];
+
+        if (paging.start) {
+            timeseries = timeseries.filter(i => moment(i.from.toString()).isSameOrAfter(paging.start));
+        }
+
+        if (paging.end) {
+            timeseries = timeseries.filter(i => moment(i.from.toString()).isBefore(paging.end));
+        }
+
+        if (paging.limit) {
+            timeseries = timeseries.slice(0, paging.limit);
+        }
+
+        return timeseries;
+    }
+
+    // --- starts the seed data webhook
+
+    static start_webhook(verbose = false) {
+        Seeder.verbose = verbose;
+        let webhook = new Webhook(DATA.WEBHOOK.URL, DATA.WEBHOOK.NAME, Seeder.cb_entity, Seeder.cb_timeseries);
+
+        webhook.start(() => {
+            if (Seeder.verbose) console.log(`Seeder Webhook Server is running at ${ DATA.WEBHOOK.URL }`);
+        });
+
+        return webhook;
     }
 }

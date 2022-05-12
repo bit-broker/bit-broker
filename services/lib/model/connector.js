@@ -64,7 +64,7 @@ module.exports = class Connector {
             'entity.properties as entity_properties',
             'connector.contribution_id',
             'connector.contribution_key_id',
-            'connector.is_live',  
+            'connector.is_live',
             'connector.session_id',
             'connector.session_started',
             'connector.session_mode',

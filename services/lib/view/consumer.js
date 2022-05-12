@@ -90,6 +90,7 @@ module.exports = class Consumer extends View {
         if (full) {
             doc = Object.assign(doc, { entity: item.record.entity });
             doc = Object.assign(doc, { instance: item.record.instance || {} })
+            doc = Object.assign(doc, { timeseries: item.record.timeseries || {} })
 
             // merge in webhook extra data if any
 

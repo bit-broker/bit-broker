@@ -4,7 +4,14 @@
         "properties": {
             "name": "Countries",
             "description": "All the countries in the world as defined by the UN",
-            "schema": {}
+            "schema": {},
+            "timeseries": {
+                "population": {
+                    "period": "P1Y",
+                    "value": "people",
+                    "unit": "x1000"
+                }
+            }
         },
         "connectors": [
             {
@@ -12,7 +19,7 @@
                 "properties": {
                     "name": "Wikipedia",
                     "description": "Country information from Wikipedia",
-                    "webhook": null,
+                    "webhook": "http://bbkt-webhook:8888/",
                     "cache": 0
                 }
             }
@@ -23,7 +30,8 @@
         "properties": {
             "name": "World Heritage Sites",
             "description": "A landmark or area with legal protection by an international convention administered by UNESCO",
-            "schema": {}
+            "schema": {},
+            "timeseries": {}
         },
         "connectors": [
             {

@@ -49,7 +49,8 @@ describe('Database Seeding', function() {
     // --- after all the tests have been run
 
     after(() => {
-        return Shared.after_all(false); // false = don't nuke the database
+        return Shared.after_all(false) // false = don't nuke the database
+        .then(() => Seeder.start_webhook(true)); // true = verbose mode
     });
 
     it('create the housing entities', () => {

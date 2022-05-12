@@ -7,6 +7,22 @@
         "description": { "$ref": "bbk://description" },
         "schema": {
             "type": "object"
+        },
+        "timeseries": {
+            "type": "object",
+            "propertyNames": { "$ref": "bbk://slug" },
+            "patternProperties": {
+                ".*": {
+                    "type": "object",
+                    "properties": {
+                        "period": { "$ref": "bbk://date#/duration" },
+                        "value": { "$ref": "bbk://string" },
+                        "unit": { "$ref": "bbk://string" }
+                     },
+                     "required": ["period", "value", "unit"],
+                     "additionalProperties": false
+                }
+            }
         }
     },
     "required": ["name", "description"]

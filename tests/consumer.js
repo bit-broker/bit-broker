@@ -34,6 +34,8 @@ const Crud = require('./lib/crud.js');
 const Seeder = require('./lib/seeder.js');
 const Webhook = require('./lib/webhook.js');
 const crypto = require('crypto');
+const moment = require('moment');
+const url = require('url');
 const chakram = require('chakram');
 const expect = chakram.expect;
 
@@ -47,35 +49,12 @@ describe('Consumer Tests', function() {
 
     let insertions = []; // will be filled in by seeder adding data
 
-    // --- callback function to add extra data via a webhook
-
-    function webhook_callback(type, id) {
-
-        /* This function makes a deterministic set of extra data to add via
-           the webhook server. It is called by the webhook server and also
-           the later end-to-end test, hence it must be deterministic - else
-           comparison tests will fail. It always add an extra item to the
-           entity object, but it 50/50 adds another extra item to the
-           instance object. */
-
-        let record = Seeder.record(type, id);
-
-        let hash1 = crypto.createHash('sha256').update(`${ record.name }`).digest('hex');
-        let hash2 = crypto.createHash('sha256').update(`${ type }${ id }`).digest('hex');
-
-        let extra = { entity: { foo: hash1 } };
-        if (hash2[0] >= '0' && hash2[0] <= '7') extra.instance = { bar: hash2 };  // fifty fifty chance of including instance data
-
-        return extra;
-    }
-
     // --- before any tests are run
 
     before(() => {
         return Shared.before_any()
         .then (() => {
-            DATA.WEBHOOK.server = new Webhook(DATA.WEBHOOK.URL, DATA.WEBHOOK.NAME, webhook_callback);
-            DATA.WEBHOOK.server.start();
+            DATA.WEBHOOK.server = Seeder.start_webhook();
         });
     });
 
@@ -187,7 +166,7 @@ describe('Consumer Tests', function() {
             }
 
             if (DATA.WEBHOOK.HOOKS.find(i => i.entity === type)) {  // this entity type has webhook added items
-                let extras = webhook_callback(type, vendor_id);
+                let extras = Seeder.cb_entity(type, vendor_id);
                 let extra = extras[entity ? 'entity' : 'instance'];
 
                 // extra things within fetched which are not present in original, must be webhook items
@@ -324,6 +303,195 @@ describe('Consumer Tests', function() {
             }
 
             return test;
+        });
+    });
+
+    describe('timeseries api tests', function() {
+
+        // --- test data - will be filled out with fuller objects during tests
+
+        const COUNTRIES = {
+            GB: { name: 'United Kingdom', low: 1960, high: 2017 } // can add more countries perhaps one day
+        };
+
+        // --- checks a timeseries with paging
+
+        function paged_timeseries(ts_url, times) {
+            return Crud.get(ts_url, ts => {
+                expect(ts).to.be.an('array');
+                expect(ts.length).to.be.eq(times.length);
+                expect(ts.map(t => t.from).sort().join()).to.be.eq(times.sort().join()); // complete time array alignment
+                return chakram.wait();
+            });
+        }
+
+        // -- the catalog api tests start here
+
+        it('can set the policy header', () => {
+            Crud.headers(Shared.policy_header(DATA.POLICY.ALLAREA.ID))
+        });
+
+        it('collect the test country public ids', () => {
+            let names = Object.keys(COUNTRIES).map(i => COUNTRIES[i].name);
+            return Crud.get(URLs.consumer_catalog({ 'type': 'country', 'name': { '$in': names }}), items => {
+                expect(items).to.be.an('array');
+
+                for (let country in COUNTRIES) {
+                    let found = items.find(i => i.name === COUNTRIES[country].name);
+
+                    expect(found).to.be.an('object');
+                    expect(found.id).to.be.a('string');
+
+                    COUNTRIES[country].item = found;
+                    COUNTRIES[country].ts_url = URLs.consumer_timeseries('country', found.id, DATA.TIMESERIES.POPULATION.name);
+                }
+
+                return chakram.wait();
+            });
+        });
+
+        it('can get a timeseries', () => {
+            return Crud.get(COUNTRIES.GB.ts_url, ts => {
+                expect(ts).to.be.an('array');
+                expect(ts.length).to.be.eq(COUNTRIES.GB.high - COUNTRIES.GB.low + 1);
+
+                for (let i = 0 ; i < ts.length ; i++) {
+                    expect(ts[i]).to.be.an('object');
+                    expect(ts[i].from).to.match(new RegExp(DATA.TIMESERIES.POPULATION.from));
+                    expect(ts[i].value).to.match(new RegExp(DATA.TIMESERIES.POPULATION.value));
+                    expect(Object.values(ts[i]).length).to.be.eq(2);
+                }
+
+                return chakram.wait();
+            });
+        });
+
+        it('can get a timeseries with just a start', () => {
+            let start = 1970;  // inclusive
+            let years = Array.from({ length: COUNTRIES.GB.high - start + 1 }, (x, i) => i + start);
+            return paged_timeseries(`${ COUNTRIES.GB.ts_url }?start=${ start }`, years);
+        });
+
+        it('can get a timeseries with a start and an end', () => {
+            let start = 1970; // inclusive
+            let end = 1996; // exclusive
+            let years = Array.from({ length: end - start }, (x, i) => i + start);
+            return paged_timeseries(`${ COUNTRIES.GB.ts_url }?start=${ start }&end=${ end }`, years);
+        });
+
+        it('can get a timeseries with a start and a duration', () => {
+            let start = 1973; // inclusive
+            let end = 2010; // exclusive
+            let duration = moment(end.toString()).unix() - moment(start.toString()).unix();
+            let years = Array.from({ length: end - start }, (x, i) => i + start);
+            return paged_timeseries(`${ COUNTRIES.GB.ts_url }?start=${ start }&duration=${ duration }`, years);
+        });
+
+        it('can get a timeseries with a start and a limit', () => {
+            let start = 1982;  // inclusive
+            let limit = 15;
+            let years = Array.from({ length: limit }, (x, i) => i + start);
+            return paged_timeseries(`${ COUNTRIES.GB.ts_url }?start=${ start }&limit=${ limit }`, years);
+        });
+
+        it('can get a timeseries with a start, an end and a limit', () => {
+            let start = 1970; // inclusive
+            let end = 1994; // exclusive
+            let limit = 12;
+            let years = Array.from({ length: limit }, (x, i) => i + start);
+            return paged_timeseries(`${ COUNTRIES.GB.ts_url }?start=${ start }&end=${ end }&limit=${ limit }`, years);
+        });
+
+        it('can get a timeseries with a start, a duration and a limit', () => {
+            let start = 1970; // inclusive
+            let end = 2010; // exclusive
+            let limit = 21;
+            let duration = moment(end.toString()).unix() - moment(start.toString()).unix();
+            let years = Array.from({ length: limit }, (x, i) => i + start);
+            return paged_timeseries(`${ COUNTRIES.GB.ts_url }?start=${ start }&duration=${ duration }&limit=${ limit }`, years);
+        });
+
+        it('can get a timeseries with a start and an excessive limit', () => {
+            let start = 1982;  // inclusive
+            let limit = 1000;
+            let years = Array.from({ length: COUNTRIES.GB.high - start + 1 }, (x, i) => i + start);
+            return paged_timeseries(`${ COUNTRIES.GB.ts_url }?start=${ start }&limit=${ limit }`, years);
+        });
+
+        it('can get a timeseries with a start, an end and an excessive limit', () => {
+            let start = 1970; // inclusive
+            let end = 1994; // exclusive
+            let limit = 1000;
+            let years = Array.from({ length: end - start }, (x, i) => i + start);
+            return paged_timeseries(`${ COUNTRIES.GB.ts_url }?start=${ start }&end=${ end }&limit=${ limit }`, years);
+        });
+
+        it('can get a timeseries with a start, a duration and an excessive limit', () => {
+            let start = 1970; // inclusive
+            let end = 2010; // exclusive
+            let limit = 1000;
+            let duration = moment(end.toString()).unix() - moment(start.toString()).unix();
+            let years = Array.from({ length: end - start }, (x, i) => i + start);
+            return paged_timeseries(`${ COUNTRIES.GB.ts_url }?start=${ start }&duration=${ duration }&limit=${ limit }`, years);
+        });
+
+        it('can get a timeseries with an excessively early start', () => {
+            let start = 1900;  // inclusive
+            let years = Array.from({ length: COUNTRIES.GB.high - COUNTRIES.GB.low + 1 }, (x, i) => i + COUNTRIES.GB.low);
+            return paged_timeseries(`${ COUNTRIES.GB.ts_url }?start=${ start }`, years);
+        });
+
+        it('can get a timeseries with a start and an excessively late end', () => {
+            let start = 1970; // inclusive
+            let end = 2050; // exclusive
+            let years = Array.from({ length: COUNTRIES.GB.high - start + 1 }, (x, i) => i + start);
+            return paged_timeseries(`${ COUNTRIES.GB.ts_url }?start=${ start }&end=${ end }`, years);
+        });
+
+        it('can get a timeseries with a start and an excessively long duration', () => {
+            let start = 1973; // inclusive
+            let end = 2042; // exclusive
+            let duration = moment(end.toString()).unix() - moment(start.toString()).unix();
+            let years = Array.from({ length: COUNTRIES.GB.high - start + 1 }, (x, i) => i + start);
+            return paged_timeseries(`${ COUNTRIES.GB.ts_url }?start=${ start }&duration=${ duration }`, years);
+        });
+
+        it('cannot get a timeseries that does not exist', () => {
+            return Crud.not_found(URLs.consumer_timeseries('country', COUNTRIES.GB.item.id, DATA.pick(DATA.SLUG.VALID)));
+        });
+
+        it('cannot get a timeseries with an invalid slug', () => {
+            return Crud.not_found(URLs.consumer_timeseries('country', COUNTRIES.GB.item.id, DATA.pick(DATA.SLUG.INVALID)));
+        });
+
+        it('cannot use various bad paging parameters', () => {
+            return Promise.resolve()
+            .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?start=foo`, [{ start: DATA.ERRORS.FORMAT }, { start: DATA.ERRORS.INVALID }]))
+            .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?start=1970 01 01`, [{ start: DATA.ERRORS.FORMAT }]))
+            .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?start=1970-13-01`, [{ start: DATA.ERRORS.INVALID }]))
+            .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?start=1970-01-01 23:00:00`, [{ start: DATA.ERRORS.FORMAT }]))
+            .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?start=1970-01-01T23:62:00`, [{ start: DATA.ERRORS.INVALID }]))
+            .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?end=foo`, [{ end: DATA.ERRORS.FORMAT }, { end: DATA.ERRORS.INVALID }]))
+            .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?end=1970 01 01`, [{ end: DATA.ERRORS.FORMAT }]))
+            .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?end=1970-13-01`, [{ end: DATA.ERRORS.INVALID }]))
+            .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?end=1970-01-01 23:00:00`, [{ end: DATA.ERRORS.FORMAT }]))
+            .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?end=1970-01-01T23:62:00`, [{ end: DATA.ERRORS.INVALID }]))
+            .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?duration=foo`, [{ duration: DATA.ERRORS.TYPE }]))
+            .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?duration=0`, [{ duration: DATA.ERRORS.SMALL }]))
+            .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?duration=-1`, [{ duration: DATA.ERRORS.SMALL }]))
+            .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?limit=foo`, [{ limit: DATA.ERRORS.TYPE }]))
+            .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?limit=0`, [{ limit: DATA.ERRORS.SMALL }]))
+            .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?limit=-1`, [{ limit: DATA.ERRORS.SMALL }]))
+            .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?start=foo&end=2017&limit=0`, [{ start: DATA.ERRORS.FORMAT }, { limit: DATA.ERRORS.SMALL }]));
+        });
+
+        it('cannot use various invalid paging parameter combinations', () => {
+            return Promise.resolve()
+            .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?end=1980`, [{ paging: 'end without a start' }]))
+            .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?duration=86400`, [{ paging: 'duration without a start' }]))
+            .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?end=1980&duration=86400`, [{ paging: 'both an end and a duration' }]))
+            .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?start=1970&end=1970`, [{ paging: 'end which is at or before the start' }]))
+            .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?start=1970&end=1969`, [{ paging: 'end which is at or before the start' }]));
         });
     });
 

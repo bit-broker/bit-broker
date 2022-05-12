@@ -49,8 +49,7 @@ api.router.get ('/catalog', controller.consumer.catalog);
 api.router.get ('/entity', controller.consumer.types);
 api.router.get ('/entity/:type', controller.consumer.list);
 api.router.get ('/entity/:type/:id', controller.consumer.get);
-api.router.get ('/entity/:type/:id/timeseries', controller.consumer.timeseries.list);
-api.router.get ('/entity/:type/:id/timeseries/:tsid', controller.consumer.timeseries.get);
+api.router.get ('/entity/:type/:id/timeseries/:tsid', controller.consumer.timeseries);
 
 // --- start the server
 

@@ -128,6 +128,10 @@ describe('Coordinator Service Tests', function() {
             return Crud.verify(entity1, { id: slug1, url: entity1, ...values1 });
         });
 
+        it('it has empty timeseries and schema when addressed directly', () => {
+            return Crud.verify(entity1, { timeseries: {}, schema: {} });
+        });
+
         it('cannot add a duplicate entity type', () => {
             return Crud.duplicate(entity1, values1);
         });
@@ -142,6 +146,10 @@ describe('Coordinator Service Tests', function() {
 
         it('new values are present when addressed directly', () => {
             return Crud.verify(entity1, { id: slug1, url: entity1, ...values2 });
+        });
+
+        it('it still has empty timeseries and schema when addressed directly', () => {
+            return Crud.verify(entity1, { timeseries: {}, schema: {} });
         });
 
         it('the second entity is not there to start with', () => {
@@ -184,11 +192,77 @@ describe('Coordinator Service Tests', function() {
         });
     });
 
+    // --- entity timeseries tests
+
+    describe('entity timeseries tests', () => {
+        let slug = DATA.pick(DATA.SLUG.VALID);
+        let entity = URLs.entity(slug);
+        let values = { name: DATA.name(), description: DATA.text(DATA.DESCRIPTION.REASONABLE) };
+        let all = URLs.entity();
+        let ts1 = { period: DATA.duration(), value: DATA.text(), unit: DATA.text() };
+        let ts2 = { period: DATA.duration(), value: DATA.text(), unit: DATA.text() };
+
+        before(() => {
+            return Shared.empty();
+        });
+
+        after(() => {
+            return Shared.empty();
+        });
+
+        it('the entity is not there to start with', () => {
+            return Crud.not_found(entity);
+        });
+
+        it('can add an entity type with first timeseries', () => {
+            return Crud.add(entity, {...values, timeseries: { ts1 }}, entity);
+        });
+
+        it('it is present in the entity type list', () => {
+            return Crud.verify_all(all, [ { id: slug, url: entity, ...values } ]);
+        });
+
+        it('it is present when addressed directly', () => {
+            return Crud.verify(entity, { id: slug, url: entity, ...values });
+        });
+
+        it('it has the timeseries present when addressed directly', () => {
+            return Crud.verify(entity, { timeseries: { ts1 }});
+        });
+
+        it('can update an entity type with second timeseries', () => {
+            return Crud.update(entity, {...values, timeseries: { ts2 }});
+        });
+
+        it('new timeseries present is when addressed directly', () => {
+            return Crud.verify(entity, { timeseries: { ts2 }});
+        });
+
+        it('can update an entity type with no timeseries', () => {
+            return Crud.update(entity, {...values, timeseries: { }});
+        });
+
+        it('no timeseries present is when addressed directly', () => {
+            return Crud.verify(entity, { timeseries: {}});
+        });
+
+        it('can delete the entity type', () => {
+            return Crud.delete(entity);
+        });
+
+        it('it is gone from the entity type list', () => {
+            return Crud.verify_all(all, []);
+        });
+    });
+
     // --- entity validation tests - here we test valid and invalid, on add and update
 
     describe('entity validation tests', () => {
         let entity = URLs.entity(DATA.pick(DATA.SLUG.VALID));
         let values = DATA.some_info();
+        let period = DATA.duration();
+        let value = DATA.text();
+        let unit =DATA.text();
 
         function some_name() { return URLs.entity(DATA.slug(DATA.SLUG.REASONABLE)); } // some reasonable name
 
@@ -255,6 +329,29 @@ describe('Coordinator Service Tests', function() {
             .then(() => Crud.bad_request(some_name(), [{ description: DATA.ERRORS.MAX }], { ...values, description: DATA.text(DATA.DESCRIPTION.LONGEST + 1) }, chakram.post));
         });
 
+        it('disallows various invalid timeseries', () => {
+            return Promise.resolve()
+            .then(() => Crud.bad_request(some_name(), [{ timeseries: DATA.ERRORS.TYPE }], { ...values, timeseries: []}, chakram.post))
+            .then(() => Crud.bad_request(some_name(), [{ timeseries: DATA.ERRORS.TYPE }], { ...values, timeseries: DATA.text()}, chakram.post))
+            .then(() => Crud.bad_request(some_name(), [{ timeseries: DATA.ERRORS.MIN }], { ...values, timeseries: { 'ts': {} }}, chakram.post))
+            .then(() => Crud.bad_request(some_name(), [{ timeseries: DATA.ERRORS.FORMAT }], { ...values, timeseries: { 'ts 1': true }}, chakram.post))
+            .then(() => Crud.bad_request(some_name(), [{ timeseries: DATA.ERRORS.FORMAT }], { ...values, timeseries: { '-ts1': true }}, chakram.post))
+            .then(() => Crud.bad_request(some_name(), [{ timeseries: DATA.ERRORS.FORMAT }], { ...values, timeseries: { 'ts1!': true }}, chakram.post))
+            .then(() => Crud.bad_request(some_name(), [{ 'timeseries.ts1': DATA.ERRORS.REQUIRED('period') }], { ...values, timeseries: { 'ts1': { value, unit } }}, chakram.post))
+            .then(() => Crud.bad_request(some_name(), [{ 'timeseries.ts1': DATA.ERRORS.REQUIRED('value') }], { ...values, timeseries: { 'ts1': { period, unit } }}, chakram.post))
+            .then(() => Crud.bad_request(some_name(), [{ 'timeseries.ts1': DATA.ERRORS.REQUIRED('unit') }], { ...values, timeseries: { 'ts1': { period, value } }}, chakram.post))
+            .then(() => Crud.bad_request(some_name(), [{ 'timeseries.ts1': DATA.ERRORS.REQUIRED('period') }], { ...values, timeseries: { 'ts1': { } }}, chakram.post))
+            .then(() => Crud.bad_request(some_name(), [{ 'timeseries.ts1': DATA.ERRORS.ADDITIONAL }], { ...values, timeseries: { 'ts1': { foo: 1, period, value, unit } }}, chakram.post))
+            .then(() => Crud.bad_request(some_name(), [{ 'timeseries.ts1.period': DATA.ERRORS.TYPE }], { ...values, timeseries: { 'ts1': { period: 1, value, unit } }}, chakram.post))
+            .then(() => Crud.bad_request(some_name(), [{ 'timeseries.ts1.value': DATA.ERRORS.TYPE }], { ...values, timeseries: { 'ts1': { period, value: 1, unit } }}, chakram.post))
+            .then(() => Crud.bad_request(some_name(), [{ 'timeseries.ts1.unit': DATA.ERRORS.TYPE }], { ...values, timeseries: { 'ts1': { period, value, unit: 1 } }}, chakram.post))
+            .then(() => Crud.bad_request(some_name(), [{ 'timeseries.ts1.period': DATA.ERRORS.FORMAT }], { ...values, timeseries: { 'ts1': { period: "", value, unit } }}, chakram.post))
+            .then(() => Crud.bad_request(some_name(), [{ 'timeseries.ts1.period': DATA.ERRORS.FORMAT }], { ...values, timeseries: { 'ts1': { period: "1H", value, unit } }}, chakram.post))
+            .then(() => Crud.bad_request(some_name(), [{ 'timeseries.ts1.period': DATA.ERRORS.FORMAT }], { ...values, timeseries: { 'ts1': { period: "P1H", value, unit } }}, chakram.post))
+            .then(() => Crud.bad_request(some_name(), [{ 'timeseries.ts1': DATA.ERRORS.TYPE }], { ...values, timeseries: { 'ts1': null }}, chakram.post))
+            .then(() => Crud.bad_request(some_name(), [{ 'timeseries.ts1': DATA.ERRORS.TYPE }], { ...values, timeseries: { 'ts1': DATA.text() }}, chakram.post));
+        });
+
         it('disallows various invalid schemas', () => {
             return Promise.resolve()
             .then(() => Crud.bad_request(some_name(), [{ schema: DATA.ERRORS.TYPE }], { ...values, schema: []}, chakram.post))
@@ -294,6 +391,29 @@ describe('Coordinator Service Tests', function() {
             .then(() => Crud.bad_request(entity, [{ description: DATA.ERRORS.MIN }], { ...values, description: '' }, chakram.put))
             .then(() => Crud.bad_request(entity, [{ description: DATA.ERRORS.MIN }], { ...values, description: null }, chakram.put))
             .then(() => Crud.bad_request(entity, [{ description: DATA.ERRORS.MAX }], { ...values, description: DATA.text(DATA.DESCRIPTION.LONGEST + 1) }, chakram.put));
+        });
+
+        it('disallows update of various invalid timeseries', () => {
+            return Promise.resolve()
+            .then(() => Crud.bad_request(some_name(), [{ timeseries: DATA.ERRORS.TYPE }], { ...values, timeseries: []}, chakram.put))
+            .then(() => Crud.bad_request(some_name(), [{ timeseries: DATA.ERRORS.TYPE }], { ...values, timeseries: DATA.text()}, chakram.put))
+            .then(() => Crud.bad_request(some_name(), [{ timeseries: DATA.ERRORS.MIN }], { ...values, timeseries: { 'ts': {} }}, chakram.put))
+            .then(() => Crud.bad_request(some_name(), [{ timeseries: DATA.ERRORS.FORMAT }], { ...values, timeseries: { 'ts 1': true }}, chakram.put))
+            .then(() => Crud.bad_request(some_name(), [{ timeseries: DATA.ERRORS.FORMAT }], { ...values, timeseries: { '-ts1': true }}, chakram.put))
+            .then(() => Crud.bad_request(some_name(), [{ timeseries: DATA.ERRORS.FORMAT }], { ...values, timeseries: { 'ts1!': true }}, chakram.put))
+            .then(() => Crud.bad_request(some_name(), [{ 'timeseries.ts1': DATA.ERRORS.REQUIRED('period') }], { ...values, timeseries: { 'ts1': { value, unit } }}, chakram.put))
+            .then(() => Crud.bad_request(some_name(), [{ 'timeseries.ts1': DATA.ERRORS.REQUIRED('value') }], { ...values, timeseries: { 'ts1': { period, unit } }}, chakram.put))
+            .then(() => Crud.bad_request(some_name(), [{ 'timeseries.ts1': DATA.ERRORS.REQUIRED('unit') }], { ...values, timeseries: { 'ts1': { period, value } }}, chakram.put))
+            .then(() => Crud.bad_request(some_name(), [{ 'timeseries.ts1': DATA.ERRORS.REQUIRED('period') }], { ...values, timeseries: { 'ts1': { } }}, chakram.put))
+            .then(() => Crud.bad_request(some_name(), [{ 'timeseries.ts1': DATA.ERRORS.ADDITIONAL }], { ...values, timeseries: { 'ts1': { foo: 1, period, value, unit } }}, chakram.put))
+            .then(() => Crud.bad_request(some_name(), [{ 'timeseries.ts1.period': DATA.ERRORS.TYPE }], { ...values, timeseries: { 'ts1': { period: 1, value, unit } }}, chakram.put))
+            .then(() => Crud.bad_request(some_name(), [{ 'timeseries.ts1.value': DATA.ERRORS.TYPE }], { ...values, timeseries: { 'ts1': { period, value: 1, unit } }}, chakram.put))
+            .then(() => Crud.bad_request(some_name(), [{ 'timeseries.ts1.unit': DATA.ERRORS.TYPE }], { ...values, timeseries: { 'ts1': { period, value, unit: 1 } }}, chakram.put))
+            .then(() => Crud.bad_request(some_name(), [{ 'timeseries.ts1.period': DATA.ERRORS.FORMAT }], { ...values, timeseries: { 'ts1': { period: "", value, unit } }}, chakram.put))
+            .then(() => Crud.bad_request(some_name(), [{ 'timeseries.ts1.period': DATA.ERRORS.FORMAT }], { ...values, timeseries: { 'ts1': { period: "1H", value, unit } }}, chakram.put))
+            .then(() => Crud.bad_request(some_name(), [{ 'timeseries.ts1.period': DATA.ERRORS.FORMAT }], { ...values, timeseries: { 'ts1': { period: "P1H", value, unit } }}, chakram.put))
+            .then(() => Crud.bad_request(some_name(), [{ 'timeseries.ts1': DATA.ERRORS.TYPE }], { ...values, timeseries: { 'ts1': null }}, chakram.put))
+            .then(() => Crud.bad_request(some_name(), [{ 'timeseries.ts1': DATA.ERRORS.TYPE }], { ...values, timeseries: { 'ts1': DATA.text() }}, chakram.put));
         });
 
         it('disallows update of various invalid schemas', () => {
@@ -470,6 +590,56 @@ describe('Coordinator Service Tests', function() {
 
         it('can add connector with a null cache and webhook', () => {
             return Crud.add_del(connector1, { ...base, webhook: null, cache: null }, defaults);
+        });
+
+        it('can delete the entity type and all hence its connectors', () => {
+            return Crud.delete(URLs.entity(entity));
+        });
+    });
+
+    // --- connector timeseries tests
+
+    describe('connector timeseries tests', () => {
+        let entity = DATA.slug();
+        let base = { name: DATA.name(), description: DATA.text(DATA.DESCRIPTION.REASONABLE) };
+        let values = { name: DATA.name(), description: DATA.text(DATA.DESCRIPTION.REASONABLE) };
+        let slug1 = DATA.pluck(DATA.SLUG.VALID); // pluck - so as to never get duplicate
+        let slug2 = DATA.pick(DATA.SLUG.VALID);
+
+        before(() => {
+            return Shared.empty();
+        });
+
+        after(() => {
+            return Shared.empty();
+        });
+
+        it('add the housing entity without a timeseries', () => {
+            return Crud.add(URLs.entity(entity), base);
+        });
+
+        it('can add the connector without a webhook', () => {
+            return Crud.add(URLs.connector(entity, slug1), values);
+        });
+
+        it('can add the connector with a webhook', () => {
+            return Crud.add(URLs.connector(entity, slug2), { ...values, webhook: DATA.pick(DATA.WEBHOOK.VALID) });
+        });
+
+        it('can delete the entity type and all hence its connectors', () => {
+            return Crud.delete(URLs.entity(entity));
+        });
+
+        it('add the housing entity with a timeseries', () => {
+            return Crud.add(URLs.entity(entity), { ...base, timeseries: { 'ts1': { period: DATA.duration(), value: DATA.text(), unit: DATA.text() }}});
+        });
+
+        it('cannot add the connector without a webhook', () => {
+            return Crud.bad_request(URLs.connector(entity, slug1), [{ webhook: DATA.ERRORS.WEBHOOK }], values, chakram.post);
+        });
+
+        it('can add the connector with a webhook', () => {
+            return Crud.add(URLs.connector(entity, slug2), { ...values, webhook: DATA.pick(DATA.WEBHOOK.VALID) });
         });
 
         it('can delete the entity type and all hence its connectors', () => {
