@@ -31,15 +31,33 @@ const url = require('url');
 
 module.exports = class Webhook {
 
-    constructor(base, name, cb) {
+    constructor(base, name, cb_entity, cb_timeseries) {
         this.server = null;
         this.app = express();
         this.port = url.parse(base).port;
 
-        this.app.get('/', (req, res) => res.json({ now: new Date().toISOString(), name: name }));
-        this.app.get('/entity/:type/:id', (req, res) => res.json(cb(req.params.type, req.params.id)));
+        // --- announce
+
+        this.app.get('/', (req, res) => {
+            res.json({ now: new Date().toISOString(), name: name })
+        });
+
+        // --- entity
+
+        this.app.get('/entity/:type/:id', (req, res) => {
+            res.json(cb_entity(req.params.type, req.params.id))
+        });
+
+        // --- timeseries
+
+        this.app.get('/timeseries/:type/:id/:tsid', (req, res) => {
+            let start = req.query.start;
+            let end = req.query.end;
+            let limit = req.query.limit;
+            res.json(cb_timeseries(req.params.type, req.params.id, req.params.tsid, { start, end, limit }))
+        });
     }
 
-    start() { this.server = this.app.listen(this.port); }
+    start(cb) { this.server = this.app.listen(this.port, cb); }
     stop() { this.server.close(); }
 }

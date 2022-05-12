@@ -1,0 +1,24 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "bbk://timeseries",
+    "paging": {
+        "type": "object",
+        "properties": {
+            "start": {
+                "$ref": "bbk://date#/iso8601"
+            },
+            "end": {
+                "$ref": "bbk://date#/iso8601"
+            },
+            "duration": {
+                "type": "integer",
+                "minimum": 1
+            },
+            "limit": {
+                "type": "integer",
+                "minimum": 1
+            }
+        },
+        "required": []
+    }
+}

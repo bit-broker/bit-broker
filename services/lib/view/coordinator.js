@@ -45,7 +45,8 @@ module.exports = class Coordinator extends View {
 
         if (full) {
             doc = Object.assign(doc, {
-                schema: item.properties.schema
+                schema: item.properties.schema,
+                timeseries: item.properties.timeseries
             });
         }
 

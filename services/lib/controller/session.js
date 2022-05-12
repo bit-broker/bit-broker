@@ -108,6 +108,8 @@ module.exports = class Session {
                         throw new failure(HTTP.BAD_REQUEST, errors);
                     }
                 }
+
+                records.forEach(r => r.timeseries = entity.timeseries); // add on the entity timeseries so that is can found via catalog calls
             }
 
             return session.process(action, records);

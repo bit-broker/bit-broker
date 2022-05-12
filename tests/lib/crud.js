@@ -87,6 +87,7 @@ module.exports = class Crud {
     static add(url, body, location, checker) {
         return chakram.post(url, body)
         .then(response => {
+        //  console.log(response.body?.error);  // debug handy logging
             expect(response).to.have.status(HTTP.CREATED);
             if (location) expect(response).to.have.header('Location', location.trim());
             if (checker) checker(response.body, response.response.headers['location']);
@@ -141,6 +142,7 @@ module.exports = class Crud {
     static bad_request(url, errors, body = undefined, action = chakram.get) {
         return action(url, body)
         .then(response => {
+        //  console.log(response.body?.error);  // debug handy logging
             this.check_error(response, HTTP.BAD_REQUEST, errors);
             return chakram.wait();
         });
@@ -186,6 +188,7 @@ module.exports = class Crud {
     static get(url, checker) {
         return chakram.get(url)
         .then(response => {
+        // if (response.body?.error) console.log(response.body?.error);  // debug handy logging  
             expect(response.response.statusCode).to.be.oneOf(OK_CODES);
             if (checker) checker(response.body);
             return chakram.wait();

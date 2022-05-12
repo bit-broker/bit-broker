@@ -66,7 +66,7 @@ module.exports = class Operation {
             let record = records[i];
             let vendor_key = action === CONST.ACTION.UPSERT ? record.id : record;
             let public_key = Permit.public_key(this.connector.contribution_id, vendor_key);
-            
+
             keys[vendor_key] = public_key;
 
             if (action === CONST.ACTION.UPSERT) {

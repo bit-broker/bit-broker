@@ -35,34 +35,12 @@ const model = require('../model/index.js');
 const view = require('../view/index.js');
 const log = require('../logger.js').Logger;
 const fetch = require('node-fetch');
+const moment = require('moment');
+const url = require('url');
 
 // --- constants - not deployment configurable
 
 const MAX_CONNECTORS = 16;
-
-// --- timeseries class (embedded)
-
-class Timeseries {
-
-    // --- lists all the timeseries on the given entity instance
-
-    list(req, res, next) {
-        let type = req.params.type.toLowerCase();
-        let id = req.params.id.toLowerCase();
-
-        res.json([]); // TODO
-    }
-
-    // --- gets details of a named timeseries on the given entity instance
-
-    get(req, res, next) {
-        let type = req.params.type.toLowerCase();
-        let id = req.params.id.toLowerCase();
-        let tsid = req.params.tsid.toLowerCase();
-
-        throw new failure(HTTP.NOT_FOUND); // TODO
-    }
-}
 
 // --- consumer class (exported)
 
@@ -71,7 +49,7 @@ module.exports = class Consumer {
     // --- constructor
 
     constructor() {
-        this.timeseries = new Timeseries();
+        // nothing yet
     }
 
     // --- extracts the call context from the request header
@@ -190,15 +168,85 @@ module.exports = class Consumer {
                 let request = Promise.resolve(); // assume no webhook
 
                 if (webhook) {
-                    request = fetch(`${ webhook }/entity/${ item.entity_slug }/${ item.vendor_id }`, { headers: CONST.FETCH.HEADERS, timeout: CONST.FETCH.TIMEOUT });
+                    let handler = `${ webhook }/entity/${ item.entity_slug }/${ item.vendor_id }`;
+                    request = fetch(handler, { headers: CONST.FETCH.HEADERS, timeout: CONST.FETCH.TIMEOUT });
                 }
 
                 request.then(res => res ? res.json() : null)
-                .then(extra => res.json(view.consumer.instance(req.originalRoute, item, extra, policy.legal_context, policy.data_segment.field_masks)))
+                .then(extra => {
+                    // TODO: some sanity validation on 'extra' - see issue #194
+                    res.json(view.consumer.instance(req.originalRoute, item, extra, policy.legal_context, policy.data_segment.field_masks));
+                })
                 .catch(error => // on fail: same record, but without any webhook data
                 {
-                    log.warn('webhook failure', type, id, error);
-                    return res.json(view.consumer.instance(req.originalRoute, item, null, policy.legal_context, policy.data_segment.field_masks))
+                    log.warn('webhook', 'entity', 'failure', type, id, error);
+                    res.json(view.consumer.instance(req.originalRoute, item, null, policy.legal_context, policy.data_segment.field_masks));
+                });
+            })
+        })
+
+        .catch(error => next(error));
+    }
+
+    // --- gets details of a named timeseries on the given entity instance
+
+    timeseries(req, res, next) {
+        let type = req.params.type.toLowerCase();
+        let id = req.params.id.toLowerCase();
+        let tsid = req.params.tsid.toLowerCase();
+        let start = req.query.start; // optional
+        let end = req.query.end; // optional
+        let duration = req.query.duration ? parseInt(req.query.duration) : req.query.duration; // optional
+        let limit = req.query.limit ? parseInt(req.query.limit) : req.query.limit; // optional
+        let paging = { start, end, duration, limit };
+        let context = Consumer.context(req);
+        let errors = [];
+
+        errors = errors.concat(model.validate.timeseries_paging(paging));
+
+        if (errors.length) {
+            throw new failure(HTTP.BAD_REQUEST, errors);
+        }
+
+        // --- post the validation rules, we reformat the query params
+
+        if (paging.start) paging.start = moment(paging.start).toISOString(); // turn into full iso8601 string
+        if (paging.end) paging.end = moment(paging.end).toISOString();
+
+        if (paging.start && paging.duration)
+        {
+            paging.end = moment(paging.start).add(paging.duration, 'seconds').toISOString(); // we alway just pass on a start and end to the connector - remove duration
+            paging.duration = undefined;
+        }
+
+        Object.keys(paging).forEach(i => typeof(paging[i]) === 'undefined' ? delete paging[i] : true); // don't pass on unused optional parameters
+
+        Consumer.with_policy(context.policy)
+
+        .then(policy => {
+            return model.catalog.find(policy.data_segment.segment_query, context.connectors, type, id)
+
+            .then(item => {
+                if (!item) throw new failure(HTTP.NOT_FOUND);
+                if (!item.record.timeseries.hasOwnProperty(tsid)) throw new failure(HTTP.NOT_FOUND); // timeseries is not found
+
+                let webhook = item.connector_properties.webhook;
+                let request = Promise.resolve(); // assume no webhook
+
+                if (webhook) {
+                    let handler = `${ webhook }/timeseries/${ item.entity_slug }/${ item.vendor_id }/${ tsid }?${ new url.URLSearchParams(paging) }`;
+                    request = fetch(handler, { headers: CONST.FETCH.HEADERS, timeout: CONST.FETCH.TIMEOUT });
+                }
+
+                request.then(res => res ? res.json() : [])
+                .then(timeseries => {
+                    // TODO-TS validate the timeseries format
+                    res.json(timeseries);
+                })
+                .catch(error => // on fail: same record, but without any webhook data
+                {
+                    log.warn('webhook', 'timeseries', 'failure', type, id, tsid, error);
+                    res.json([]);
                 });
             })
         })

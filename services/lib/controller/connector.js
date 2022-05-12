@@ -31,6 +31,7 @@ const HTTP = require('http-status-codes');
 const failure = require('../errors.js');
 const model = require('../model/index.js');
 const view = require('../view/index.js');
+const locales = require('../locales.js');
 const log = require('../logger.js').Logger;
 
 // --- connector class (exported)
@@ -109,6 +110,11 @@ module.exports = class Connector {
 
         .then(connectors => {
             if (!connectors) throw new failure(HTTP.NOT_FOUND);
+
+            if (Object.keys(connectors.entity.properties.timeseries).length && !properties.webhook) {  // must supply a webhook when there are entity timeseries
+                throw new failure(HTTP.BAD_REQUEST, [ failure.response('webhook', locales.__('error.connector-requires-webhook')) ]);
+            }
+
             return connectors.find(cid)
 
             .then(item => {
@@ -149,6 +155,11 @@ module.exports = class Connector {
 
         .then(connectors => {
             if (!connectors) throw new failure(HTTP.NOT_FOUND);
+
+            if (Object.keys(connectors.entity.properties.timeseries).length && !properties.webhook) {  // must supply a webhook when there are entity timeseries
+                throw new failure(HTTP.BAD_REQUEST, [ failure.response('webhook', locales.__('error.connector-requires-webhook')) ]);
+            }
+
             return connectors.find(cid)
 
             .then(item => {

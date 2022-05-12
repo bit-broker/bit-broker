@@ -43,7 +43,8 @@ module.exports = class Entity {
         return {
             name: body.name || '',
             description: body.description || '',
-            schema: body.schema || {}
+            schema: body.schema || {},
+            timeseries: body.timeseries || {}
         };
     }
 

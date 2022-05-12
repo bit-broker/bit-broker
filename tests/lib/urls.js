@@ -74,6 +74,7 @@ class URLs {
 
     consumer_entity(eid, iid) { return this.consumer() + '/entity' + (eid ? `/${eid}` : '') + (iid ? `/${iid}` : ''); }
     consumer_catalog(q) { return this.consumer() + '/catalog' + (q ? `?q=${ encodeURIComponent(JSON.stringify(q)) }` : ''); }
+    consumer_timeseries(eid, iid, tsid) { return this.consumer() + `/entity/${ eid }/${ iid }/timeseries/${ tsid }`; }
 }
 
 // --- exported classes

@@ -28,11 +28,13 @@ const Validator = require('jsonschema').Validator; // specifically NOT json-sche
 const Query = require('./query.js');
 const failure = require('../errors.js');
 const locales = require('../locales.js');
+const moment = require('moment');
 const fs = require('fs');
+const util = require('util');
 
 // --- scheme list
 
-const SCHEMES = [ 'id', 'slug', 'name', 'description', 'entity', 'connector', 'session', 'policy', 'user', 'userid', 'user_addendum', 'paging', 'records' ]; // we name them here, rather than just iterate the directory
+const SCHEMES = [ 'id', 'slug', 'string', 'name', 'description', 'date', 'entity', 'connector', 'session', 'policy', 'user', 'userid', 'user_addendum', 'paging', 'records', 'timeseries' ]; // we name them here, rather than just iterate the directory
 
 // --- validate class (exported)
 
@@ -125,8 +127,51 @@ module.exports = class Validate {
     records_delete(records) { return this.scheme(records, 'records#/delete', 'records'); }
     records_upsert(records) { return this.scheme(records, 'records#/upsert', 'records'); }
     records_entity(records, scheme) {
-        scheme = { type: 'array', items: { type: 'object', properties: { entity: scheme }}};  // scheme applies to all entity properties of all records in the array
-        return this.scheme(records, scheme, 'records', false);
+        let schema = {
+            type: 'array',
+            items: {
+                type: 'object',
+                properties: { entity: scheme }
+            }
+        };  // scheme applies to all entity properties of all records in the array
+
+        return this.scheme(records, schema, 'records', false);
+    }
+
+    // --- timeseries validators
+
+    timeseries_paging(options) {
+        let errors = this.scheme(options, 'timeseries#/paging');
+
+        if (options.start && !moment(options.start, moment.ISO_8601).isValid()) {
+            errors.push(failure.response('start', locales.__('error.not-valid-date')));
+        }
+
+        if (options.end && !moment(options.end, moment.ISO_8601).isValid()) {
+            errors.push(failure.response('end', locales.__('error.not-valid-date')));
+        }
+
+        if (options.end && !options.start)  // an end without a start
+        {
+            errors.push(failure.response('paging', locales.__('error.ts-end-without-start')));
+        }
+
+        if (options.duration && !options.start)  // a duration without a start
+        {
+            errors.push(failure.response('paging', locales.__('error.ts-duration-without-start')));
+        }
+
+        if (options.end && options.duration)  // where both an end and duration are supplied
+        {
+            errors.push(failure.response('paging', locales.__('error.ts-end-with-duration')));
+        }
+
+        if (options.start && options.end && moment(options.end).isSameOrBefore(options.start))  // where end is at or before the start
+        {
+            errors.push(failure.response('paging', locales.__('error.ts-end-at-or-before-start')));
+        }
+
+        return errors;
     }
 
     // --- validates a data segment query
