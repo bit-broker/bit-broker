@@ -436,6 +436,8 @@ describe('Coordinator Service Tests', function() {
         let entity = DATA.pluck(DATA.SLUG.VALID); // pluck - so as to never get duplicate
         let slug1 = DATA.pluck(DATA.SLUG.VALID); // pluck - so as to never get duplicate
         let slug2 = DATA.pick(DATA.SLUG.VALID);
+        let cid1 = null; // filled in during tests
+        let cid2 = null; // filled in during tests
         let connector1 = URLs.connector(entity, slug1);
         let connector2 = URLs.connector(entity, slug2);
         let all = URLs.connector(entity);
@@ -492,13 +494,14 @@ describe('Coordinator Service Tests', function() {
             return Crud.verify_all(all, []);
         });
 
-        it('add the connector to the entity', () => {
+        it('add the first connector to the entity', () => {
             return Crud.add(connector1, values1, connector1, body => {
                 expect(body).to.be.an('object');
                 expect(body.id).to.be.a('string');
                 expect(body.id).to.match(new RegExp(DATA.GUID.REGEX));
                 expect(body.token).to.be.a('string');
                 expect(body.token).to.match(new RegExp(DATA.KEY.REGEX));
+                cid1 = body.id;
             })
             .then (() => { values1.webhook = values1.webhook.replace(/\/$/g, ''); }) // insertion will strip any trailing slashes from webhook url
         });
@@ -524,6 +527,7 @@ describe('Coordinator Service Tests', function() {
                 expect(body.id).to.match(new RegExp(DATA.GUID.REGEX));
                 expect(body.token).to.be.a('string');
                 expect(body.token).to.match(new RegExp(DATA.KEY.REGEX));
+                cid2 = body.id;
             })
             .then (() => { values2.webhook = values2.webhook.replace(/\/$/g, ''); }) // insertion will strip any trailing slashes from webhook url
         });
@@ -578,6 +582,31 @@ describe('Coordinator Service Tests', function() {
 
         it('the entity is gone when addressed directly', () => {
             return Crud.not_found(connector2);
+        });
+
+        it('re-adding the first connector gives the same contribution id', () => {
+            return Crud.add(connector1, values1, connector1, body => {
+                expect(body).to.be.an('object');
+                expect(body.id).to.be.a('string');
+                expect(body.id).to.be.eq(cid1);
+            });
+        });
+
+        it('re-adding the second connector gives the same contribution id', () => {
+            return Crud.add(connector2, values2, connector2, body => {
+                expect(body).to.be.an('object');
+                expect(body.id).to.be.a('string');
+                expect(body.id).to.be.eq(cid2);
+            });
+        });
+
+        it('can delete both connectors from the entity', () => {
+            let tests = [];
+
+            tests.push(Crud.delete(connector1));
+            tests.push(Crud.delete(connector2));
+
+            return Promise.all(tests);
         });
 
         it('can add connector with a missing cache and webhook', () => {
