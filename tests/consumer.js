@@ -350,6 +350,26 @@ describe('Consumer Tests', function() {
             });
         });
 
+        it('can see timeseries on the parent entity', () => {
+            return Crud.get(URLs.consumer_entity('country', COUNTRIES.GB.item.id), item => {
+                expect(item).to.be.an('object');
+                expect(item.timeseries).to.be.an('object');
+                expect(item.timeseries[DATA.TIMESERIES.POPULATION.name]).to.be.an('object');
+
+                let ts = item.timeseries[DATA.TIMESERIES.POPULATION.name];
+                expect(ts.unit).to.be.a('string');
+                expect(ts.unit.length).to.be.gt(0);
+                expect(ts.value).to.be.a('string');
+                expect(ts.value.length).to.be.gt(0);
+                expect(ts.period).to.be.a('string');
+                expect(ts.period.length).to.be.gt(0);
+                expect(ts.url).to.be.a('string');
+                expect(ts.url).to.be.eq(COUNTRIES.GB.ts_url);
+
+                return chakram.wait();
+            });
+        });
+
         it('can get a timeseries', () => {
             return Crud.get(COUNTRIES.GB.ts_url, ts => {
                 expect(ts).to.be.an('array');
