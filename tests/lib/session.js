@@ -54,8 +54,8 @@ module.exports = class Session {
 
             .then(response => {
                 expect(response.body).to.be.a('string');
-                expect(response.body).to.match(new RegExp(DATA.ID.REGEX));
-                expect(response.body.length).to.be.eq(DATA.ID.SIZE);
+                expect(response.body).to.match(new RegExp(DATA.GUID.REGEX));
+                expect(response.body.length).to.be.eq(DATA.GUID.SIZE);
                 expect(response).to.have.status(HTTP.OK);
                 return response.body;
             })
@@ -86,8 +86,8 @@ module.exports = class Session {
                     for (let j = start; j < end; j++) {
                         let key = action === 'upsert' ? data[j].id : data[j];
                         expect(response.body[key]).to.a('string');
-                        expect(response.body[key]).to.match(new RegExp(DATA.PUBLIC_ID.REGEX));
-                        expect(response.body[key].length).to.be.eq(DATA.PUBLIC_ID.SIZE);
+                        expect(response.body[key]).to.match(new RegExp(DATA.ID.REGEX));
+                        expect(response.body[key].length).to.be.eq(DATA.ID.SIZE);
                     }
                     expect(response).to.have.status(HTTP.OK);
                     return chakram.wait();

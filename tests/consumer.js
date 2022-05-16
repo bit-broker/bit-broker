@@ -136,8 +136,8 @@ describe('Consumer Tests', function() {
 
         function entity_base(type, fetched, original) {
             expect(fetched.id).to.be.a('string');
-            expect(fetched.id).to.match(new RegExp(DATA.PUBLIC_ID.REGEX));
-            expect(fetched.id.length).to.be.eq(DATA.PUBLIC_ID.SIZE);
+            expect(fetched.id).to.match(new RegExp(DATA.ID.REGEX));
+            expect(fetched.id.length).to.be.eq(DATA.ID.SIZE);
             expect(fetched.url).to.be.eq(URLs.consumer_entity(type, fetched.id));
             expect(fetched.type).to.be.eq(type);
             expect(fetched.name).to.be.eq(original.name);
