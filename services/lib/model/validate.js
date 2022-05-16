@@ -34,7 +34,7 @@ const util = require('util');
 
 // --- scheme list
 
-const SCHEMES = [ 'id', 'slug', 'string', 'name', 'description', 'date', 'entity', 'connector', 'session', 'policy', 'user', 'userid', 'user_addendum', 'paging', 'records', 'timeseries' ]; // we name them here, rather than just iterate the directory
+const SCHEMES = [ 'id', 'guid', 'slug', 'string', 'name', 'description', 'date', 'entity', 'connector', 'session', 'policy', 'user', 'userid', 'user_addendum', 'paging', 'records', 'timeseries' ]; // we name them here, rather than just iterate the directory
 
 // --- validate class (exported)
 
@@ -99,6 +99,7 @@ module.exports = class Validate {
     action(item) { return this.scheme(item, 'session#/action', 'action'); }
     commit(item) { return this.scheme(item, 'session#/commit', 'commit'); }
     id(item) { return this.scheme(item, 'id', 'id'); }
+    guid(item) { return this.scheme(item, 'guid', 'id'); }  
     limit(item) {return this.scheme(item, 'paging#/limit', 'limit'); }
     mode(item) { return this.scheme(item, 'session#/mode', 'mode'); }
     name(item) { return this.scheme(item, 'name', 'name'); }

@@ -110,7 +110,7 @@ module.exports = class Connector {
 
         .then (token => {
             values.slug = slug;
-            values.contribution_id = Permit.CONTRIBUTION_ID;
+            values.contribution_id = Permit.contribution_id(this.entity.slug, values.slug);
             values.contribution_key_id = token.jti;
             values.entity_id = this.db.from('entity').select('id').where({ slug: this.entity.slug }).first(); // this will *not* execute here, but is compounded into the SQL below
 

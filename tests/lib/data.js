@@ -161,15 +161,16 @@ const DATA = {
         REGEX: "^v\\d+$",
     },
 
-    ID: { // uuidv4
+    GUID: { // uuidv4 - i.e. session_ids
         SIZE: 36,
         REGEX: "^[a-z0-9][a-z0-9-]+$",
         UNKNOWN: '6b50b0c0-7df3-40d5-8a5f-51cd0141a084',
     },
 
-    PUBLIC_ID: { // sha256
-        SIZE: 64,
+    ID: { // sha1 - i.e. contribution_ids and public_ids
+        SIZE: 40,
         REGEX: "^[a-z0-9]+$",
+        UNKNOWN: 'aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d',
     },
 
     KEY: { // jwt
@@ -233,7 +234,7 @@ const DATA = {
             value: "^\\d+$"
         }
     },
-    
+
     PROSE: 'lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum',
 
     POLICY: {

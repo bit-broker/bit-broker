@@ -187,13 +187,13 @@ describe('Contributor Tests', function() {
         });
 
         it('cannot post data with an unknown session id', () => {
-            return Crud.unauthorized(URLs.session_action(session.cid, DATA.ID.UNKNOWN), [], chakram.post);
+            return Crud.unauthorized(URLs.session_action(session.cid, DATA.GUID.UNKNOWN), [], chakram.post);
         });
 
         it('cannot post data with various invalid id and actions', () => {
             return Promise.resolve()
             .then (() => Crud.bad_request(URLs.session_action(DATA.ID.UNKNOWN + 'x', session.sid), [{ id: DATA.ERRORS.MAX }], [], chakram.post))
-            .then (() => Crud.bad_request(URLs.session_action(session.cid, DATA.ID.UNKNOWN + 'x'), [{ id: DATA.ERRORS.MAX }], [], chakram.post))
+            .then (() => Crud.bad_request(URLs.session_action(session.cid, DATA.GUID.UNKNOWN + 'x'), [{ id: DATA.ERRORS.MAX }], [], chakram.post))
             .then (() => Crud.bad_request(URLs.session_action(session.cid, session.sid, DATA.slug()), [{ action: DATA.ERRORS.ENUM }], [], chakram.post));
         });
 
@@ -202,15 +202,15 @@ describe('Contributor Tests', function() {
         });
 
         it('cannot close a session with an unknown session id', () => {
-            return Crud.unauthorized(URLs.session_close(session.cid, DATA.ID.UNKNOWN));
+            return Crud.unauthorized(URLs.session_close(session.cid, DATA.GUID.UNKNOWN));
         });
 
         it('cannot close a session with various invalid ids and commits', () => {
             return Promise.resolve()
             .then (() => Crud.bad_request(URLs.session_close(DATA.ID.UNKNOWN + 'x', session.sid), [{ id: DATA.ERRORS.MAX }]))
             .then (() => Crud.bad_request(URLs.session_close(DATA.ID.UNKNOWN + 'X', session.sid), [{ id: DATA.ERRORS.FORMAT }]))
-            .then (() => Crud.bad_request(URLs.session_close(session.cid, DATA.ID.UNKNOWN + 'x'), [{ id: DATA.ERRORS.MAX }]))
-            .then (() => Crud.bad_request(URLs.session_close(session.cid, DATA.ID.UNKNOWN + 'X'), [{ id: DATA.ERRORS.FORMAT }]))
+            .then (() => Crud.bad_request(URLs.session_close(session.cid, DATA.GUID.UNKNOWN + 'x'), [{ id: DATA.ERRORS.MAX }]))
+            .then (() => Crud.bad_request(URLs.session_close(session.cid, DATA.GUID.UNKNOWN + 'X'), [{ id: DATA.ERRORS.FORMAT }]))
             .then (() => Crud.bad_request(URLs.rest('connector', session.cid, 'session', session.sid, 'close', DATA.slug()), [{ commit: DATA.ERRORS.ENUM }]));
         });
 

@@ -82,7 +82,7 @@ module.exports = class Session {
         let errors = [];
 
         errors = errors.concat(model.validate.id(cid));
-        errors = errors.concat(model.validate.id(sid));
+        errors = errors.concat(model.validate.guid(sid));
         errors = errors.concat(model.validate.action(action));
 
         if (action === CONST.ACTION.UPSERT) errors = errors.concat(model.validate.records_upsert(records));
@@ -132,7 +132,7 @@ module.exports = class Session {
         let errors = [];
 
         errors = errors.concat(model.validate.id(cid));
-        errors = errors.concat(model.validate.id(sid));
+        errors = errors.concat(model.validate.guid(sid));
         errors = errors.concat(model.validate.commit(commit));
 
         if (errors.length) {

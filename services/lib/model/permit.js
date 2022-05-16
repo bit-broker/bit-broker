@@ -45,14 +45,14 @@ module.exports = class Permit {
 
     // --- generates a unique contribution id
 
-    static get CONTRIBUTION_ID() {
-        return crypto.randomUUID();
+    static contribution_id(entity_slug, connector_slug) {
+        return crypto.createHash('sha1').update(`${ entity_slug }:${ connector_slug }:${ process.env.APP_SECRET }`).digest('hex');
     }
 
     // --- generates a public key from a connector id and a vendor id
 
     static public_key(connector_id, vendor_id) {
-        return crypto.createHash('sha256').update(`${ connector_id }:${ vendor_id }`).digest('hex');
+        return crypto.createHash('sha1').update(`${ connector_id }:${ vendor_id }`).digest('hex');
     }
 
     // --- obtains an access token and a key_id from the auth-service

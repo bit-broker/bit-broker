@@ -496,7 +496,7 @@ describe('Coordinator Service Tests', function() {
             return Crud.add(connector1, values1, connector1, body => {
                 expect(body).to.be.an('object');
                 expect(body.id).to.be.a('string');
-                expect(body.id).to.match(new RegExp(DATA.ID.REGEX));
+                expect(body.id).to.match(new RegExp(DATA.GUID.REGEX));
                 expect(body.token).to.be.a('string');
                 expect(body.token).to.match(new RegExp(DATA.KEY.REGEX));
             })
@@ -521,7 +521,7 @@ describe('Coordinator Service Tests', function() {
             return Crud.add(connector2, values2, connector2, body => {
                 expect(body).to.be.an('object');
                 expect(body.id).to.be.a('string');
-                expect(body.id).to.match(new RegExp(DATA.ID.REGEX));
+                expect(body.id).to.match(new RegExp(DATA.GUID.REGEX));
                 expect(body.token).to.be.a('string');
                 expect(body.token).to.match(new RegExp(DATA.KEY.REGEX));
             })

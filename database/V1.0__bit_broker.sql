@@ -56,7 +56,7 @@ CREATE TABLE connector
     entity_id SERIAL NOT NULL REFERENCES entity (id) ON DELETE CASCADE,
     slug VARCHAR (32) UNIQUE NOT NULL,
     properties JSONB NOT NULL,
-    contribution_id CHAR(36) UNIQUE,
+    contribution_id CHAR(40) UNIQUE,
     contribution_key_id CHAR(36) UNIQUE NOT NULL,
     is_live BOOLEAN NOT NULL DEFAULT FALSE,
     session_id CHAR(36) UNIQUE,
@@ -77,7 +77,7 @@ CREATE INDEX idx_connector_session_id ON connector (session_id);
 CREATE TABLE catalog
 (
     id SERIAL PRIMARY KEY,
-    public_id CHAR(64) NOT NULL UNIQUE,
+    public_id CHAR(40) NOT NULL UNIQUE,
     connector_id SERIAL NOT NULL REFERENCES connector (id) ON DELETE CASCADE,
     vendor_id VARCHAR(256) NOT NULL,
     record JSONB NOT NULL,
@@ -98,7 +98,7 @@ CREATE TABLE operation
 (
     id SERIAL PRIMARY KEY,
     session_id CHAR(36) NOT NULL REFERENCES connector (session_id) ON DELETE CASCADE,
-    public_id CHAR(64) NOT NULL,
+    public_id CHAR(40) NOT NULL,
     action OPERATION_ACTIONS NOT NULL,
     record JSONB NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
