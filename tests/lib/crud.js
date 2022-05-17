@@ -188,7 +188,7 @@ module.exports = class Crud {
     static get(url, checker) {
         return chakram.get(url)
         .then(response => {
-        // if (response.body?.error) console.log(response.body?.error);  // debug handy logging  
+        // if (response.body?.error) console.log(response.body?.error);  // debug handy logging
             expect(response.response.statusCode).to.be.oneOf(OK_CODES);
             if (checker) checker(response.body);
             return chakram.wait();
@@ -230,6 +230,7 @@ module.exports = class Crud {
         resources.sort((a, b) => a.id.toString().localeCompare(b.id.toString(), undefined, {'numeric': true})); // in id order
         return chakram.get(url)
         .then(response => {
+         // if (response.body?.error) console.log(response.body?.error);  // debug handy logging
             expect(response.body).to.be.an('array');
             expect(response.body.length).to.be.eq(resources.length);
             for (let i = 0; i < resources.length; i++) {
