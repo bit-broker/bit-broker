@@ -41,7 +41,7 @@ module.exports = {
     },
     POLICY: {
         HEADER: 'x-bbk-audience',
-        CONNECTORS: 'x-bbk-connectors',        
+        CONNECTORS: 'x-bbk-connectors',
         EMPTY: { data_segment: { segment_query: {}, field_masks: [] }, legal_context: [] } // the policy to use when USE_POLICY is false in .en
     },
     REDIS: {
