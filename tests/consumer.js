@@ -67,6 +67,24 @@ describe('Consumer Tests', function() {
         });
     });
 
+    // --- helper to test validation of paging parameters
+
+    function paging_validation(base, paramed = false) {
+        let sep = paramed ? '&' : '?';
+        return Promise.resolve()
+        .then (() => Crud.bad_request(`${ base }${ sep }limit=abc`, [{ limit: DATA.ERRORS.TYPE }]))
+        .then (() => Crud.bad_request(`${ base }${ sep }limit=-1`, [{ limit: DATA.ERRORS.SMALL }]))
+        .then (() => Crud.bad_request(`${ base }${ sep }limit=0`, [{ limit: DATA.ERRORS.SMALL }]))
+        .then (() => Crud.bad_request(`${ base }${ sep }limit=1.2`, [{ limit: DATA.ERRORS.TYPE }]))
+        .then (() => Crud.bad_request(`${ base }${ sep }limit=.2`, [{ limit: DATA.ERRORS.TYPE }]))
+        .then (() => Crud.bad_request(`${ base }${ sep }limit=1000`, [{ limit: DATA.ERRORS.BIG }]))
+        .then (() => Crud.bad_request(`${ base }${ sep }offset=abc`, [{ offset: DATA.ERRORS.TYPE }]))
+        .then (() => Crud.bad_request(`${ base }${ sep }offset=-1`, [{ offset: DATA.ERRORS.SMALL }]))
+        .then (() => Crud.bad_request(`${ base }${ sep }offset=1.2`, [{ offset: DATA.ERRORS.TYPE }]))
+        .then (() => Crud.bad_request(`${ base }${ sep }offset=.2`, [{ offset: DATA.ERRORS.TYPE }]))
+        .then (() => Crud.bad_request(`${ base }${ sep }limit=abc&offset=-1`, [{ limit: DATA.ERRORS.TYPE }, { offset: DATA.ERRORS.SMALL }]));
+    }
+
     // --- start up tests
 
     describe('start up tests', () => {
@@ -131,6 +149,8 @@ describe('Consumer Tests', function() {
         let entities = Seeder.entities;
         let policy = Seeder.policies.find(i => i.slug === DATA.POLICY.ALLAREA.ID);
         let records = {};
+        let page_url = URLs.consumer_entity('heritage-site'); // should return greater than paging list max
+        let page_first = null; // will be filled out during tests
 
         // --- tests a base entity record
 
@@ -212,23 +232,33 @@ describe('Consumer Tests', function() {
         function entity_list(type) {
             records[type] = Seeder.records(type);
 
-            return Crud.get(URLs.consumer_entity(type), body => {
-                expect(body).to.be.an('array');
+            let act = Promise.resolve();
+            let base = URLs.consumer_entity(type);
+            let pages = records[type].length / DATA.PAGING.LIST;
+            let found = 0;
 
-                for (let i = 0; i < body.length; i++) {
-                    let fetched = body[i];
-                    let original = records[type].find(i => i.name === fetched.name);
+            for (let i = 0 ; i < pages; i++) {
+                act = act.then(() => Crud.get(`${ base }?offset=${ i * DATA.PAGING.LIST }`, body => {
+                    expect(body).to.be.an('array');
 
-                    expect(original).to.be.an('object');
-                    entity_base(type, fetched, original);
+                    for (let j = 0; j < body.length; j++) {
+                        let fetched = body[j];
+                        let original = records[type].find(j => j.name === fetched.name);
 
-                    original.public_id = fetched.id;  // store this id for later use
-                }
+                        expect(original).to.be.an('object');
+                        entity_base(type, fetched, original);
 
-                expect(body.length).to.be.eq(records[type].length);
+                        original.public_id = fetched.id;  // store this id for later use
+                        found++;
+                    }
+                }));
+            }
 
-                return chakram.wait();
+            act = act.then(() => {
+                expect(found).to.be.eq(records[type].length);
             });
+
+            return act;
         }
 
         // --- tests an entity item
@@ -304,6 +334,101 @@ describe('Consumer Tests', function() {
 
             return test;
         });
+
+        it('can set access all areas policy', () => {
+            Crud.headers(Shared.policy_header(DATA.POLICY.ALLAREA.ID));
+        });
+
+        it('can page entity type', () => {
+            return Crud.get(`${ URLs.consumer_entity() }?limit=1$offset=1`, items => {
+                expect(items).to.be.an('array');
+                expect(items.length).to.be.eq(1);
+                return chakram.wait();
+            });
+        });
+
+        it('can get default entity instance page size', () => {
+            return Crud.get(page_url, items => {
+                expect(items).to.be.an('array');
+                expect(items.length).to.be.eq(DATA.PAGING.LIST);
+                page_first = items; // will be used by later tests for verification
+                return chakram.wait();
+            });
+        });
+
+        it('can page entity instance via limit as per default', () => {
+            return Crud.get(`${ page_url }?limit=${ DATA.PAGING.LIST }`, items => {
+                expect(items).to.be.an('array');
+                expect(items.length).to.be.eq(DATA.PAGING.LIST);
+
+                let found = items.map(i => i.id).join();
+                let expected = page_first.map(i => i.id).join();
+                expect(found).to.be.eq(expected); // same list in same order too
+
+                return chakram.wait();
+            });
+        });
+
+        it('can page entity instance via limit', () => {
+            let limit = 10;
+            return Crud.get(`${ page_url }?limit=${ limit }`, items => {
+                expect(items).to.be.an('array');
+                expect(items.length).to.be.eq(limit);
+
+                let found = items.map(i => i.id).join();
+                let expected = page_first.slice(0, limit).map(i => i.id).join();
+                expect(found).to.be.eq(expected); // same list in same order too
+
+                return chakram.wait();
+            });
+        });
+
+        it('can page entity instance via offset', () => {
+            let offset = 12;
+            return Crud.get(`${ page_url }?offset=${ offset }`, items => {
+                expect(items).to.be.an('array');
+                expect(items.length).to.be.eq(DATA.PAGING.LIST);
+
+                let found = items.slice(0, DATA.PAGING.LIST - offset).map(i => i.id).join(); // exclude the page two which crept in
+                let expected = page_first.slice(offset).map(i => i.id).join();
+                expect(found).to.be.eq(expected); // same list in same order too
+
+                return chakram.wait();
+            });
+        });
+
+        it('can page entity instance via limit and offset', () => {
+            let limit = 23;
+            let offset = 18;  // don't venture into second page here
+            return Crud.get(`${ page_url }?limit=${ limit }&offset=${ offset }`, items => {
+                expect(items).to.be.an('array');
+                expect(items.length).to.be.eq(limit);
+
+                let found = items.map(i => i.id).join();
+                let expected = page_first.slice(offset, offset + limit).map(i => i.id).join();
+                expect(found).to.be.eq(expected); // same list in same order too
+
+                return chakram.wait();
+            });
+
+        });
+
+        it('can page entity instance via excessive offset', () => {
+            let offset = 1500;
+            return Crud.get(`${ page_url }?offset=${ offset }`, items => {
+                expect(items).to.be.an('array');
+                expect(items.length).to.be.eq(0);
+                return chakram.wait();
+            });
+        });
+
+        it('cannot use various invalid entity type paging parameter combinations', () => {
+            return paging_validation(URLs.consumer_entity());
+        });
+
+        it('cannot use various invalid entity instance paging parameter combinations', () => {
+            return paging_validation(URLs.consumer_entity('country'));
+        });
     });
 
     describe('timeseries api tests', function() {
@@ -345,6 +470,26 @@ describe('Consumer Tests', function() {
                     COUNTRIES[country].item = found;
                     COUNTRIES[country].ts_url = URLs.consumer_timeseries('country', found.id, DATA.TIMESERIES.POPULATION.name);
                 }
+
+                return chakram.wait();
+            });
+        });
+
+        it('can see timeseries on the parent entity', () => {
+            return Crud.get(URLs.consumer_entity('country', COUNTRIES.GB.item.id), item => {
+                expect(item).to.be.an('object');
+                expect(item.timeseries).to.be.an('object');
+                expect(item.timeseries[DATA.TIMESERIES.POPULATION.name]).to.be.an('object');
+
+                let ts = item.timeseries[DATA.TIMESERIES.POPULATION.name];
+                expect(ts.unit).to.be.a('string');
+                expect(ts.unit.length).to.be.gt(0);
+                expect(ts.value).to.be.a('string');
+                expect(ts.value.length).to.be.gt(0);
+                expect(ts.period).to.be.a('string');
+                expect(ts.period.length).to.be.gt(0);
+                expect(ts.url).to.be.a('string');
+                expect(ts.url).to.be.eq(COUNTRIES.GB.ts_url);
 
                 return chakram.wait();
             });
@@ -413,7 +558,7 @@ describe('Consumer Tests', function() {
 
         it('can get a timeseries with a start and an excessive limit', () => {
             let start = 1982;  // inclusive
-            let limit = 1000;
+            let limit = 500;
             let years = Array.from({ length: COUNTRIES.GB.high - start + 1 }, (x, i) => i + start);
             return paged_timeseries(`${ COUNTRIES.GB.ts_url }?start=${ start }&limit=${ limit }`, years);
         });
@@ -421,7 +566,7 @@ describe('Consumer Tests', function() {
         it('can get a timeseries with a start, an end and an excessive limit', () => {
             let start = 1970; // inclusive
             let end = 1994; // exclusive
-            let limit = 1000;
+            let limit = 500;
             let years = Array.from({ length: end - start }, (x, i) => i + start);
             return paged_timeseries(`${ COUNTRIES.GB.ts_url }?start=${ start }&end=${ end }&limit=${ limit }`, years);
         });
@@ -429,7 +574,7 @@ describe('Consumer Tests', function() {
         it('can get a timeseries with a start, a duration and an excessive limit', () => {
             let start = 1970; // inclusive
             let end = 2010; // exclusive
-            let limit = 1000;
+            let limit = 500;
             let duration = moment(end.toString()).unix() - moment(start.toString()).unix();
             let years = Array.from({ length: end - start }, (x, i) => i + start);
             return paged_timeseries(`${ COUNTRIES.GB.ts_url }?start=${ start }&duration=${ duration }&limit=${ limit }`, years);
@@ -479,9 +624,14 @@ describe('Consumer Tests', function() {
             .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?duration=foo`, [{ duration: DATA.ERRORS.TYPE }]))
             .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?duration=0`, [{ duration: DATA.ERRORS.SMALL }]))
             .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?duration=-1`, [{ duration: DATA.ERRORS.SMALL }]))
+            .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?duration=1.25`, [{ duration: DATA.ERRORS.TYPE }]))
+            .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?duration=.25`, [{ duration: DATA.ERRORS.TYPE }]))
             .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?limit=foo`, [{ limit: DATA.ERRORS.TYPE }]))
             .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?limit=0`, [{ limit: DATA.ERRORS.SMALL }]))
             .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?limit=-1`, [{ limit: DATA.ERRORS.SMALL }]))
+            .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?limit=1.25`, [{ limit: DATA.ERRORS.TYPE }]))
+            .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?limit=.25`, [{ limit: DATA.ERRORS.TYPE }]))
+            .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?limit=1000`, [{ limit: DATA.ERRORS.BIG }]))
             .then (() => Crud.bad_request(`${ COUNTRIES.GB.ts_url }?start=foo&end=2017&limit=0`, [{ start: DATA.ERRORS.FORMAT }, { limit: DATA.ERRORS.SMALL }]));
         });
 
@@ -505,12 +655,17 @@ describe('Consumer Tests', function() {
 
     describe('catalog api tests', function() {
 
-        // --- test data
+        // --- constant test data
 
         const THE_WORLD = Seeder.records('country').map(i => i.name);
         const GEOGRAPHY = Seeder.records('geography');
         const POPULATION = Seeder.records('country').reduce((m, i) => { m[i.id] = i.entity.population; return m; }, {});
         const CALLING_CODE = Seeder.records('country').reduce((m, i) => { m[i.id] = i.entity.calling_code; return m; }, {});
+
+        // --- test data
+
+        let page_url = URLs.consumer_catalog({ 'type': 'heritage-site' }); // should return greater than paging list max
+        let page_first = null; // will be filled out during tests
 
         // --- tests a catalog query
 
@@ -851,6 +1006,89 @@ describe('Consumer Tests', function() {
                 query: { 'type': 'country', '$or': [{ 'name': 'United Kingdom' }, { 'entity.calling_code': CALLING_CODE.IN }] },
                 yields: ['United Kingdom', 'India']
             });
+        });
+
+        it('can set access all areas policy', () => {
+            Crud.headers(Shared.policy_header(DATA.POLICY.ALLAREA.ID));
+        });
+
+        it('can get default page size', () => {
+            return Crud.get(page_url, items => {
+                expect(items).to.be.an('array');
+                expect(items.length).to.be.eq(DATA.PAGING.LIST);
+                page_first = items; // will be used by later tests for verification
+                return chakram.wait();
+            });
+        });
+
+        it('can page via limit as per default', () => {
+            return Crud.get(`${ page_url }&limit=${ DATA.PAGING.LIST }`, items => {
+                expect(items).to.be.an('array');
+                expect(items.length).to.be.eq(DATA.PAGING.LIST);
+
+                let found = items.map(i => i.id).join();
+                let expected = page_first.map(i => i.id).join();
+                expect(found).to.be.eq(expected); // same list in same order too
+
+                return chakram.wait();
+            });
+        });
+
+        it('can page via limit', () => {
+            let limit = 10;
+            return Crud.get(`${ page_url }&limit=${ limit }`, items => {
+                expect(items).to.be.an('array');
+                expect(items.length).to.be.eq(limit);
+
+                let found = items.map(i => i.id).join();
+                let expected = page_first.slice(0, limit).map(i => i.id).join();
+                expect(found).to.be.eq(expected); // same list in same order too
+
+                return chakram.wait();
+            });
+        });
+
+        it('can page via offset', () => {
+            let offset = 12;
+            return Crud.get(`${ page_url }&offset=${ offset }`, items => {
+                expect(items).to.be.an('array');
+                expect(items.length).to.be.eq(DATA.PAGING.LIST);
+
+                let found = items.slice(0, DATA.PAGING.LIST - offset).map(i => i.id).join(); // exclude the page two which crept in
+                let expected = page_first.slice(offset).map(i => i.id).join();
+                expect(found).to.be.eq(expected); // same list in same order too
+
+                return chakram.wait();
+            });
+        });
+
+        it('can page via limit and offset', () => {
+            let limit = 23;
+            let offset = 18;  // don't venture into second page here
+            return Crud.get(`${ page_url }&limit=${ limit }&offset=${ offset }`, items => {
+                expect(items).to.be.an('array');
+                expect(items.length).to.be.eq(limit);
+
+                let found = items.map(i => i.id).join();
+                let expected = page_first.slice(offset, offset + limit).map(i => i.id).join();
+                expect(found).to.be.eq(expected); // same list in same order too
+
+                return chakram.wait();
+            });
+
+        });
+
+        it('can page via excessive offset', () => {
+            let offset = 1500;
+            return Crud.get(`${ page_url }&offset=${ offset }`, items => {
+                expect(items).to.be.an('array');
+                expect(items.length).to.be.eq(0);
+                return chakram.wait();
+            });
+        });
+
+        it('cannot use various invalid catalog paging parameter combinations', () => {
+            return paging_validation(URLs.consumer_catalog({ 'type': 'country' }), true);
         });
 
         it('escaped single quotes', () => {

@@ -25,6 +25,10 @@ Non configurable, system level constants
 // --- constants - not externally configurable
 
 module.exports = {
+    PAGING: {
+        MAX_LIST: 250, // if you modify, make the same changes in the validation/paging.json file
+        MAX_TIMESERIES: 500 // if you modify, make the same changes in the validation/timeseries.json file
+    },
     ACTION: {
         UPSERT: 'upsert',
         DELETE: 'delete'
@@ -41,7 +45,7 @@ module.exports = {
     },
     POLICY: {
         HEADER: 'x-bbk-audience',
-        CONNECTORS: 'x-bbk-connectors',        
+        CONNECTORS: 'x-bbk-connectors',
         EMPTY: { data_segment: { segment_query: {}, field_masks: [] }, legal_context: [] } // the policy to use when USE_POLICY is false in .en
     },
     REDIS: {

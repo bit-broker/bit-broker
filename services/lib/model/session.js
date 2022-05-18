@@ -99,6 +99,6 @@ module.exports = class Session {
 
     close(commit) {
         return this.operations.commit(commit, this.mode === CONST.SESSION.MODE.REPLACE)
-        .then(result => this.write(null, null));
+        .then(result => this.write(null, null)); // kills the session on the connector
     }
 }

@@ -92,6 +92,10 @@ module.exports = class Consumer extends View {
             doc = Object.assign(doc, { instance: item.record.instance || {} })
             doc = Object.assign(doc, { timeseries: item.record.timeseries || {} })
 
+            for (let tsid in doc.timeseries) {
+                doc.timeseries[tsid].url = this.rest(route, 'entity', item.entity_slug, item.public_id, 'timeseries', tsid);
+            }
+
             // merge in webhook extra data if any
 
             if (extra && typeof extra === 'object') {

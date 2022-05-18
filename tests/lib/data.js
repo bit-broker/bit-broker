@@ -227,6 +227,10 @@ const DATA = {
         MAX_CONNECTORS: 16
     },
 
+    PAGING: {
+        LIST: 250
+    },
+    
     TIMESERIES: {
         POPULATION:  {
             name: 'population',

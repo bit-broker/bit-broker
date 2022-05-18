@@ -62,6 +62,14 @@ module.exports = class Consumer {
         return { policy, connectors };
     }
 
+    // --- extracts the paging parameters if present
+
+    static paging(req) {
+        let limit = req.query.limit ? parseFloat(req.query.limit) : CONST.PAGING.MAX_LIST; // optional
+        let offset = req.query.offset ? parseFloat(req.query.offset) : 0; // optional
+        return { limit, offset };
+    }
+
     // --- within the context of an active policy
 
     static with_policy(slug) {
@@ -82,9 +90,11 @@ module.exports = class Consumer {
     catalog(req, res, next) {
         let query = req.query.q || '{}';
         let context = Consumer.context(req);
+        let paging = Consumer.paging(req);
         let errors = [];
 
         errors = errors.concat(model.validate.query(query));
+        errors = errors.concat(model.validate.paging(paging));
 
         if (errors.length) {
             throw new failure(HTTP.BAD_REQUEST, errors);
@@ -93,7 +103,7 @@ module.exports = class Consumer {
         Consumer.with_policy(context.policy)
 
         .then(policy => {
-            return model.catalog.query(policy.data_segment.segment_query, context.connectors, JSON.parse(query))
+            return model.catalog.query(policy.data_segment.segment_query, context.connectors, JSON.parse(query), paging)
 
             .then(items => {
                 res.json(view.consumer.instances(req.originalRoute, items, policy.legal_context));
@@ -107,11 +117,19 @@ module.exports = class Consumer {
 
     types(req, res, next) {
         let context = Consumer.context(req);
+        let paging = Consumer.paging(req);
+        let errors = [];
+
+        errors = errors.concat(model.validate.paging(paging));
+
+        if (errors.length) {
+            throw new failure(HTTP.BAD_REQUEST, errors);
+        }
 
         Consumer.with_policy(context.policy)
 
         .then(policy => {
-            return model.catalog.types(policy.data_segment.segment_query, context.connectors)
+            return model.catalog.types(policy.data_segment.segment_query, context.connectors, paging)
 
             .then(items => {
                 res.json(view.consumer.entities(req.originalRoute, items, policy.legal_context)); // can be empty
@@ -125,9 +143,15 @@ module.exports = class Consumer {
 
     list(req, res, next) {
         let type = req.params.type.toLowerCase();
-        let limit = req.params.limit || 50;  // TODO
-        let offset = req.params.offset || 0;
         let context = Consumer.context(req);
+        let paging = Consumer.paging(req);
+        let errors = [];
+
+        errors = errors.concat(model.validate.paging(paging));
+
+        if (errors.length) {
+            throw new failure(HTTP.BAD_REQUEST, errors);
+        }
 
         Consumer.with_policy(context.policy)
 
@@ -138,7 +162,7 @@ module.exports = class Consumer {
                 let slugs = types.map(t => t.entity_slug);
           //      if (!slugs.includes(type)) throw new failure(HTTP.NOT_FOUND);  // the entity type is either not present or not in policy
 
-                return model.catalog.list(policy.data_segment.segment_query, context.connectors, type)
+                return model.catalog.list(policy.data_segment.segment_query, context.connectors, type, paging)
 
                 .then(items => {
                     res.json(view.consumer.instances(req.originalRoute, items, policy.legal_context)); // can be empty
@@ -196,8 +220,8 @@ module.exports = class Consumer {
         let tsid = req.params.tsid.toLowerCase();
         let start = req.query.start; // optional
         let end = req.query.end; // optional
-        let duration = req.query.duration ? parseInt(req.query.duration) : req.query.duration; // optional
-        let limit = req.query.limit ? parseInt(req.query.limit) : req.query.limit; // optional
+        let duration = req.query.duration ? parseFloat(req.query.duration) : req.query.duration; // optional
+        let limit = req.query.limit ? parseFloat(req.query.limit) : CONST.PAGING.MAX_TIMESERIES; // optional
         let paging = { start, end, duration, limit };
         let context = Consumer.context(req);
         let errors = [];
