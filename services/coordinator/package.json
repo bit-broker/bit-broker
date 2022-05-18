@@ -21,7 +21,7 @@
     "i18n": "^0.14.2",
     "ioredis": "^5.0.5",
     "json-keys-sort": "^2.1.0",
-    "jsonschema": "^1.4.0",
+    "jsonschema": "^1.4.1",
     "knex": "^2.0.0",
     "lodash": "^4.17.21",
     "mongo-query-to-postgres-jsonb": "^0.2.15",
