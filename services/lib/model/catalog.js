@@ -51,6 +51,7 @@ raw bindings.
 
 // --- dependancies
 
+const CONST = require('../constants.js');
 const Query = require('./query.js');
 
 // --- catalog class (exported)
@@ -88,6 +89,12 @@ module.exports = class Catalog {
         ];
     }
 
+    // --- default paging parameters
+
+    get DEFAULT_PAGING() {
+        return { limit: CONST.PAGING.MAX_LIST, offset: 0 }
+    }
+
     // --- table read context - ALL read queries MUST go via this to ensure blanket policy enforcement
 
     rows(segment, connectors, full = true) {  // ===== SEE VITAL POINT ABOUT SECURITY IN FILE HEADER =====
@@ -109,22 +116,25 @@ module.exports = class Catalog {
 
     // --- a catalog query
 
-    query(segment, connectors, query) { // ===== SEE VITAL POINT ABOUT SECURITY IN FILE HEADER =====
+    query(segment, connectors, query, paging) { // ===== SEE VITAL POINT ABOUT SECURITY IN FILE HEADER =====
         let subset = Query.process(query).where;
         if (subset === 'TRUE') subset = 'FALSE';  // by convention, no query = no records on bare catalog calls
-        return this.rows(segment, connectors).whereRaw(subset);
+        paging = paging || this.DEFAULT_PAGING; // this is optional on this method
+        return this.rows(segment, connectors).whereRaw(subset).limit(paging.limit).offset(paging.offset);
     }
 
     // --- list of entity types
 
-    types(segment, connectors) {
-        return this.rows(segment, connectors, false).distinct('entity.slug').orderBy('entity.slug');
+    types(segment, connectors, paging) {
+        paging = paging || this.DEFAULT_PAGING; // this is optional on this method
+        return this.rows(segment, connectors, false).distinct('entity.slug').limit(paging.limit).offset(paging.offset);
     }
 
     // --- list of entity instances for a given entity type
 
-    list(segment, connectors, type) {
-        return this.rows(segment, connectors).where({ 'entity.slug': type });
+    list(segment, connectors, type, paging) {
+        paging = paging || this.DEFAULT_PAGING; // this is optional on this method
+        return this.rows(segment, connectors).where({ 'entity.slug': type }).limit(paging.limit).offset(paging.offset);
     }
 
     // --- find an entity instances by id for a given entity type

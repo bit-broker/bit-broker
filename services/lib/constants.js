@@ -25,6 +25,10 @@ Non configurable, system level constants
 // --- constants - not externally configurable
 
 module.exports = {
+    PAGING: {
+        MAX_LIST: 250, // if you modify, make the same changes in the validation/paging.json file
+        MAX_TIMESERIES: 500 // if you modify, make the same changes in the validation/timeseries.json file
+    },
     ACTION: {
         UPSERT: 'upsert',
         DELETE: 'delete'

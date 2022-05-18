@@ -99,11 +99,10 @@ module.exports = class Validate {
     action(item) { return this.scheme(item, 'session#/action', 'action'); }
     commit(item) { return this.scheme(item, 'session#/commit', 'commit'); }
     id(item) { return this.scheme(item, 'id', 'id'); }
-    guid(item) { return this.scheme(item, 'guid', 'id'); }  
-    limit(item) {return this.scheme(item, 'paging#/limit', 'limit'); }
+    guid(item) { return this.scheme(item, 'guid', 'id'); }
+    paging(item) {return this.scheme(item, 'paging'); }
     mode(item) { return this.scheme(item, 'session#/mode', 'mode'); }
     name(item) { return this.scheme(item, 'name', 'name'); }
-    offset(item) { return this.scheme(item, 'paging#/offset', 'offset'); }
     slug(item) { return this.scheme(item, 'slug', 'slug'); }
     user_id(item) { return this.scheme(item, 'userid', 'user id'); }
 
@@ -143,12 +142,14 @@ module.exports = class Validate {
 
     timeseries_paging(options) {
         let errors = this.scheme(options, 'timeseries#/paging');
+        let valid_start = options.start && moment(options.start, moment.ISO_8601).isValid();
+        let valid_end = options.end && moment(options.end, moment.ISO_8601).isValid();
 
-        if (options.start && !moment(options.start, moment.ISO_8601).isValid()) {
+        if (options.start && !valid_start) {
             errors.push(failure.response('start', locales.__('error.not-valid-date')));
         }
 
-        if (options.end && !moment(options.end, moment.ISO_8601).isValid()) {
+        if (options.end && !valid_end) {
             errors.push(failure.response('end', locales.__('error.not-valid-date')));
         }
 
@@ -167,7 +168,7 @@ module.exports = class Validate {
             errors.push(failure.response('paging', locales.__('error.ts-end-with-duration')));
         }
 
-        if (options.start && options.end && moment(options.end).isSameOrBefore(options.start))  // where end is at or before the start
+        if (valid_start && valid_end && moment(options.end).isSameOrBefore(options.start))  // where end is at or before the start
         {
             errors.push(failure.response('paging', locales.__('error.ts-end-at-or-before-start')));
         }
