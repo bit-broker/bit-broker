@@ -80,6 +80,7 @@ module.exports = class Session {
             actions = actions.then(() => {
                 return chakram.post(URLs.session_action(cid, sid, action), data.slice(start, end))
                 .then(response => {
+                //  if (response.body?.error) console.log(response.body?.error?.message); // debug handy logging
                     expect(response.body).to.be.an('object');
                     items = { ...items,  ...response.body };
 
