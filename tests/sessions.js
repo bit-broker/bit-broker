@@ -14,6 +14,7 @@
 
 // -- dependancies
 
+const HTTP = require('http-status-codes');
 const DATA = require('./lib/data.js');
 const Shared = require('./lib/shared.js');  // include first for dotenv
 const URLs = require('./lib/urls.js');
@@ -57,7 +58,7 @@ describe('Connector Session Tests', function() {
     it('can make the housing connector live', () => {
         return Crud.post(URLs.connector_live(entity, connector));
     });
-    
+
     it('can create the policy', () => {
         return Crud.add(URLs.policy(DATA.POLICY.ALLAREA.ID), DATA.POLICY.ALLAREA.DETAIL);
     });
@@ -844,8 +845,85 @@ describe('Connector Session Tests', function() {
             steps.push('close ' + (DATA.flip() ? 'true' : 'false'));
         }
 
-        //            console.log (steps);
+     // console.log (steps); // handy debug line
         return script.run(steps);
+    });
+
+    it('can bulk stream upsert multiple record set sequentially', () => {
+        const NUM_PAGES = 100;
+        const NUM_ITEMS = 100;
+
+        return chakram.get(URLs.connector(entity, connector))
+
+        .then(response => {
+            let cid = response.body.contribution_id;
+            return chakram.get(URLs.session_open(cid, 'stream'))
+
+            .then(response => {
+                let sid = response.body;
+                let actions = Promise.resolve();  // one after another
+
+                for (let i = 0 ; i < NUM_PAGES ; i ++) {
+                    actions = actions.then(() => {
+                        let data = [ ...new Array(NUM_ITEMS) ].map(i => ({ id: DATA.vendor_id(), name: DATA.text(), entity: { item: DATA.integer() }}));
+
+                        return chakram.post(URLs.session_action(cid, sid, 'upsert'), data)
+                        .then(response => {
+                             expect(response.body).to.be.an('object');
+                             expect(Object.keys(response.body).length).to.be.eq(data.length);
+                             expect(response).to.have.status(HTTP.OK);
+                             return chakram.wait();
+                        });
+                    });
+                }
+
+                return actions.then(() => {
+                    return chakram.get(URLs.session_close(cid, sid, true))
+                    .then(response => {
+                        expect(response).to.have.status(HTTP.OK);
+                        return chakram.wait();
+                    });
+                });
+            });
+        });
+    });
+
+    it('can bulk stream upsert multiple record set in parallel', () => {
+        const NUM_PAGES = 100;
+        const NUM_ITEMS = 100;
+
+        return chakram.get(URLs.connector(entity, connector))
+
+        .then(response => {
+            let cid = response.body.contribution_id;
+            return chakram.get(URLs.session_open(cid, 'stream'))
+
+            .then(response => {
+                let sid = response.body;
+                let actions = []; // all at the same time
+
+                for (let i = 0 ; i < NUM_PAGES ; i ++) {
+                    let data = [ ...new Array(NUM_ITEMS) ].map(i => ({ id: DATA.vendor_id(), name: DATA.text(), entity: { item: DATA.integer() }}));
+
+                    actions.push(chakram.post(URLs.session_action(cid, sid, 'upsert'), data)
+                        .then(response => {
+                             expect(response.body).to.be.an('object');
+                             expect(Object.keys(response.body).length).to.be.eq(data.length);
+                             expect(response).to.have.status(HTTP.OK);
+                             return chakram.wait();
+                        })
+                    );
+                }
+
+                return Promise.all(actions).then(() => {
+                    return chakram.get(URLs.session_close(cid, sid, true))
+                    .then(response => {
+                        expect(response).to.have.status(HTTP.OK);
+                        return chakram.wait();
+                    });
+                });
+            });
+        });
     });
 
     it('can delete the housing entity', () => {

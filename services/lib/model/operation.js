@@ -47,13 +47,16 @@ module.exports = class Operation {
     constructor(db, id, connector) {
         this.db = db;
         this.id = id;
+        this.set_id = Permit.SET_ID;  // generates a new and unique set id
         this.connector = connector;
     }
 
     // --- operations read context
 
-    get rows() {
-        return this.db('operation').where({ session_id: this.id }).orderBy('id'); // order it VERY important for operations
+    rows(within_set = false) {
+        let query = this.db('operation').where({ session_id: this.id });
+        if (within_set) query.andWhere({ set_id: this.set_id });
+        return query.orderBy('id'); // order it VERY important for operations
     }
 
     // --- stores operations associated with the given records in the given session
@@ -77,27 +80,28 @@ module.exports = class Operation {
 
             values.push({
                 session_id: this.id,
+                set_id: this.set_id,
                 public_id: public_key,
                 action: action,
                 record: record
             });
         }
 
-        let write = values.length ? this.rows.insert(values).then(result => result.rowCount > 0) : Promise.resolve(true);
+        let write = values.length ? this.rows().insert(values).then(result => result.rowCount > 0) : Promise.resolve(true);
         return write.then (() => keys);
     }
 
     // --- deletes operations associated with the given session
 
-    delete() {
-        return this.rows.delete().then(result => result.rowCount > 0);
+    delete(within_set) {
+        return this.rows(within_set).delete().then(result => result.rowCount > 0);
     }
 
     // --- processes operations associated with the given session
 
-    process(wipe = false) {
+    process(wipe, within_set) {
 
-        return this.rows.then(items => {
+        return this.rows(within_set).then(items => {
 
             let catalog = new Catalog(this.db);
             let step = wipe ? catalog.wipe(this.connector.id) : Promise.resolve(); // TODO: Add transaction boundaries
@@ -126,7 +130,7 @@ module.exports = class Operation {
 
     // --- commits or rollbacks pending operations for the session
 
-    commit(commit, wipe = false) {
-        return (commit ? this.process(wipe) : Promise.resolve(true)).then(result => this.delete());
+    commit(commit, wipe = false, within_set = false) {
+        return (commit ? this.process(wipe, within_set) : Promise.resolve(true)).then(result => this.delete(within_set));
     }
 }
