@@ -228,9 +228,10 @@ const DATA = {
     },
 
     PAGING: {
-        LIST: 250
+        LIST: 250,
+        TIMESERIES: 500
     },
-    
+
     TIMESERIES: {
         POPULATION:  {
             name: 'population',
