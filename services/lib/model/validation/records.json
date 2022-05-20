@@ -18,14 +18,14 @@
         "type": "array",
         "items": { "$ref": "#/definitions/record" },
         "minItems": 0,
-        "maxItems": 100,
+        "maxItems": 250,
         "uniqueItems": false
     },
     "delete": {
         "type": "array",
         "items": { "type": "string" },
         "minItems": 0,
-        "maxItems": 100,
+        "maxItems": 250,
         "uniqueItems": false
     }
 }
