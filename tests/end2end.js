@@ -39,7 +39,7 @@ const expect = chakram.expect;
 // --- constanst
 
 const LOCAL = process.env.TESTS_LOCAL_MODE !== 'false' || false; // tests on a local environment not a full k8s deployment
-const PAGE = 100; // number of records in a single data upsert
+const PAGE = 250; // number of records in a single data upsert
 const SKIPPED = 'skipped';  // used as a string return to track skipped test due to LOCAL mode
 
 // --- the test cases

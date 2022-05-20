@@ -224,7 +224,7 @@ const DATA = {
     },
 
     RECORDS: {
-        MAXIMUM: 100,
+        MAXIMUM: 250,
         ITEM_MAXIMUM: 256
     },
 
