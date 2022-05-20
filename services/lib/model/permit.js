@@ -43,6 +43,12 @@ module.exports = class Permit {
         return crypto.randomUUID();
     }
 
+    // --- generates a unique set id
+
+    static get SET_ID() {
+        return crypto.randomUUID();
+    }
+
     // --- generates a unique contribution id
 
     static contribution_id(entity_slug, connector_slug) {

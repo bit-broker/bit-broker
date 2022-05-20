@@ -558,7 +558,7 @@ describe('Consumer Tests', function() {
 
         it('can get a timeseries with a start and an excessive limit', () => {
             let start = 1982;  // inclusive
-            let limit = 500;
+            let limit = DATA.PAGING.TIMESERIES;
             let years = Array.from({ length: COUNTRIES.GB.high - start + 1 }, (x, i) => i + start);
             return paged_timeseries(`${ COUNTRIES.GB.ts_url }?start=${ start }&limit=${ limit }`, years);
         });
@@ -566,7 +566,7 @@ describe('Consumer Tests', function() {
         it('can get a timeseries with a start, an end and an excessive limit', () => {
             let start = 1970; // inclusive
             let end = 1994; // exclusive
-            let limit = 500;
+            let limit = DATA.PAGING.TIMESERIES;
             let years = Array.from({ length: end - start }, (x, i) => i + start);
             return paged_timeseries(`${ COUNTRIES.GB.ts_url }?start=${ start }&end=${ end }&limit=${ limit }`, years);
         });
@@ -574,7 +574,7 @@ describe('Consumer Tests', function() {
         it('can get a timeseries with a start, a duration and an excessive limit', () => {
             let start = 1970; // inclusive
             let end = 2010; // exclusive
-            let limit = 500;
+            let limit = DATA.PAGING.TIMESERIES;
             let duration = moment(end.toString()).unix() - moment(start.toString()).unix();
             let years = Array.from({ length: end - start }, (x, i) => i + start);
             return paged_timeseries(`${ COUNTRIES.GB.ts_url }?start=${ start }&duration=${ duration }&limit=${ limit }`, years);

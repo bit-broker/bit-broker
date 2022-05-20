@@ -90,7 +90,7 @@ module.exports = class Session {
         return this.operations.insert(action, records)
         .then(keys =>
         {
-            let commit = this.mode === CONST.SESSION.MODE.STREAM ? this.operations.commit(true) : Promise.resolve(); // streaming sessions auto commit true on each action
+            let commit = this.mode === CONST.SESSION.MODE.STREAM ? this.operations.commit(true, false, true) : Promise.resolve(); // streaming sessions auto commit true on each action
             return commit.then (() => keys);
         });
     }

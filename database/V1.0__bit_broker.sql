@@ -98,6 +98,7 @@ CREATE TABLE operation
 (
     id SERIAL PRIMARY KEY,
     session_id CHAR(36) NOT NULL REFERENCES connector (session_id) ON DELETE CASCADE,
+    set_id CHAR(36) NOT NULL,
     public_id CHAR(40) NOT NULL,
     action OPERATION_ACTIONS NOT NULL,
     record JSONB NOT NULL,

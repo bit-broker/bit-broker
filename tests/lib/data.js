@@ -25,6 +25,7 @@ Shared testing data used by all test scripts
 // --- dependancies
 
 const fs = require('fs');
+const crypto = require('crypto');
 
 // --- data used for tests (exported)
 
@@ -81,6 +82,10 @@ const DATA = {
         }
 
         return slug.substring(0, size);
+    },
+
+    vendor_id: function() {
+        return crypto.createHash('sha1').update(DATA.text()).digest('hex');
     },
 
     some_info: function() {
@@ -228,9 +233,10 @@ const DATA = {
     },
 
     PAGING: {
-        LIST: 250
+        LIST: 250,
+        TIMESERIES: 500
     },
-    
+
     TIMESERIES: {
         POPULATION:  {
             name: 'population',
