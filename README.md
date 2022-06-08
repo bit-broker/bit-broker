@@ -1,4 +1,4 @@
-# BitBroker
+# BitBroker Core Engine
 
 This is the main engine repo of BitBroker.
 
