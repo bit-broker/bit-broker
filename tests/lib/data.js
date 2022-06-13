@@ -200,7 +200,7 @@ const DATA = {
     DESCRIPTION: {
         SHORTEST: 1,
         REASONABLE: 64,
-        LONGEST: 8192,
+        LONGEST: 2048,
     },
 
     EMAIL: {
