@@ -90,7 +90,7 @@
                     ]
                 },
                 "text": {
-                    "$ref": "bbk://description"
+                    "$ref": "bbk://string"
                 },
                 "link": {
                     "type": [
