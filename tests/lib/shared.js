@@ -96,7 +96,7 @@ class Shared {
 
     // --- tests a server announce message
 
-    announce(server, name) {
+    announce(server, name, status = DATA.STATUS.DEV) {
         return chakram.get(server)
         .then(response => {
             expect(response.body).to.be.an('object');
@@ -104,7 +104,7 @@ class Shared {
             expect(response.body.now).to.match(new RegExp(DATA.DATE.REGEX));
             expect(response.body.name).to.be.a('string');
             expect(response.body.name).to.contain(name);
-            expect(response.body.status).to.be.equal(DATA.STATUS);
+            expect(response.body.status).to.be.equal(status);
             return chakram.wait();
         });
     }
