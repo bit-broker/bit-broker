@@ -133,7 +133,10 @@ const DATA = {
         return `P${ lead }${ time }`;
     },
 
-    STATUS: 'development', // tests are only for development deployments
+    STATUS: {
+       DEV: 'development', // tests are only for development deployments
+       PROD: 'production'
+    },
 
     ERRORS: {
         BIG: 'must be less than or equal',
