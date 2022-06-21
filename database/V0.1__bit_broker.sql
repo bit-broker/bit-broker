@@ -15,23 +15,30 @@
 -- SPDX-License-Identifier: Apache-2.0
 
 /*
-A script to clear out an existing bit-broker database
+The bit-broker database intialisation script.
 */
 
 \connect postgres
 
--- set output context
+-- create the user and role assets
 
-SET client_min_messages = warning;
+CREATE ROLE bbk_reader;
+CREATE ROLE bbk_writer;
 
--- clean up any previous assets - for development only
+CREATE USER bbk_admin WITH ENCRYPTED PASSWORD 'bbk_admin_pwd';
+CREATE USER bbk_coordinator WITH ENCRYPTED PASSWORD 'bbk_coordinator_pwd';
+CREATE USER bbk_contributor WITH ENCRYPTED PASSWORD 'bbk_contributor_pwd';
+CREATE USER bbk_consumer WITH ENCRYPTED PASSWORD 'bbk_consumer_pwd';
 
-DROP DATABASE IF EXISTS bit_broker;
+GRANT bbk_reader TO bbk_consumer;
+GRANT bbk_writer TO bbk_admin, bbk_coordinator, bbk_contributor;
 
-DROP USER IF EXISTS bbk_admin;
-DROP USER IF EXISTS bbk_coordinator;
-DROP USER IF EXISTS bbk_contributor;
-DROP USER IF EXISTS bbk_consumer;
+-- create the database
 
-DROP ROLE IF EXISTS bbk_reader;
-DROP ROLE IF EXISTS bbk_writer;
+CREATE DATABASE bit_broker WITH ENCODING = 'UTF8' OWNER = bbk_admin;
+
+-- create extensions
+
+\connect bit_broker
+
+CREATE EXTENSION postgis;
