@@ -38,3 +38,7 @@ updates:
     directory: "/build/coordinator"
     schedule:
       interval: "daily"
+  - package-ecosystem: "docker"
+    directory: "/build/flyway"
+    schedule:
+      interval: "daily"
