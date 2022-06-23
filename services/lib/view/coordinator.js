@@ -40,7 +40,9 @@ module.exports = class Coordinator extends View {
             id: item.slug,
             url: this.rest(route, 'entity', item.slug),
             name: item.properties.name,
-            description: item.properties.description
+            description: item.properties.description,
+            tags: item.properties.tags ?? [],
+            icon: item.properties.icon ?? null
         };
 
         if (full) {
