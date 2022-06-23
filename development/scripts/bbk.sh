@@ -90,6 +90,12 @@ function wipe
     done;
 }
 
+function drop
+{
+    info "dropping the database..."
+    psql -U postgres -a -f $(ls $ROOT/database/*.sql | sort | head -1) > /dev/null
+}
+
 function unpack
 {
     info "creating .env from .env.example"
@@ -170,6 +176,17 @@ case $1 in
         fi
     ;;
 
+    drop)
+        if [ $(count) -eq "0" ]; then
+            drop
+            info "drop complete"
+        else
+            error "some services are already running - stop those first"
+            echo
+            status
+        fi
+    ;;
+
     bounce)
         if [ $(count) -ne "0" ]; then
             stop
@@ -195,6 +212,18 @@ case $1 in
         status
     ;;
 
+    clean)
+        if [ $(count) -ne "0" ]; then
+            stop
+        else
+            info "no services running"
+        fi
+
+        drop
+        echo
+        status
+    ;;
+
     *)
         echo "  $0 <command>"
         echo
@@ -207,8 +236,10 @@ case $1 in
         echo "    logs   → tails all bbk services logs"
         echo "    db     → start a sql session"
         echo "    wipe   → resets the bbk database"
+        echo "    drop   → drops the bbk database"
         echo "    bounce → stop » start"
         echo "    reset  → stop » wipe » start"
+        echo "    clean  → stop » drop"
     ;;
 
 esac

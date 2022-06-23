@@ -19,9 +19,17 @@
 /*
 Whole system end-to-end test - use command 'mocha end2end'
 
-NOTE:
-This script, unlike the others in this directory, only works the system from
-the published APIs. It makes NO direct access to the database.
+NOTE: This script, unlike the others in this directory, only works the system
+from the published APIs. It makes NO direct access to the database.
+
+NOTE: The purpose of this script is to test end2end scenarios, especially in
+production environments. It is not the intention to recreate all the tests
+which have been, so dilligently, executed in the earlier development test
+scripts. For example, here we _will_ test policy enforcement, entity instance
+visiblity, field masking etc. But, we _won't_ test paging, catalog querying,
+validation, etc. Some of these will be indirectly verified by the tests here
+anyway.
+
 */
 
 'use strict'; // code assumes ECMAScript 6
