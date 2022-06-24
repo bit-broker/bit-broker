@@ -895,24 +895,26 @@ describe('Consumer Tests', function() {
             });
         });
 
-/*
-        TODO: Issue #62
-
-        it('str » $contains » M', () => {
+        it('str » $contains » M (single)', () => {
             return catalog({
-                query: { 'type': 'country', 'entity.languages': { '$contains': 'Japanese' }},
-                yields: THE_WORLD,
-                except: ['Japan', 'United States', 'Brazil']
+                query: { 'type': 'country', 'entity.languages': { '$contains': ['Japanese'] }},
+                yields: ['Japan', 'United States', 'Brazil']
             });
         });
 
-        it('num » $contains » M', () => {
+        it('str » $contains » M (multiple)', () => {
             return catalog({
-                query: { 'type': 'country', 'entity.location.coordinates': { '$contains': GEOGRAPHY.BIG_BEN.coordinates[1] }},
+                query: { 'type': 'country', 'entity.languages': { '$contains': ['Japanese', 'English'] }},
+                yields: ['Japan', 'United States']
+            });
+        });
+
+        it('num » $contains » M (array)', () => {
+            return catalog({
+                query: { 'type': 'country', 'entity.location.coordinates': { '$contains': GEOGRAPHY.BIG_BEN.coordinates }},
                 yields: ['United Kingdom']
             });
         });
-*/
 
         it('str » regex (basic)', () => {
             return catalog({
