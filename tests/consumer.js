@@ -914,10 +914,24 @@ describe('Consumer Tests', function() {
         });
 */
 
-        it('str » regex', () => {
+        it('str » regex (basic)', () => {
+            return catalog({
+                query: { 'type': 'country', 'name': { '$regex': '^.*stan$' } },
+                yields: ['Afghanistan', 'Kyrgyzstan', 'Kazakhstan', 'Pakistan', 'Tajikistan', 'Turkmenistan', 'Uzbekistan']
+            });
+        });
+
+        it('str » regex (case insenitive)', () => {
             return catalog({
                 query: { 'type': 'country', 'name': { '$regex': 'United .*', '$options': 'i' } },
                 yields: ['United Kingdom', 'United States', 'United Arab Emirates']
+            });
+        });
+
+        it('str » regex (combination)', () => {
+            return catalog({
+                query: { 'type': 'country', '$or':[ { 'name': { '$regex': '.*stan$' }}, {'entity.capital': { '$regex': '^San\\s' } } ] },
+                yields: ['Afghanistan', 'Costa Rica', 'Kyrgyzstan', 'Kazakhstan', 'Pakistan', 'Puerto Rico', 'El Salvador', 'San Marino', 'Tajikistan', 'Turkmenistan', 'Uzbekistan']
             });
         });
 

@@ -128,6 +128,9 @@ module.exports = class Query {
             result.where = convert(column, query);
             result.where = Query.modify(result.where, MODS_AFTER);
 
+            // --- the line below is a workaround for https://github.com/thomas4019/mongo-query-to-postgres-jsonb/issues/28
+            result.where = result.where.replaceAll(/'\(\?([^\)]+)\)/g, "'(\\?$1)"); // i.e. '(?p) => '(\?p)
+
         } catch (err) {
             result = { valid: false, where: 'FALSE' };
         }
