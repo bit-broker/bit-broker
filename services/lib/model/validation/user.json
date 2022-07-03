@@ -11,7 +11,10 @@
             "format": "email",
             "minLength": 1,
             "maxLength": 256
+        },
+        "organization": {
+            "$ref": "bbk://organization"
         }
     },
-    "required": ["name", "email"]
+    "required": ["name", "email", "organization"]
 }

@@ -75,6 +75,7 @@ module.exports = class Coordinator extends View {
             url: this.rest(route, 'user', item.id),
             name: item.properties.name,
             email: item.email,
+            organization: item.properties.organization,
             coordinator: item.coordinator_key_id !== null,
             accesses: item.accesses.map(a => ({
                 id: a,

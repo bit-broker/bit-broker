@@ -45,6 +45,7 @@ module.exports = class User {
         return {
             name: body.name || '',
             email: (body.email || '').toString().toLowerCase(),
+            organization: body.organization,
             addendum: body.addendum || {}
         };
     }
@@ -155,7 +156,14 @@ module.exports = class User {
                 throw new failure(HTTP.CONFLICT);
             }
 
-            return model.user.insert({ email: properties.email, properties: { name: properties.name, addendum: properties.addendum } });
+            return model.user.insert({
+                email: properties.email,
+                properties: {
+                    name: properties.name,
+                    organization: properties.organization,
+                    addendum: properties.addendum,
+                }
+            });
         })
 
         .then(id => {
@@ -181,6 +189,7 @@ module.exports = class User {
         let errors = [];
 
         errors = errors.concat(model.validate.name(properties.name));
+        errors = errors.concat(model.validate.organization(properties.organization));
         errors = errors.concat(model.validate.user_addendum(properties.addendum));
 
         if (errors.length) {
@@ -191,7 +200,14 @@ module.exports = class User {
 
         .then(item => {
             if (!item) throw new failure(HTTP.NOT_FOUND);
-            return model.user.update(uid, { properties: { name: properties.name, addendum: properties.addendum }});
+            const updatedUser = {
+                properties: {
+                    name: properties.name,
+                    organization: properties.organization,
+                    addendum: properties.addendum
+                }
+            }
+            return model.user.update(uid, updatedUser);
         })
 
         .then(() => {
