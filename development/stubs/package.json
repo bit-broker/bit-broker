@@ -21,7 +21,7 @@
     "i18n": "^0.15.0",
     "lodash": "^4.17.21",
     "prom-client": "^14.0.1",
-    "winston": "^3.8.0",
+    "winston": "^3.8.1",
     "winston-daily-rotate-file": "^4.7.1"
   }
 }
