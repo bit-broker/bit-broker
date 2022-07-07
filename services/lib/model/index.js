@@ -39,7 +39,7 @@ const log = require('../logger.js').Logger;
 // --- running contexts
 
 var db = new Knex({ client: 'pg', connection: process.env.APP_DATABASE }); // TODO: should we fix the client version here?
-var redis = new Redis(process.env.POLICY_CACHE, { commandTimeout: CONST.REDIS.TIMEOUT });
+var redis = new Redis(`${process.env.POLICY_CACHE}?db=${process.env.POLICY_CACHE_DB}&password=${process.env.POLICY_CACHE_PASSWORD}`, { commandTimeout: CONST.REDIS.TIMEOUT });
 
 // --- redis event logging
 
