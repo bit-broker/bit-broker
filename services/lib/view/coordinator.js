@@ -40,7 +40,9 @@ module.exports = class Coordinator extends View {
             id: item.slug,
             url: this.rest(route, 'entity', item.slug),
             name: item.properties.name,
-            description: item.properties.description
+            description: item.properties.description,
+            tags: item.properties.tags ?? [],
+            icon: item.properties.icon ?? null
         };
 
         if (full) {
@@ -73,6 +75,7 @@ module.exports = class Coordinator extends View {
             url: this.rest(route, 'user', item.id),
             name: item.properties.name,
             email: item.email,
+            organization: item.properties.organization,
             coordinator: item.coordinator_key_id !== null,
             accesses: item.accesses.map(a => ({
                 id: a,
