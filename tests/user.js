@@ -77,10 +77,10 @@ describe('User Tests', function() {
         let id2 = null;
         let user1 = null; // will be filled in during the first test
         let user2 = null;
-        let admin = { id: 1, url: URLs.user(1), name: process.env.BOOTSTRAP_USER_NAME };
-        let values1 = { name: DATA.name(), email: DATA.pluck(DATA.EMAIL.VALID) };  // pluck to ensure different emails
-        let values2 = { name: DATA.name(), email: DATA.pluck(DATA.EMAIL.VALID) };
-        let update1 = { name: DATA.name() };
+        let admin = { id: 1, url: URLs.user(1), name: process.env.BOOTSTRAP_USER_NAME, organization: process.env.BOOTSTRAP_USER_ORG };
+        let values1 = { name: DATA.name(), email: DATA.pluck(DATA.EMAIL.VALID), organization: DATA.name() };  // pluck to ensure different emails
+        let values2 = { name: DATA.name(), email: DATA.pluck(DATA.EMAIL.VALID), organization: DATA.name() };
+        let update1 = { name: DATA.name(), organization: DATA.name() };
         let all = URLs.user();
 
         before(() => {
@@ -112,12 +112,12 @@ describe('User Tests', function() {
         it('it is present in the user list', () => {
             return Crud.verify_all(all, [
                 admin,
-                { id: id1, url: user1, name: values1.name, email: values1.email }
+                { id: id1, url: user1, email: values1.email, ...values1 }
             ]);
         });
 
         it('it is present when addressed directly', () => {
-            return Crud.verify(user1, { id: id1, url: user1, name: values1.name, email: values1.email });
+            return Crud.verify(user1, { id: id1, url: user1, email: values1.email, ...values1 });
         });
 
         it('cannot add a duplicate user', () => {
@@ -131,12 +131,12 @@ describe('User Tests', function() {
         it('new values are present in the user list', () => {
             return Crud.verify_all(all, [
                 admin,
-                { id: id1, url: user1, name: update1.name, email: values1.email }
+                { id: id1, url: user1, email: values1.email, ...update1 }
             ]);
         });
 
         it('new values are present when addressed directly', () => {
-            return Crud.verify(user1, { id: id1, url: user1, name: update1.name, email: values1.email });
+            return Crud.verify(user1, { id: id1, url: user1, email: values1.email, ...update1 });
         });
 
         it('the second user is not there to start with', () => {
@@ -150,17 +150,17 @@ describe('User Tests', function() {
         it('both are present in the user list', () => {
             return Crud.verify_all(all, [
                 admin,
-                { id: id1, url: user1, name: update1.name, email: values1.email },
-                { id: id2, url: user2, name: values2.name, email: values2.email }
+                { id: id1, url: user1, email: values1.email, ...update1 },
+                { id: id2, url: user2, email: values2.email, ...values2 }
             ]);
         });
 
         it('can find the first user by email', () => {
-            return Crud.verify(URLs.user_email(values1.email), { id: id1, url: user1, name: update1.name, email: values1.email });
+            return Crud.verify(URLs.user_email(values1.email), { id: id1, url: user1, email: values1.email, ...update1 });
         });
 
         it('can find the second user by email', () => {
-            return Crud.verify(URLs.user_email(values2.email), { id: id2, url: user2, name: values2.name, email: values2.email });
+            return Crud.verify(URLs.user_email(values2.email), { id: id2, url: user2, email: values2.email, ...values2 });
         });
 
         it('cannot find a third user by email', () => {
@@ -174,7 +174,7 @@ describe('User Tests', function() {
         it('it is gone from the user list', () => {
             return Crud.verify_all(all, [
                 admin,
-                { id: id2, url: user2, name: values2.name, email: values2.email }
+                { id: id2, url: user2, email: values2.email, ...values2 }
             ]);
         });
 
@@ -197,8 +197,8 @@ describe('User Tests', function() {
 
         let uid = null; // will be filled in during the first test
         let url = null;
-        let admin = { id: 1, url: URLs.user(1), name: process.env.BOOTSTRAP_USER_NAME, coordinator: true };
-        let values = { name: DATA.name(), email: DATA.pick(DATA.EMAIL.VALID) };
+        let admin = { id: 1, url: URLs.user(1), name: process.env.BOOTSTRAP_USER_NAME, organization: process.env.BOOTSTRAP_USER_ORG, coordinator: true };
+        let values = { name: DATA.name(), email: DATA.pick(DATA.EMAIL.VALID), organization: DATA.name() };
         let all = URLs.user();
 
         before(() => {
@@ -228,12 +228,12 @@ describe('User Tests', function() {
         it('it is present in the user list', () => {
             return Crud.verify_all(all, [
                 admin,
-                { id: uid, url: url, name: values.name, email: values.email, coordinator: false }
+                { id: uid, url: url, coordinator: false, ...values }
             ]);
         });
 
         it('it is present when addressed directly', () => {
-            return Crud.verify(url, { id: uid, url: url, name: values.name, email: values.email, coordinator: false });
+            return Crud.verify(url, { id: uid, url: url, coordinator: false, ...values });
         });
 
         it('can promote user to coordinator', () => {
@@ -246,12 +246,12 @@ describe('User Tests', function() {
         it('it is reflected in the user list', () => {
             return Crud.verify_all(all, [
                 admin,
-                { id: uid, url: url, name: values.name, email: values.email, coordinator: true }
+                { id: uid, url: url, coordinator: true, ...values }
             ]);
         });
 
         it('it is reflected when addressed directly', () => {
-            return Crud.verify(url, { id: uid, url: url, name: values.name, email: values.email, coordinator: true });
+            return Crud.verify(url, { id: uid, url: url, coordinator: true, ...values });
         });
 
         it('cannot re-promote user to coordinator', () => {
@@ -271,12 +271,12 @@ describe('User Tests', function() {
         it('it is reflected in the user list', () => {
             return Crud.verify_all(all, [
                 admin,
-                { id: uid, url: url, name: values.name, email: values.email, coordinator: false }
+                { id: uid, url: url, coordinator: false, ...values }
             ]);
         });
 
         it('it is reflected when addressed directly', () => {
-            return Crud.verify(url, { id: uid, url: url, name: values.name, email: values.email, coordinator: false });
+            return Crud.verify(url, { id: uid, url: url, coordinator: false, ...values });
         });
 
         it('cannot re-de-promote user to coordinator', () => {
@@ -300,7 +300,7 @@ describe('User Tests', function() {
 
     describe('user addendum manipulation tests', () => {
 
-        let user = { id: null, name: DATA.name(), email: DATA.pick(DATA.EMAIL.VALID), addendum: { foo: DATA.text() } };
+        let user = { id: null, name: DATA.name(), email: DATA.pick(DATA.EMAIL.VALID), organization: DATA.name(), addendum: { foo: DATA.text() } };
         let admin = { id: 1, url: URLs.user(1), name: process.env.BOOTSTRAP_USER_NAME };
         let url = null;
         let all = URLs.user();
@@ -383,7 +383,7 @@ describe('User Tests', function() {
 
         let id = null; // will be filled in during the first test
         let user = null;
-        let values = { email: DATA.pick(DATA.EMAIL.VALID), name: DATA.name() };
+        let values = { email: DATA.pick(DATA.EMAIL.VALID), name: DATA.name(), organization: DATA.name() };
         let all = URLs.user();
 
         before(() => {
@@ -403,16 +403,25 @@ describe('User Tests', function() {
 
         it('cannot create a user with an invalid name', () => {
             let test = Promise.resolve()
-            .then(() => Crud.bad_request(all, [{ name: DATA.ERRORS.MIN }], { email: values.email }, chakram.post))
+            .then(() => Crud.bad_request(all, [{ name: DATA.ERRORS.MIN }], { email: values.email, organization: values.organization }, chakram.post))
             .then(() => Crud.bad_request(all, [{ name: DATA.ERRORS.MIN }], { ...values, name: null }, chakram.post))
             .then(() => Crud.bad_request(all, [{ name: DATA.ERRORS.MIN }], { ...values, name: '' }, chakram.post))
             .then(() => Crud.bad_request(all, [{ name: DATA.ERRORS.MAX }], { ...values, name: DATA.name(DATA.NAME.LONGEST + 1)}, chakram.post))
             return test;
         });
 
+        it('cannot create a user with an invalid organization', () => {
+            let test = Promise.resolve()
+            .then(() => Crud.bad_request(all, [{ organization: DATA.ERRORS.MIN }], { email: values.email, name: values.name }, chakram.post))
+            .then(() => Crud.bad_request(all, [{ organization: DATA.ERRORS.MIN }], { ...values, organization: null }, chakram.post))
+            .then(() => Crud.bad_request(all, [{ organization: DATA.ERRORS.MIN }], { ...values, organization: '' }, chakram.post))
+            .then(() => Crud.bad_request(all, [{ organization: DATA.ERRORS.MAX }], { ...values, organization: DATA.name(DATA.NAME.LONGEST + 1)}, chakram.post))
+            return test;
+        });
+
         it('cannot create a user with an invalid email', () => {
             let test = Promise.resolve()
-            .then(() => Crud.bad_request(all, [{ email: DATA.ERRORS.MIN }], { name: values.name }, chakram.post))
+            .then(() => Crud.bad_request(all, [{ email: DATA.ERRORS.MIN }], { name: values.name, organization: values.organization }, chakram.post))
             .then(() => Crud.bad_request(all, [{ email: DATA.ERRORS.MIN }], { ...values, email: null }, chakram.post))
             .then(() => Crud.bad_request(all, [{ email: DATA.ERRORS.MIN }], { ...values, email: '' }, chakram.post))
             .then(() => Crud.bad_request(all, [{ email: DATA.ERRORS.MAX }], { ...values, email: DATA.name(DATA.EMAIL.LONGEST + 1) }, chakram.post))
@@ -438,10 +447,19 @@ describe('User Tests', function() {
 
         it('cannot update a user with an invalid name', () => {
             let test = Promise.resolve()
-            .then(() => Crud.bad_request(user, [{ name: DATA.ERRORS.MIN }], { email: values.email }, chakram.put))
+            .then(() => Crud.bad_request(user, [{ name: DATA.ERRORS.MIN }], { email: values.email, organization: values.organization }, chakram.put))
             .then(() => Crud.bad_request(user, [{ name: DATA.ERRORS.MIN }], { ...values, name: null }, chakram.put))
             .then(() => Crud.bad_request(user, [{ name: DATA.ERRORS.MIN }], { ...values, name: '' }, chakram.put))
             .then(() => Crud.bad_request(user, [{ name: DATA.ERRORS.MAX }], { ...values, name: DATA.name(DATA.NAME.LONGEST + 1)}, chakram.put))
+            return test;
+        });
+
+        it('cannot update a user with an invalid organization', () => {
+            let test = Promise.resolve()
+            .then(() => Crud.bad_request(user, [{ organization: DATA.ERRORS.MIN }], { email: values.email, name: values.name }, chakram.put))
+            .then(() => Crud.bad_request(user, [{ organization: DATA.ERRORS.MIN }], { ...values, organization: null }, chakram.put))
+            .then(() => Crud.bad_request(user, [{ organization: DATA.ERRORS.MIN }], { ...values, organization: '' }, chakram.put))
+            .then(() => Crud.bad_request(user, [{ organization: DATA.ERRORS.MAX }], { ...values, organization: DATA.name(DATA.NAME.LONGEST + 1)}, chakram.put))
             return test;
         });
 

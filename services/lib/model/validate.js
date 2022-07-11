@@ -103,6 +103,7 @@ module.exports = class Validate {
     paging(item) {return this.scheme(item, 'paging'); }
     mode(item) { return this.scheme(item, 'session#/mode', 'mode'); }
     name(item) { return this.scheme(item, 'name', 'name'); }
+    organization(item) { return this.scheme(item, 'name', 'organization'); }
     slug(item) { return this.scheme(item, 'slug', 'slug'); }
     user_id(item) { return this.scheme(item, 'userid', 'user id'); }
 
