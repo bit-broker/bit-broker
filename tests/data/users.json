@@ -3,6 +3,7 @@
         "properties": {
             "name": "alice",
             "email": "alice@domain.com",
+            "organization": "acme",
             "addendum": {
                 "opaque1": "lorem ipsum",
                 "opaque2": "dolor sit amet"
@@ -15,6 +16,7 @@
         "properties": {
             "name": "bob",
             "email": "bob@domain.com",
+            "organization": "acme",
             "addendum": {
                 "opaque1": "lorem ipsum",
                 "opaque2": "consectetur adipisicing elit",
@@ -28,6 +30,7 @@
         "properties": {
             "name": "carol",
             "email": "carol@domain.com",
+            "organization": "corp",
             "addendum": {}
         },
         "coordinator": true,
@@ -36,7 +39,8 @@
     {
         "properties": {
             "name": "ted",
-            "email": "ted@domain.com"
+            "email": "ted@domain.com",
+            "organization": "corp"
         },
         "coordinator": false,
         "access": []

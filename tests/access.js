@@ -74,8 +74,8 @@ describe('User Access Tests', function() {
     describe('user access manipulation tests', () => {
 
         let admin = { id: 1, url: URLs.user(1), name: process.env.BOOTSTRAP_USER_NAME, accesses: [] };
-        let user1 = { name: DATA.name(), email: DATA.pluck(DATA.EMAIL.VALID) };  // pluck to ensure different emails
-        let user2 = { name: DATA.name(), email: DATA.pick(DATA.EMAIL.VALID) };
+        let user1 = { name: DATA.name(), email: DATA.pluck(DATA.EMAIL.VALID), organization: DATA.name() };  // pluck to ensure different emails
+        let user2 = { name: DATA.name(), email: DATA.pick(DATA.EMAIL.VALID), organization: DATA.name() };
         let policy1 = DATA.POLICY.ALLAREA;
         let policy2 = DATA.POLICY.EXAMPLE;
         let access1 = []; // filled out as we go
