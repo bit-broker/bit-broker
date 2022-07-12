@@ -8,6 +8,16 @@
         "schema": {
             "type": "object"
         },
+        "tags": {
+            "type": "array",
+            "uniqueItems": true,
+            "maxItems": 16,
+            "items": { "$ref": "bbk://name" }
+        },
+        "icon": {
+            "type": "string",
+            "maxLength": 256
+        },
         "timeseries": {
             "type": "object",
             "propertyNames": { "$ref": "bbk://slug" },

@@ -151,6 +151,7 @@ const DATA = {
         JSON: 'unexpected token',
         ADDITIONAL: 'not allowed to have the additional property',
         MATCH: 'do not match',
+        DUPLICATE: 'contains duplicate',
         REQUIRED: function (item) { return `requires property "${ item }"` },
         WEBHOOK: 'must supply a webhook'
     },
@@ -198,6 +199,17 @@ const DATA = {
         SHORTEST: 1,
         REASONABLE: 32,
         LONGEST: 64
+    },
+
+    ICON: {
+        REASONABLE: 64,
+        LONGEST: 256
+    },
+
+    TAGS: {
+        REASONABLE: 16,
+        LONGEST: 64,
+        MAX: 16
     },
 
     DESCRIPTION: {

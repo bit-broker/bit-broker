@@ -44,7 +44,9 @@ module.exports = class Entity {
             name: body.name || '',
             description: body.description || '',
             schema: body.schema || {},
-            timeseries: body.timeseries || {}
+            timeseries: body.timeseries || {},
+            tags: body.tags ?? [],
+            icon: body.icon ?? ''
         };
     }
 
