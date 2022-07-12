@@ -100,8 +100,8 @@ describe('Coordinator Service Tests', function() {
         let slug2 = DATA.pick(DATA.SLUG.VALID);
         let entity1 = URLs.entity(slug1);
         let entity2 = URLs.entity(slug2);
-        let values1 = { name: DATA.name(), description: DATA.text(DATA.DESCRIPTION.REASONABLE) };
-        let values2 = { name: DATA.name(), description: DATA.text(DATA.DESCRIPTION.REASONABLE + 1) }; // +1 - so as to be different from first
+        let values1 = { name: DATA.name(), description: DATA.text(DATA.DESCRIPTION.REASONABLE), tags: [ DATA.name(), DATA.name(), DATA.name() ] }; // with tags
+        let values2 = { name: DATA.name(), description: DATA.text(DATA.DESCRIPTION.REASONABLE + 1), icon: DATA.name() }; // with icon, +1 - so as to be different from first
         let all = URLs.entity();
 
         before(() => {
@@ -259,10 +259,10 @@ describe('Coordinator Service Tests', function() {
 
     describe('entity validation tests', () => {
         let entity = URLs.entity(DATA.pick(DATA.SLUG.VALID));
-        let values = DATA.some_info();
+        let values = { name: DATA.name(), description: DATA.text(), icon: DATA.name(), tags: [ DATA.name(), DATA.name(), DATA.name() ] };
         let period = DATA.duration();
         let value = DATA.text();
-        let unit =DATA.text();
+        let unit = DATA.text();
 
         function some_name() { return URLs.entity(DATA.slug(DATA.SLUG.REASONABLE)); } // some reasonable name
 
@@ -292,6 +292,23 @@ describe('Coordinator Service Tests', function() {
             return Promise.resolve()
             .then(() => Crud.add_del(some_name(), { ...values, description: DATA.text(DATA.DESCRIPTION.SHORTEST) }))
             .then(() => Crud.add_del(some_name(), { ...values, description: DATA.text(DATA.DESCRIPTION.LONGEST) }));
+        });
+
+        it('allows various valid tags', () => {
+            return Promise.resolve()
+            .then(() => Crud.add_del(some_name(), { ...values, tags: [] }))
+            .then(() => Crud.add_del(some_name(), { ...values, tags: [DATA.name()] }))
+            .then(() => Crud.add_del(some_name(), { ...values, tags: [DATA.text(DATA.TAGS.REASONABLE)] }))
+            .then(() => Crud.add_del(some_name(), { ...values, tags: [DATA.text(DATA.TAGS.LONGEST)] }))
+            .then(() => Crud.add_del(some_name(), { ...values, tags: [DATA.name(), DATA.name()] }))
+            .then(() => Crud.add_del(some_name(), { ...values, tags: new Array(DATA.TAGS.MAX).fill(undefined).map(t => DATA.name()) }))
+        });
+
+        it('allows various valid icons', () => {
+            return Promise.resolve()
+            .then(() => Crud.add_del(some_name(), { ...values, icon: '' }))
+            .then(() => Crud.add_del(some_name(), { ...values, icon: DATA.text(DATA.ICON.REASONABLE) }))
+            .then(() => Crud.add_del(some_name(), { ...values, icon: DATA.text(DATA.ICON.LONGEST) }));
         });
 
         it('allows add with trailing slash', () => {
@@ -327,6 +344,20 @@ describe('Coordinator Service Tests', function() {
             .then(() => Crud.bad_request(some_name(), [{ description: DATA.ERRORS.MIN }], { ...values, description: '' }, chakram.post))
             .then(() => Crud.bad_request(some_name(), [{ description: DATA.ERRORS.MIN }], { ...values, description: null }, chakram.post))
             .then(() => Crud.bad_request(some_name(), [{ description: DATA.ERRORS.MAX }], { ...values, description: DATA.text(DATA.DESCRIPTION.LONGEST + 1) }, chakram.post));
+        });
+
+        it('disallows various invalid tags', () => {
+            return Promise.resolve()
+            .then(() => Crud.bad_request(some_name(), [{ tags: DATA.ERRORS.TYPE }], { ...values, tags: DATA.name() }, chakram.post))
+            .then(() => Crud.bad_request(some_name(), [{ tags: DATA.ERRORS.MIN }], { ...values, tags: [DATA.name(), ''] }, chakram.post))
+            .then(() => Crud.bad_request(some_name(), [{ tags: DATA.ERRORS.MAX }], { ...values, tags: [DATA.name(), DATA.text(DATA.TAGS.LONGEST + 1)] }, chakram.post))
+            .then(() => Crud.bad_request(some_name(), [{ tags: DATA.ERRORS.DUPLICATE }], { ...values, tags: new Array(2).fill(DATA.name()) }, chakram.post))
+            .then(() => Crud.bad_request(some_name(), [{ tags: DATA.ERRORS.MAX }], { ...values, tags: new Array(DATA.TAGS.MAX + 1).fill(undefined).map(t => DATA.name()) }, chakram.post));
+        });
+
+        it('disallows various invalid icon', () => {
+            return Promise.resolve()
+            .then(() => Crud.bad_request(some_name(), [{ icon: DATA.ERRORS.MAX }], { ...values, icon: DATA.text(DATA.ICON.LONGEST + 1) }, chakram.post));
         });
 
         it('disallows various invalid timeseries', () => {
@@ -377,6 +408,23 @@ describe('Coordinator Service Tests', function() {
             .then(() => Crud.update(entity, { ...values, description: DATA.text(DATA.DESCRIPTION.LONGEST) }));
         });
 
+        it('allows update of various valid tags', () => {
+            return Promise.resolve()
+            .then(() => Crud.update(entity, { ...values, tags: [] }))
+            .then(() => Crud.update(entity, { ...values, tags: [DATA.name()] }))
+            .then(() => Crud.update(entity, { ...values, tags: [DATA.text(DATA.TAGS.REASONABLE)] }))
+            .then(() => Crud.update(entity, { ...values, tags: [DATA.text(DATA.TAGS.LONGEST)] }))
+            .then(() => Crud.update(entity, { ...values, tags: [DATA.name(), DATA.name()] }))
+            .then(() => Crud.update(entity, { ...values, tags: new Array(DATA.TAGS.MAX).fill(undefined).map(t => DATA.name()) }))
+        });
+
+        it('allows update of various valid icons', () => {
+            return Promise.resolve()
+            .then(() => Crud.update(entity, { ...values, icon: '' }))
+            .then(() => Crud.update(entity, { ...values, icon: DATA.text(DATA.ICON.REASONABLE) }))
+            .then(() => Crud.update(entity, { ...values, icon: DATA.text(DATA.ICON.LONGEST) }));
+        });
+
         it('disallows update of various invalid names', () => {
             return Promise.resolve()
             .then(() => Crud.bad_request(entity, [{ name: DATA.ERRORS.MIN }], { description: DATA.text() }, chakram.put))
@@ -391,6 +439,20 @@ describe('Coordinator Service Tests', function() {
             .then(() => Crud.bad_request(entity, [{ description: DATA.ERRORS.MIN }], { ...values, description: '' }, chakram.put))
             .then(() => Crud.bad_request(entity, [{ description: DATA.ERRORS.MIN }], { ...values, description: null }, chakram.put))
             .then(() => Crud.bad_request(entity, [{ description: DATA.ERRORS.MAX }], { ...values, description: DATA.text(DATA.DESCRIPTION.LONGEST + 1) }, chakram.put));
+        });
+
+        it('disallows update of various invalid tags', () => {
+            return Promise.resolve()
+            .then(() => Crud.bad_request(entity, [{ tags: DATA.ERRORS.TYPE }], { tags: DATA.name() }, chakram.put))
+            .then(() => Crud.bad_request(entity, [{ tags: DATA.ERRORS.MIN }], { tags: [DATA.name(), ''] }, chakram.put))
+            .then(() => Crud.bad_request(entity, [{ tags: DATA.ERRORS.MAX }], { tags: [DATA.name(), DATA.text(DATA.TAGS.LONGEST + 1)] }, chakram.put))
+            .then(() => Crud.bad_request(entity, [{ tags: DATA.ERRORS.DUPLICATE }], { tags: new Array(2).fill(DATA.name()) }, chakram.put))
+            .then(() => Crud.bad_request(entity, [{ tags: DATA.ERRORS.MAX }], { tags: new Array(DATA.TAGS.MAX + 1).fill(undefined).map(t => DATA.name()) }, chakram.put));
+        });
+
+        it('disallows update of various invalid icons', () => {
+            return Promise.resolve()
+            .then(() => Crud.bad_request(entity, [{ icon: DATA.ERRORS.MAX }], { ...values, icon: DATA.text(DATA.ICON.LONGEST + 1) }, chakram.put));
         });
 
         it('disallows update of various invalid timeseries', () => {
