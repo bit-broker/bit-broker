@@ -50,7 +50,7 @@ module.exports = class Search {
 
         cb(query)
 
-        .then(items => { console.log(items); res.json(items); })
+        .then(items => res.json(items))
         .catch(error => next(error));
     }
 
