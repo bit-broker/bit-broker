@@ -212,6 +212,13 @@ const DATA = {
         MAX: 16
     },
 
+    SEARCH: {
+        SHORTEST: 1,
+        LONGEST: 64,
+        VALID: ['apple', 'apricots', 'avocado', 'blackberries', 'blackcurrant', 'blueberries', 'banana'],
+        EXAMPLES: ['a', 'ap', 'b', 'bl', 'bla', 'blu', 'c', 'AP', 'BL']
+    },
+
     DESCRIPTION: {
         SHORTEST: 1,
         REASONABLE: 64,

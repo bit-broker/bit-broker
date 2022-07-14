@@ -36,6 +36,7 @@ var mocha = new Mocha();
 // --- test case list in preferred order - do NOT include the 'seed' script as this is for developmemnt testing only
 
 mocha.addFile('./coordinator.js');
+mocha.addFile('./search.js');
 mocha.addFile('./contributor.js');
 mocha.addFile('./sessions.js');
 mocha.addFile('./consumer.js');
@@ -49,7 +50,7 @@ mocha.addFile('./access.js');
          many tests cases will be skipped. Use the .env setting
          process.env.TESTS_LOCAL_MODE to state you are test in development
          mode only. */
-         
+
 mocha.addFile('./end2end.js');
 
 // --- run the tests
