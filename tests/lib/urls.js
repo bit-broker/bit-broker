@@ -39,7 +39,8 @@ class URLs {
             entity: process.env.TESTS_COORDINATOR,
             connector: process.env.TESTS_CONTRIBUTOR,
             policy: process.env.TESTS_COORDINATOR,
-            user: process.env.TESTS_COORDINATOR
+            user: process.env.TESTS_COORDINATOR,
+            search: process.env.TESTS_COORDINATOR
         };
     }
 
@@ -67,6 +68,7 @@ class URLs {
     user_coordinator(uid) { return this.rest('user', uid, 'coordinator'); }
     access(uid, pid) { return this.rest('user', uid, 'access', pid); }
     policy(pid, resource) { return this.rest('policy', pid, resource); }
+    search(resource) { return this.rest('search', resource) };
 
     session_open(cid, mode = 'stream') { return this.rest('connector', cid, 'session', 'open', mode); }
     session_action(cid, sid, action = 'upsert') { return this.rest('connector', cid, 'session', sid, action); }

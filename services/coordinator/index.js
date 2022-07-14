@@ -98,6 +98,11 @@ api.router.post('/user/:uid/access/:pid', controller.access.insert);
 api.router.put('/user/:uid/access/:pid', controller.access.update);
 api.router.delete('/user/:uid/access/:pid', controller.access.delete); // rescinds a single user key
 
+// --- search endpoints
+
+api.router.get('/search/user/organization', controller.search.user_org);
+api.router.get('/search/entity/tags', controller.search.entity_tags);
+
 // --- bootstrap the user - add other bootstraps here
 
 controller.user.bootstrap();

@@ -212,6 +212,13 @@ const DATA = {
         MAX: 16
     },
 
+    SEARCH: {
+        SHORTEST: 1,
+        LONGEST: 64,
+        VALID: ['apple', 'apricots', 'avocado', 'blackberries', 'blackcurrant', 'blueberries', 'banana'],
+        EXAMPLES: ['a', 'ap', 'b', 'bl', 'bla', 'blu', 'c', 'AP', 'BL']
+    },
+
     DESCRIPTION: {
         SHORTEST: 1,
         REASONABLE: 64,
@@ -220,7 +227,7 @@ const DATA = {
 
     EMAIL: {
         LONGEST: 256,
-        VALID: ['lorem1@ipsum.com', 'lorem2@ipsum.com', 'lorem3@ipsum.com', 'lorem4@ipsum.com', 'lorem5@ipsum.com', 'lorem6@ipsum.com', 'lorem7@ipsum.com', 'lorem8@ipsum.com'],
+        VALID: ['lorem1@ipsum.com', 'lorem2@ipsum.com', 'lorem3@ipsum.com', 'lorem4@ipsum.com', 'lorem5@ipsum.com', 'lorem6@ipsum.com', 'lorem7@ipsum.com', 'lorem8@ipsum.com', 'lorem9@ipsum.com', 'lorem10@ipsum.com', 'lorem11@ipsum.com', 'lorem12@ipsum.com', 'lorem13@ipsum.com', 'lorem14@ipsum.com', 'lorem15@ipsum.com', 'lorem16@ipsum.com'],
         INVALID: ['foo', 'foo@', '@bar.com', 'foo @ bar.com', 'foo@bar']
     },
 

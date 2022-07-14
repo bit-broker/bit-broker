@@ -32,6 +32,7 @@ const Entity = require('./entity.js');
 const Policy = require('./policy.js');
 const Session = require('./session.js');
 const User = require('./user.js');
+const Search = require('./search.js');
 
 // --- exports
 
@@ -42,5 +43,6 @@ module.exports = {
     entity: new Entity(),
     policy: new Policy(),
     session: new Session(),
-    user: new User()
+    user: new User(),
+    search: new Search()
 };
