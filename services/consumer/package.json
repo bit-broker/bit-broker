@@ -22,7 +22,7 @@
     "ioredis": "^5.1.0",
     "json-keys-sort": "^2.1.0",
     "jsonschema": "^1.4.1",
-    "knex": "^2.1.0",
+    "knex": "^2.2.0",
     "lodash": "^4.17.21",
     "mongo-query-to-postgres-jsonb": "^0.2.15",
     "node-fetch": "^2.6.7",
