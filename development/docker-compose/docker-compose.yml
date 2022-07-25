@@ -36,8 +36,8 @@ services:
     container_name: bbk-coordinator
     image: bbk-coordinator
     depends_on:
-      bbk-database:
-        condition: service_healthy
+      bbk-flyway:
+        condition: service_completed_successfully
       bbk-policy-cache:
         condition: service_healthy
       bbk-auth-service:
@@ -59,8 +59,8 @@ services:
     container_name: bbk-contributor
     image: bbk-contributor
     depends_on:
-      bbk-database:
-        condition: service_healthy
+      bbk-flyway:
+        condition: service_completed_successfully
     ports:
       - 8002:8002
     healthcheck:
@@ -78,8 +78,8 @@ services:
     container_name: bbk-consumer
     image: bbk-consumer
     depends_on:
-      bbk-database:
-        condition: service_healthy
+      bbk-flyway:
+        condition: service_completed_successfully
     ports:
       - 8003:8003
     healthcheck:
@@ -95,7 +95,8 @@ services:
     container_name: bbk-database
     volumes:
       - dbdata:/var/lib/postgresql/data
-      - ../../database:/docker-entrypoint-initdb.d 
+      - ../../database/V0.0bit_broker.sql:/docker-entrypoint-initdb.d/V0.0bit_broker.sql
+      - ../../database/V0.1bit_broker.sql:/docker-entrypoint-initdb.d/V0.1bit_broker.sql
     environment:
       POSTGRES_PASSWORD: "bitbr0ker"
     ports:
@@ -109,6 +110,16 @@ services:
       interval: 4s
       timeout: 4s
       retries: 4
+
+  bbk-flyway:
+    build:
+      context: ../..
+      dockerfile: ./build/flyway/Dockerfile
+    container_name: bbk-flyway
+    command: ['migrate', '-url=jdbc:postgresql://bbk-database:5432/bit_broker', '-schemas=public', '-user=bbk_admin', '-password=bbk_admin_pwd', '-connectRetries=3', '-mixed=true']
+    depends_on:
+      bbk-database:
+        condition: service_started
 
   # --- rate limit service stub
   bbk-rate-limit:
