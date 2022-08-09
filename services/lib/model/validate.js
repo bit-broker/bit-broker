@@ -85,7 +85,7 @@ module.exports = class Validate {
         for (let i = 0; i < errs.length; i++) {
             let reason = errs[i].message;
             let name = errs[i].property.replace(/^instance[\.]?/, property).replace(/\[\d+\]/, '');
-            let match = errs[i].property.match(/^instance\[(\d+)\]/);
+            let match = errs[i].property.match(/\[(\d+)\]/);
             let index = match && match.length && match.length > 1 ? parseInt(match[1]) : null; // first matching group or null
 
             msgs.push(failure.response(name, reason, isNaN(index) ? null : index));
