@@ -102,6 +102,7 @@ api.router.delete('/user/:uid/access/:pid', controller.access.delete); // rescin
 
 api.router.get('/search/user/organization', controller.search.user_org);
 api.router.get('/search/entity/tags', controller.search.entity_tags);
+api.router.get('/search/policy/tags', controller.search.policy_tags);
 
 // --- bootstrap the user - add other bootstraps here
 

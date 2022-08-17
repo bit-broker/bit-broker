@@ -189,6 +189,55 @@ describe('Coordinator Search Tests', function() {
         });
     });
 
+    // --- policy search tests
+
+    describe('policy search tests', () => {
+        let policies = []; // will be filled out during tests
+        let search = URLs.search('policy/tags');
+
+        before(() => {
+            return Shared.empty();
+        });
+
+        after(() => {
+            return Shared.empty();
+        });
+
+        it('can add policies with tags', () => {
+            let tests = [];
+
+            for (let i = 0 ; i < DATA.SEARCH.VALID.length ; i += 2) { // spreads over entities
+                let slug = DATA.pluck(DATA.SLUG.VALID);
+                let tags = DATA.SEARCH.VALID.slice(i, i + 2);
+
+                policies.push(slug);
+                tests.push(Crud.add(URLs.policy(slug), { ...DATA.POLICY.ALLAREA.DETAIL, tags }));
+            }
+
+            return Promise.all(tests);
+        });
+
+        it('can perform policy tag searches', () => {
+            let tests = [];
+
+            for (let i = 0 ; i < DATA.SEARCH.EXAMPLES.length ; i++) {
+                tests.push(search_for(search, DATA.SEARCH.EXAMPLES[i], DATA.SEARCH.VALID));
+            }
+
+            return Promise.all(tests);
+        });
+
+        it('can delete all policies', () => {
+            let tests = [];
+
+            for (let i = 0 ; i < policies.length ; i++) {
+               tests.push(Crud.delete(URLs.policy(policies[i])));
+            }
+
+            return Promise.all(tests);
+        });
+    });
+
     // --- search validation tests
 
     describe('search validation tests', () => {

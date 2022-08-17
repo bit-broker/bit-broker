@@ -143,7 +143,8 @@ module.exports = class Coordinator extends View {
             id: item.slug,
             url: this.rest(route, 'policy', item.slug),
             name: item.properties.name,
-            description: item.properties.description
+            description: item.properties.description,
+            tags: item.properties.tags
         };
 
         if (full) {

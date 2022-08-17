@@ -48,12 +48,24 @@ module.exports = class Search {
                .then(results => results.map(i => i.organization));
     }
 
-    // --- search for entity tags
+    // --- search for tags on given type
 
-    entity_tags(query) {
-        const INNER = "SELECT DISTINCT jsonb_array_elements(properties->'tags') #>> '{}' tag FROM entity";
+    tags(type, query) {
+        const INNER = `SELECT DISTINCT jsonb_array_elements(properties->'tags') #>> '{}' tag FROM ${ type }`;
         return this.db.select(this.db.raw(`tag from (${ INNER }) tags`))
                .whereRaw("tag ~* ?", Search.starts_with(query))  // case independant
                .then(results => results.map(i => i.tag));
+    }
+
+    // --- search for entity tags
+
+    entity_tags(query) {
+        return this.tags('entity', query);
+    }
+
+    // --- search for policy tags
+
+    policy_tags(query) {
+        return this.tags('policy', query);
     }
 }

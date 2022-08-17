@@ -119,6 +119,9 @@
         },
         "policy": {
             "$ref": "#/definitions/_policy"
+        },
+        "tags": {
+            "$ref": "bbk://tags"
         }
     },
     "required": [

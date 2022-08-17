@@ -43,7 +43,8 @@ module.exports = class Policy {
         return {
             name: body.name || '',
             description: body.description || '',
-            policy: body.policy || {}
+            policy: body.policy || {},
+            tags: body.tags ?? []
         };
     }
 
