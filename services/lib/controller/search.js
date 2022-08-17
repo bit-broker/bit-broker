@@ -65,4 +65,10 @@ module.exports = class Search {
     entity_tags(req, res, next) {
         Search.find(req, res, next, query => model.search.entity_tags(query));
     }
+
+    // --- search for policy tags
+
+    policy_tags(req, res, next) {
+        Search.find(req, res, next, query => model.search.policy_tags(query));
+    }
 }

@@ -74,6 +74,7 @@ describe('Policy Tests', function() {
     describe('policy manipulation tests', () => {
 
         let all = url();
+        let tags = [ DATA.name(), DATA.name(), DATA.name() ];
 
         function url(pid, resource) { return URLs.policy(pid, resource); }
 
@@ -89,13 +90,13 @@ describe('Policy Tests', function() {
             return Crud.not_found(url(DATA.POLICY.ALLAREA.ID));
         });
 
-        it('can add a policy', () => {
-            return Crud.add(url(DATA.POLICY.ALLAREA.ID), DATA.POLICY.ALLAREA.DETAIL, url(DATA.POLICY.ALLAREA.ID));
+        it('can add a policy with tags', () => {
+            return Crud.add(url(DATA.POLICY.ALLAREA.ID), { ...DATA.POLICY.ALLAREA.DETAIL, tags } , url(DATA.POLICY.ALLAREA.ID));
         });
 
         it('it is present in the policy list', () => {
             return Crud.verify_all(all, [
-                { id: DATA.POLICY.ALLAREA.ID, url: url(DATA.POLICY.ALLAREA.ID), name: DATA.POLICY.ALLAREA.DETAIL.name, description: DATA.POLICY.ALLAREA.DETAIL.description }
+                { id: DATA.POLICY.ALLAREA.ID, url: url(DATA.POLICY.ALLAREA.ID), name: DATA.POLICY.ALLAREA.DETAIL.name, description: DATA.POLICY.ALLAREA.DETAIL.description, tags }
             ]);
         });
 
@@ -167,6 +168,8 @@ describe('Policy Tests', function() {
 
     describe('policy validation tests', () => {
 
+        let values = DATA.POLICY.ALLAREA.DETAIL;
+
         function url(pid, resource) { return URLs.policy(pid, resource); }
 
         before(() => {
@@ -213,8 +216,27 @@ describe('Policy Tests', function() {
             return test;
         });
 
+        it('disallows various invalid tags', () => {
+            return Promise.resolve()
+            .then(() => Crud.bad_request(url(DATA.POLICY.ALLAREA.ID), [{ tags: DATA.ERRORS.TYPE }], { ...values, tags: DATA.name() }, chakram.post))
+            .then(() => Crud.bad_request(url(DATA.POLICY.ALLAREA.ID), [{ tags: DATA.ERRORS.MIN }], { ...values, tags: [DATA.name(), ''] }, chakram.post))
+            .then(() => Crud.bad_request(url(DATA.POLICY.ALLAREA.ID), [{ tags: DATA.ERRORS.MAX }], { ...values, tags: [DATA.name(), DATA.text(DATA.TAGS.LONGEST + 1)] }, chakram.post))
+            .then(() => Crud.bad_request(url(DATA.POLICY.ALLAREA.ID), [{ tags: DATA.ERRORS.DUPLICATE }], { ...values, tags: new Array(2).fill(DATA.name()) }, chakram.post))
+            .then(() => Crud.bad_request(url(DATA.POLICY.ALLAREA.ID), [{ tags: DATA.ERRORS.MAX }], { ...values, tags: new Array(DATA.TAGS.MAX + 1).fill(undefined).map(t => DATA.name()) }, chakram.post));
+        });
+
         it('can add a policy', () => {
             return Crud.add(url(DATA.POLICY.ALLAREA.ID), DATA.POLICY.ALLAREA.DETAIL, url(DATA.POLICY.ALLAREA.ID));
+        });
+
+        it('allows various valid tags', () => {
+            return Promise.resolve()
+            .then(() => Crud.add_del(url(DATA.slug()), { ...values, tags: [] }))
+            .then(() => Crud.add_del(url(DATA.slug()), { ...values, tags: [DATA.name()] }))
+            .then(() => Crud.add_del(url(DATA.slug()), { ...values, tags: [DATA.text(DATA.TAGS.REASONABLE)] }))
+            .then(() => Crud.add_del(url(DATA.slug()), { ...values, tags: [DATA.text(DATA.TAGS.LONGEST)] }))
+            .then(() => Crud.add_del(url(DATA.slug()), { ...values, tags: [DATA.name(), DATA.name()] }))
+            .then(() => Crud.add_del(url(DATA.slug()), { ...values, tags: new Array(DATA.TAGS.MAX).fill(undefined).map(t => DATA.name()) }))
         });
 
         it('cannot update a policy with an invalid policy object', () => {
@@ -237,6 +259,25 @@ describe('Policy Tests', function() {
             let policy = JSON.parse(JSON.stringify(DATA.POLICY.ALLAREA.DETAIL));
             delete policy.policy.legal_context;
             return Crud.bad_request(url(DATA.POLICY.INVALID.ID), [{ policy: DATA.ERRORS.REQUIRED('legal_context') }], policy, chakram.put);
+        });
+
+        it('disallows update of various invalid tags', () => {
+            return Promise.resolve()
+            .then(() => Crud.bad_request(url(DATA.POLICY.INVALID.ID), [{ tags: DATA.ERRORS.TYPE }], { ...values, tags: DATA.name() }, chakram.put))
+            .then(() => Crud.bad_request(url(DATA.POLICY.INVALID.ID), [{ tags: DATA.ERRORS.MIN }], { ...values, tags: [DATA.name(), ''] }, chakram.put))
+            .then(() => Crud.bad_request(url(DATA.POLICY.INVALID.ID), [{ tags: DATA.ERRORS.MAX }], { ...values, tags: [DATA.name(), DATA.text(DATA.TAGS.LONGEST + 1)] }, chakram.put))
+            .then(() => Crud.bad_request(url(DATA.POLICY.INVALID.ID), [{ tags: DATA.ERRORS.DUPLICATE }], { ...values, tags: new Array(2).fill(DATA.name()) }, chakram.put))
+            .then(() => Crud.bad_request(url(DATA.POLICY.INVALID.ID), [{ tags: DATA.ERRORS.MAX }], { ...values, tags: new Array(DATA.TAGS.MAX + 1).fill(undefined).map(t => DATA.name()) }, chakram.put));
+        });
+
+        it('allows update of various valid tags', () => {
+            return Promise.resolve()
+            .then(() => Crud.update(url(DATA.POLICY.ALLAREA.ID), { ...values, tags: [] }))
+            .then(() => Crud.update(url(DATA.POLICY.ALLAREA.ID), { ...values, tags: [DATA.name()] }))
+            .then(() => Crud.update(url(DATA.POLICY.ALLAREA.ID), { ...values, tags: [DATA.text(DATA.TAGS.REASONABLE)] }))
+            .then(() => Crud.update(url(DATA.POLICY.ALLAREA.ID), { ...values, tags: [DATA.text(DATA.TAGS.LONGEST)] }))
+            .then(() => Crud.update(url(DATA.POLICY.ALLAREA.ID), { ...values, tags: [DATA.name(), DATA.name()] }))
+            .then(() => Crud.update(url(DATA.POLICY.ALLAREA.ID), { ...values, tags: new Array(DATA.TAGS.MAX).fill(undefined).map(t => DATA.name()) }))
         });
 
         it('TODO: significant extra, detailed policy validation tests are required to be inserted here');

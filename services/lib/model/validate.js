@@ -34,7 +34,7 @@ const util = require('util');
 
 // --- scheme list
 
-const SCHEMES = [ 'id', 'guid', 'slug', 'string', 'name', 'description', 'date', 'entity', 'connector', 'session', 'policy', 'user', 'userid', 'user_addendum', 'paging', 'records', 'timeseries', 'search' ]; // we name them here, rather than just iterate the directory
+const SCHEMES = [ 'id', 'guid', 'slug', 'string', 'tags', 'name', 'description', 'date', 'entity', 'connector', 'session', 'policy', 'user', 'userid', 'user_addendum', 'paging', 'records', 'timeseries', 'search' ]; // we name them here, rather than just iterate the directory
 
 // --- validate class (exported)
 
