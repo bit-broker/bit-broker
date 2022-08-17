@@ -193,6 +193,26 @@ describe('Policy Tests', function() {
             return Crud.bad_request(url(DATA.POLICY.INVALID.ID), [{ 'policy.legal_context.type': DATA.ERRORS.ENUM }], DATA.POLICY.INVALID.DETAIL, chakram.post);
         });
 
+        it('cannot add a policy with an invalid data segment', () => {
+            let policies = [
+                { segment: true, error: DATA.ERRORS.UNPARSED },
+                { segment: DATA.slug(), error: DATA.ERRORS.UNPARSED },
+                { segment: { "$foo": DATA.slug() }, error: DATA.ERRORS.UNRECOGNISED },
+                { segment: { "$or": true }, error: DATA.ERRORS.UNPARSED },
+                { segment: { "$and": [] }, error: DATA.ERRORS.UNPARSED }
+            ];
+
+            let test = Promise.resolve()
+
+            for (let i = 0; i < policies.length; i++) {
+                let error = { 'policy.data_segment.segment_query': policies[i].error };
+                let policy = { ...DATA.POLICY.ALLAREA.DETAIL, policy: { data_segment: { segment_query: policies[i].segment }}};
+                test = test.then(() => Crud.bad_request(url(DATA.POLICY.ALLAREA.ID), [ error ], policy, chakram.post));
+            }
+
+            return test;
+        });
+
         it('can add a policy', () => {
             return Crud.add(url(DATA.POLICY.ALLAREA.ID), DATA.POLICY.ALLAREA.DETAIL, url(DATA.POLICY.ALLAREA.ID));
         });

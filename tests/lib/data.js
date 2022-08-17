@@ -152,6 +152,8 @@ const DATA = {
         ADDITIONAL: 'not allowed to have the additional property',
         MATCH: 'do not match',
         DUPLICATE: 'contains duplicate',
+        UNRECOGNISED: 'contains unrecognised operations',
+        UNPARSED: 'cannot be parsed',
         REQUIRED: function (item) { return `requires property "${ item }"` },
         WEBHOOK: 'must supply a webhook'
     },
