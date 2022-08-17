@@ -111,9 +111,15 @@ module.exports = class Validate {
     // --- complex property validators
 
     connector(properties) { return this.scheme(properties, 'connector'); }
-    policy(properties) { return this.scheme(properties, 'policy'); }
     user(properties) { return this.scheme(properties, 'user'); }
     user_addendum(properties) { return this.scheme(properties, 'user_addendum', 'addendum'); }
+    policy(properties) {
+        let errors = this.scheme(properties, 'policy');
+        let segment = properties.policy?.data_segment?.segment_query || {}; // will be an object from previous schema step
+
+        errors = errors.concat(this.query(JSON.stringify(segment)));
+        return errors;
+    }
     entity(properties) {
         let errors = this.scheme(properties, 'entity');
 
@@ -197,6 +203,6 @@ module.exports = class Validate {
             error = 'is-not-valid-json';
         }
 
-        return error ? [locales.__(`error.query-${ error }`, item)] : [];
+        return error ? [ failure.response('policy.data_segment.segment_query', locales.__(`error.query-${ error }`)) ] : [];
     }
 }
