@@ -120,21 +120,21 @@ module.exports = class Catalog {
         let subset = Query.process(query).where;
         if (subset === 'TRUE') subset = 'FALSE';  // by convention, no query = no records on bare catalog calls
         paging = paging || this.DEFAULT_PAGING; // this is optional on this method
-        return this.rows(segment, connectors).whereRaw(subset).limit(paging.limit).offset(paging.offset);
+        return this.rows(segment, connectors).whereRaw(subset).orderBy('catalog.id').limit(paging.limit).offset(paging.offset);
     }
 
     // --- list of entity types
 
     types(segment, connectors, paging) {
         paging = paging || this.DEFAULT_PAGING; // this is optional on this method
-        return this.rows(segment, connectors, false).distinct('entity.slug').limit(paging.limit).offset(paging.offset);
+        return this.rows(segment, connectors, false).distinct('entity.slug').orderBy('entity.slug').limit(paging.limit).offset(paging.offset);
     }
 
     // --- list of entity instances for a given entity type
 
     list(segment, connectors, type, paging) {
         paging = paging || this.DEFAULT_PAGING; // this is optional on this method
-        return this.rows(segment, connectors).where({ 'entity.slug': type }).limit(paging.limit).offset(paging.offset);
+        return this.rows(segment, connectors).where({ 'entity.slug': type }).orderBy('catalog.id').limit(paging.limit).offset(paging.offset);
     }
 
     // --- find an entity instances by id for a given entity type
