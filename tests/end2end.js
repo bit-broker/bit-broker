@@ -169,10 +169,12 @@ describe('End-to-End Tests', function() {
             }
 
             tests.push (Crud.verify_all(URLs.consumer_entity(), entities)); // check entity types
-            tests.push (new Promise(resolve => { headers(coordinator.token); resolve(); })); // back to coordinator key
-            tests.push (Crud.delete(URLs.access(consumer.uid, policy))); // remove the key
 
-            return Promise.all(tests);
+            return Promise.all(tests)
+            .then(() => {
+                headers(coordinator.token);
+                return Crud.delete(URLs.access(consumer.uid, policy));
+            })
         });
     }
 
