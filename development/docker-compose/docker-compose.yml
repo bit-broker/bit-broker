@@ -91,7 +91,7 @@ services:
 
   # --- main database
   bbk-database:
-    image: postgis/postgis:13-3.1-alpine
+    image: postgis/postgis:14-3.3-alpine
     container_name: bbk-database
     volumes:
       - dbdata:/var/lib/postgresql/data
